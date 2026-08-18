@@ -1,6 +1,16 @@
 # MIRA — Project 3
 
-MIRA is a private, authenticated brand-recognition and creative-direction application. This repository contains the Project 3 implementation and verification evidence for the MIRA V3 journey, alongside the separately isolated V4 creative-direction surface that shares the same application platform.
+MIRA is a private, authenticated brand-recognition and creative-direction application. MIRA V4 is the current Project 3 Brand World path from structured creative evidence through Creative DNA to a five-image editorial moodboard. MIRA V3 remains an active, separate recognition product in the same codebase; it has not been superseded in routing or persistence.
+
+## Peer Audit — Start Here
+
+These documents provide factual system information for an independent audit and intentionally exclude the builder's own legal classification or compliance conclusions:
+
+- [System brief for peer audit](MIRA_SYSTEM_BRIEF_FOR_PEER_AUDIT.md)
+- [Architecture for audit](docs/MIRA_ARCHITECTURE_FOR_AUDIT.md)
+- [AI and data inventory](docs/MIRA_AI_AND_DATA_INVENTORY.md)
+- [Detailed technical handoff](docs/MIRA_TECHNICAL_HANDOFF_FOR_CODEX.md)
+- [V4 current state](docs/MIRA_V4_CURRENT_STATE.md)
 
 ## What the application does
 
@@ -42,6 +52,25 @@ pnpm build
 - `evidence/` — connected journey screenshots and generated-output evidence
 - [`MIRA_V3_STAGING_STATUS.md`](MIRA_V3_STAGING_STATUS.md) — concise V3 status and verification summary
 - [`FINAL_PRIVATE_MVP_VERIFICATION.md`](FINAL_PRIVATE_MVP_VERIFICATION.md) — consolidated acceptance evidence
+
+## Repository Map
+
+- `client/` — React/Vite routes and user interfaces for V3, V4, and the partial level-based extension
+- `server/` — Express/tRPC APIs, owner-scoped workflows, model/provider adapters, storage, PDF generation, and tests
+- `shared/` — shared schemas and deterministic campaign contracts
+- `drizzle/` — MySQL/TiDB schema, relations, and migrations
+- `docs/` — current-state, architecture, prompt, environment, provider, and validation documentation
+- `evidence/` — connected V3 journey screenshots, PDFs, transcript material, and validation records
+
+## Current Status
+
+- **Implemented:** V3 recognition and confirmed document outputs; V4 Brand World journey, structured Creative DNA, initial visual directions, one refinement, and final five-image moodboard generation.
+- **Partial:** the `/mira-1` Level 1/Level 2 extension, optional Notion retrieval, provider-dependent live revalidation, and some schema-declared V4 stages without customer-facing implementations.
+- **Optional:** V3 Dakidarts numerology context and consent-gated reference-image analysis.
+- **Not implemented:** an active Human Design provider, automatic V3-to-V4 data transfer, V4 Brand Book/PDF export, or n8n workflow.
+- **Legacy/retained:** older route and field names remain for compatibility; current behavior should be verified from client routing, tRPC procedures, schemas, and tests rather than inferred from names alone.
+
+Useful evidence includes the [V3 screenshot/PDF journey](evidence/journey-30001/), the [V3 transcript package](evidence/journey-60001/), and the [V4 refinement validation](docs/V4_REFINEMENT_RETRY_VALIDATION.md).
 
 ## Deployment and demo limitations
 
