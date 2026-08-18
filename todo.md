@@ -1,0 +1,285 @@
+# Mira V3 Staging TODO
+
+## Current V4 implementation scope
+
+- [x] Implement the approved V4 Moodboard end-to-end journey directly, using the existing V4 architecture and without publishing, redesigning, or changing Mira V3.
+- [x] Complete all approved V4 stages that do not depend on `maria_visual_style.py`, using a clearly marked temporary prompt integration placeholder rather than inventing Maria's visual style.
+- [x] Align Quick Context labels, helper text, CTA, and downstream evidence aliases while retaining existing persisted fields and journey-state transitions.
+- [x] Refine Recognition output into concise evidence extraction, one short transition, and one high-signal next question without increasing question count unnecessarily.
+- [x] Make existing typography options visually understandable with the approved sample phrase and already-available fonts.
+- [x] Add explicit, idempotent, cached five-reference visual-direction generation and selection using existing generation infrastructure.
+- [x] Add exactly one bounded visual-reference refinement round, including selected reasons, optional text, preserve, and avoid evidence.
+- [x] Generate and render the final premium editorial Moodboard from existing Creative DNA, Campaign Compiler, approved visual-reference evidence, and the existing Maria visual-style implementation.
+- [x] Integrate the user-supplied authoritative `maria_visual_style.py` only at the V4 prompt seam, map Creative DNA and stored creative evidence safely, then validate the private final five-image Moodboard journey without publishing.
+- [x] Inspect the received `maria_visual_style(2)(2).py`, preserve its creative principles verbatim, and connect it only through `applyTemporaryMariaVisualStylePlaceholder`.
+- [x] Retain the documented `applyTemporaryMariaVisualStylePlaceholder` as the sole V4 integration seam while delegating to the authoritative Maria layer internally.
+- [x] Complete and document one authenticated private V4 journey through real final five-image Moodboard generation after Maria integration, verifying cache reuse prevents duplicate image calls.
+- [x] Verify by source search and regression that `applyTemporaryMariaVisualStylePlaceholder` is the only Maria integration entrypoint used by V4 Moodboard generation.
+- [x] Verify the final authenticated five-image Moodboard success and cache-reuse evidence are persisted in the V4 validation record.
+- [x] Diagnose and repair the application-level handling of the authenticated Journey 210001 Visual Direction failure reported on 2026-08-10: preserve stored progress, retain safe retry behavior, and surface the upstream usage-exhaustion constraint without duplicate image generation.
+- [x] Translate image-provider usage exhaustion into an explicit V4 Visual Direction retry message while retaining the existing retryable visual-set state.
+- [x] Prepare separate current-state documents for Mira V3, Mira V4, and their implementation differences with practical next-step options for product direction.
+- [x] Produce a repository-grounded, read-only technical handoff of existing Mira V3 and V4 implementation status, seams, schemas, integrations, constraints, and known issues for Codex takeover.
+- [ ] Prepare and deliver a complete secret-safe transfer of the current `mira-v3-staging` source tree through a new private GitHub repository when available, or a VS Code-ready ZIP fallback, including `.env.example` and excluding secrets, dependencies, caches, build output, uploads, and private data.
+- [x] Diagnose and repair the observed authenticated private V4 Creative DNA synthesis failure, retaining safe stage-specific retry behavior and avoiding duplicate image-generation work.
+- [x] Diagnose and repair the refined visual-set persistence failure exposed by the authenticated test journey, retaining the completed initial set and preventing duplicate generation on retry.
+- [x] Diagnose and repair the remaining refined-image generation failure after a successful refined visual-set claim, retaining the user’s selected reference and safe retry behavior.
+- [x] Re-run the authenticated V4 refinement after the signed-URL repair and confirm it completes without an image-input or SSRF error.
+- [x] Add focused regression coverage proving a post-claim refinement image failure is marked retryable while preserving the selected source reference.
+- [x] Remove the stale final-Moodboard placeholder disclosure and verify the visible final-stage language accurately reflects the authoritative Maria visual-direction integration.
+- [x] Preserve successful intermediate data and allow stage-specific retries without duplicate AI or image-generation calls.
+- [x] Add only focused V4 regression tests for final Moodboard completion, visual-reference/refinement bounds, prompt styling, and duplicate-generation protection.
+- [x] Generate and render the final five-image editorial Moodboard from existing Creative DNA, Campaign Compiler, approved visual-reference evidence, and the explicitly marked temporary style-integration placeholder.
+
+- [x] Create an isolated `mira-v3-staging` full-stack project; do not touch Mira V2 code, routes, data, or deployment.
+- [x] Record the V3-only implementation baseline and server-side feature-gate requirement.
+- [x] Add isolated `mira_v3_journeys` table with user ownership, lifecycle state, turn count, active session, timestamps, and soft-deletion fields.
+- [x] Add isolated `mira_v3_sessions` table for session-scoped journey activity and expiry.
+- [x] Add isolated `mira_v3_messages` table for ordered reflective conversation turns and provenance.
+- [x] Add isolated `mira_v3_media_assets` table storing metadata and S3 keys only, never file bytes.
+- [x] Add isolated `mira_v3_consents` table for explicit image-analysis consent and revocation.
+- [x] Add isolated `mira_v3_reflection_revisions` table with immutable versioned Reflection Bundle snapshots and enforce at most one confirmed revision per journey.
+- [x] Add isolated `mira_v3_module_outputs` table for optional provider outputs, including provider, version, raw result, normalized result, and status.
+- [x] Add isolated `mira_v3_render_artifacts` table for three deliverables and their HTML/PDF artifacts.
+- [x] Apply and verify the V3-only database migration without altering existing tables.
+- [x] Add a server-side `MIRA_V3_ENABLED` feature gate that hides all `/mira-v3/*` routes by default.
+- [x] Add a server-side disabled-by-default `MIRA_V3_BIRTH_DATA_ENABLED` flag.
+- [x] Protect every V3 API procedure with authenticated user ownership checks.
+- [x] Implement journey creation, resume, deletion, session expiry, and user-scoped status retrieval.
+- [x] Implement the calm meditation entry screen as the mandatory first journey step.
+- [x] Implement one-primary-question-at-a-time reflective conversation.
+- [x] Implement adaptive follow-up selection grounded in the latest response and prior journey context.
+- [x] Enforce a hard minimum of eight completed user answer turns before synthesis can be called.
+- [x] Implement optional birth-data collection with required date and optional time/place only when the feature flag is enabled.
+- [x] Define a provider-switchable birth-data adapter interface with no dependencies outside the module.
+- [x] Implement a disabled-by-default Dakidarts proof-of-concept adapter with graceful unavailability and no hard dependency.
+- [x] Add a clearly labelled Gene Keys placeholder with no calculation or interpretation.
+- [x] Implement an explicit consent gate before any image can be uploaded.
+- [x] Validate image type, size, count, and ownership on the server.
+- [x] Store uploaded images under the exact `mira-v3/{userId}/{journeyId}/` prefix.
+- [x] Keep uploaded media private and expose only short-lived, ownership-checked access.
+- [x] Implement image deletion and consent revocation behavior.
+- [x] Implement structured, non-judgmental image analysis for color families, texture, silhouette, pattern rhythm, composition, recurring motifs, material cues, emotional atmosphere, and cross-image consistencies.
+- [x] Prohibit scores, rankings, trend judgments, body judgments, sensitive-attribute inference, and unsupported claims in image analysis.
+- [x] Generate a draft Reflection Bundle only after the eight-turn gate.
+- [x] Implement The Mirror confirm-or-edit step before bundle locking.
+- [x] Store edits as new immutable reflection revisions and lock only the explicitly confirmed revision.
+- [x] Prevent all deliverable rendering before a confirmed Reflection Bundle exists, including owner-scoped HTML and PDF routes.
+- [x] Render The Mirror only from the confirmed Reflection Bundle.
+- [x] Render the Brand Soul File only from the confirmed Reflection Bundle with evidence provenance.
+- [x] Render Visuals That Feel Like You only from the confirmed Reflection Bundle with palette, typography, photography, layout, shoot, and website-direction sections.
+- [x] Ensure every visual recommendation cites confirmed reflection evidence or structured image evidence.
+- [x] Build responsive result pages for all three deliverables.
+- [x] Implement server-side HTML-derived PDF downloads for all three deliverables.
+- [x] Record PDF render artifacts and failures without blocking on optional modules.
+- [x] Add deterministic fallback behavior when AI, storage, optional provider, or PDF rendering is unavailable.
+- [x] Add Vitest coverage for feature gates, ownership, eight-turn enforcement, consent, storage prefixes, confirmation locking, deliverable prerequisites, and evidence provenance.
+- [x] Run TypeScript checks, unit tests, production build, and database verification.
+- [x] Run a complete authenticated staging journey and capture representative screenshots.
+- [x] Generate one sample PDF for each deliverable.
+- [x] Measure and document expected OpenAI usage per complete journey.
+- [x] Create the final staging working-status report with blockers and unverified external dependencies.
+- [x] Save exactly one first-delivery checkpoint after all completed items are marked `[x]`.
+- [x] Validate one complete authenticated journey—meditation, eight user turns, Mirror confirmation, three deliverables, and three PDF downloads—before implementing optional image or birth-data features.
+- [x] Implement the owner-scoped deliverable query that rejects every unconfirmed journey and exposes only its owner’s confirmed Reflection Bundle.
+- [x] Implement owner-scoped server HTML/PDF render routes guarded by the same confirmed-revision prerequisite.
+- [x] Add route-level tests proving unconfirmed journeys cannot access deliverable HTML/PDF paths while confirmed journeys can.
+- [x] Diagnose the failed user browser handoff at Manus OAuth without requesting credentials or weakening deployed authentication.
+- [x] Add and remove, or strictly contain, any staging-only validation mechanism needed to exercise the authenticated journey when browser takeover is unavailable.
+- [x] Complete one evidence-recorded journey through meditation, eight stored answers, Mirror confirmation, three deliverables, and three valid PDF downloads.
+- [x] Reproduce and diagnose the `invalid oauth state` callback caused by completing Google sign-in in a browser context that does not retain the originating staging cookie.
+- [x] Validate the core journey with either a fresh same-context OAuth round trip or a development-only authenticated test session that is impossible to activate in production and is removed or disabled before checkpoint.
+- [x] Use the ephemeral, token-protected development owner session to complete browser validation; confirm the route is not registered outside development and never changes the production OAuth callback.
+- [x] Confirm the browser-validation token is single-use, no-store, no-referrer, short-lived, owner-only, and followed by an immediate clean redirect to `/mira-v3`.
+- [x] Prevent valid Mirror model outputs with oversized arrays from failing strict Zod validation and silently degrading to transcript-copy fallback content; normalize bounded arrays before final validation and cover the behavior with Vitest.
+- [x] Allow only an active fallback Mirror draft to be retried into a new immutable draft revision, expose the retry in review UI, and prevent retrying confirmed or non-fallback revisions.
+- [x] Restore the missing `getLatestMiraV3ModuleOutput` database export referenced by the optional-module router and clear the runtime module error.
+- [x] Implement a deterministic, user-visible PDF-render failure path that records a failed artifact without changing confirmed deliverable state.
+- [x] Add Vitest coverage proving PDF-render failure is deterministic, user-visible, and leaves confirmed deliverable state intact.
+- [x] Handle signed-URL storage failure during private image analysis with a deterministic user-visible fail-closed response and persisted failed analysis/module state.
+- [x] Add route regressions for storage-unavailable private image upload and analysis paths, including no orphan upload record and preserved owner journey state.
+- [x] Split and verify the umbrella fallback requirement across AI generation, private storage, optional providers, and PDF rendering before marking it complete.
+- [x] Verify the current private V3 staging URL and assemble a screenshot-led walkthrough covering meditation, conversation, Mirror review, confirmation, both deliverable pages, and PDF downloads.
+- [x] Locate and validate one generated sample PDF for each of the three deliverables before sharing them.
+- [x] Reconfirm every active and disabled feature flag, Dakidarts status, uploaded-image-analysis status, and all remaining blockers before one private real-user test.
+- [x] Deliver a product-only verification pack with the walkthrough evidence and generated PDFs, without architecture discussion.
+- [x] Verify whether `/` still renders the template example and identify the exact route wiring that bypasses the real Mira V3 entry.
+- [x] Replace the placeholder root experience with the private Mira V3 entry while preserving authenticated owner-only journey and result routes.
+- [x] Add or update routing tests proving `/` and `/mira-v3` reach the real Mira V3 experience rather than the template page.
+- [x] Rerun the connected journey from meditation through all three PDF downloads and capture fresh screenshots only from the real interface.
+- [x] Save a new private-staging checkpoint after route, test, build, and end-to-end verification; do not publish publicly.
+- [x] Run a fresh authenticated Mira V3 journey from meditation through eight adaptive answers using the real connected interface and capture every stage.
+- [x] Verify every journey screen and output uses the latest approved Mira V3 prompt lineage, with no placeholder, example, mock, prototype, or debug content.
+- [x] Verify the Mirror uses the latest Recognition Engine and correct any divergence before confirmation.
+- [x] Verify the Brand Soul File uses the latest approved structure and correct any divergence.
+- [x] Verify Visuals That Feel Like You uses the latest approved visual reasoning and correct any divergence.
+- [x] Generate all three PDFs from the fresh session data, open each file, and confirm content, formatting, and absence of debug or placeholder material.
+- [x] Export the Mira V3 System Prompt, Recognition Engine Prompt, Mirror Prompt, Brand Soul File Prompt, Visuals That Feel Like You Prompt, and PDF Generation Prompts into version-controlled Markdown files.
+- [x] Run the complete regression suite, TypeScript check, production build, clean runtime restart, and private browser verification after any fixes.
+- [x] Deliver the connected private staging URL, complete journey screenshots, validated sample PDFs, exact remaining blockers, and private-user-testing readiness assessment.
+- [x] Fix the adaptive conversation client so a successfully persisted answer advances automatically instead of remaining stuck in the Listening state until manual reload.
+- [x] Add a regression for automatic post-answer journey refresh and verify adaptive turns progress without page reload.
+- [x] Replace hash-selected visual swatches with deterministic semantic color matching so named intentions such as deep blue, warm beige, terracotta, and ochre render as truthful colors in the page and PDF.
+- [x] Make semantic color matching use whole-word cues so words such as “trust” cannot accidentally match “rust”.
+- [x] Remove embedded numbers from Visuals That Feel Like You shoot-list text so the ordered page and PDF lists do not display duplicated numbering.
+- [x] Restart private staging after the final route, adaptive-refresh, and visual-deliverable changes; smoke-test `/`, `/mira-v3/journey/30001`, and `/mira-v3/results/30001`; and confirm no post-restart runtime or module errors.
+- [x] Recover and validate the exact chronological Mira question-and-answer transcript for private journey 60001, then deliver it as a clean downloadable Markdown document without altering the user’s wording.
+- [x] Rebuild journey 60001’s transcript from the authoritative 16-row database export, restoring the eighth Mira question omitted by the completed-journey UI.
+- [x] Cross-check the database-ordered transcript against the uploaded Mirror PDF as secondary evidence and deliver the corrected transcript.
+- [x] Document that the uploaded one-page Mirror PDF corroborates the confirmed Mirror sections and quoted turns 1–4, but is not itself a complete conversation transcript; retain the 16-row database export as the authoritative full-session source.
+- [x] Replace the disabled Dakidarts proof-of-concept with a server-side `BirthDataProvider` adapter that calls the official API when configured and degrades safely when credentials or the service are unavailable.
+- [x] Normalize Dakidarts responses into bounded hidden brand-reflection signals without exposing provider terminology, numerology labels, raw numbers, or unsupported certainty to the user.
+- [x] Persist the normalized hidden birth-intelligence output through the existing `birth_data` module contract with private provenance and no additional database tables.
+- [x] Load the latest completed birth-data and image-analysis module outputs during adaptive reflection and pass only compact normalized evidence into the question generator.
+- [x] Add a deterministic multi-signal divergence assessment after sufficient conversation context exists and allow at most two deeper probes framed with “I’m noticing something interesting…” before synthesis.
+- [x] Preserve the eight-answer synthesis gate and credit-efficient journey behavior while ensuring deeper probes compare conversation evidence, hidden birth intelligence, and uploaded-image evidence when available.
+- [x] Add one final multi-evidence Recognition call that compares all available conversation, hidden birth-intelligence, and image signals before document generation.
+- [x] Require every final recommendation to carry multi-signal support or be omitted, while preserving conversation evidence as the authority for personal claims and image evidence as visual-only support.
+- [x] Reuse the single final Recognition result across The Mirror, Brand Soul File, and Visuals That Feel Like You rather than making a separate model call per document.
+- [x] Update the version-controlled Mira V3 prompt archives to match the hidden-signal adaptive-question and final Recognition contracts.
+- [x] Add Vitest regressions for Dakidarts configuration/fallback, normalized-output privacy, bounded contradiction probes, optional-signal behavior, and the final Recognition deliverable gate.
+- [x] Run the full Vitest suite, TypeScript check, production build, clean restart, and a private authenticated journey smoke test without publishing publicly.
+- [x] Save a new private-staging checkpoint after all refinement items are verified and marked complete.
+- [x] Reconcile the previously discussed Mira V3 intake flow with the current UI and identify why birth-date and image-evidence controls are not visible.
+- [x] SUPERSEDED BY USER REFINEMENT — Do not place birth intake before reflection begins; insert it after the first conversation and before the second adaptive conversation.
+- [x] Add a visible optional image-evidence placeholder and consented multi-image upload control before the reflective conversation begins.
+- [x] Connect the visible birth and image inputs to the existing private module-output, consent, storage, and hidden Recognition contracts without exposing provider terminology.
+- [x] Add Vitest coverage for the visible intake state and server procedures, then run the full test suite, TypeScript check, and production build.
+- [x] SUPERSEDED BY USER CREDIT-MINIMIZATION REQUEST — Verify the corrected intake and complete journey in the authenticated private interface, save a new checkpoint, and deliver an accurate chat summary; replaced by complete automated validation plus a read-only authenticated access-control smoke pass.
+- [x] Detect explicit incomprehension responses such as “I don’t understand the question” before saving a reflective answer.
+- [x] Rephrase the current question in simpler, concrete language without incrementing the eight-answer count or advancing the reflection stage.
+- [x] Prevent an incomprehension response on answer eight from unlocking Mirror/report generation until a substantive replacement answer is saved.
+- [x] Add route regressions for early-turn and eighth-turn incomprehension, rephrasing, unchanged turn count, and synthesis blocking.
+- [x] SUPERSEDED BY USER DECISION — Do not configure or call a paid Human Design provider; remove it from the active acceptance scope.
+- [x] Verify a real birth-data submission produces bounded Dakidarts-only output, persists only the approved private summary, and becomes available to adaptive questioning and final Recognition.
+- [x] Surface a clear, non-destructive UI error when Dakidarts is unavailable; never present fallback data as a successful provider result.
+- [x] ACCEPTANCE — Verify the welcome video placeholder is visible in the real authenticated interface.
+- [x] ACCEPTANCE — Verify the first conversation starts and accepts a substantive answer in the real interface.
+- [x] ACCEPTANCE — Verify “I don’t understand” rephrases the same question, does not save an answer, and cannot unlock synthesis.
+- [x] ACCEPTANCE — Verify birth-date intake is visible, validates correctly, and submits successfully through the real interface.
+- [x] ACCEPTANCE — Verify real Dakidarts birth intelligence is connected and demonstrably influences a later question or Recognition result without exposing numerology terminology.
+- [x] ACCEPTANCE — Verify Dakidarts is genuinely connected, or label it plainly as not implemented or blocked in the acceptance report.
+- [x] ACCEPTANCE — Verify a second adaptive conversation appears after birth-data submission.
+- [x] ACCEPTANCE — Verify optional multi-image upload, consent, storage, and analysis work through the real interface.
+- [x] ACCEPTANCE — Verify the Recognition Engine receives and uses every available evidence source for the acceptance journey.
+- [x] ACCEPTANCE — Verify Brand Soul File, Brand Expression Guide, and Shoot Mood Board are generated from the confirmed shared evidence bundle.
+- [x] ACCEPTANCE — Download and open all three PDFs from the real interface, confirming correct document type and non-empty rendering.
+- [x] SUPERSEDED BY USER CREDIT-MINIMIZATION REQUEST — Repeat the entire journey cleanly after all fixes; replaced by the passing full suite, production build, focused two-mode tests, authenticated gating smoke pass, and log inspection.
+- [x] Restrict Dakidarts Tier 1 evidence to Life Path, Destiny, Heart Desire, Personality, Challenge, and Maturity numbers.
+- [x] Restrict Dakidarts Tier 2 evidence to Pinnacle Cycles, Period Cycles, and Essence Cycle, used only to recognize the client’s current transition.
+- [x] Restrict Dakidarts Tier 3 evidence to Hidden Passion, Karmic Lessons, Karmic Debt, and Personal Year as subtle language context only.
+- [x] Exclude every other Dakidarts endpoint and prevent numerology labels, readings, or provider terminology from appearing in the Mira interface or brand documents.
+- [x] Verify conversation remains authoritative and that bounded numerology only improves adaptive questions and multi-evidence pattern recognition.
+- [x] Remove every Human Design provider call, configuration dependency, fallback path, UI reference, prompt reference, test expectation, and acceptance requirement from Mira V3.
+- [x] After the first conversation and before the second adaptive conversation, show an optional birth-intelligence interlude requesting full name at birth, date of birth, birthplace, and optional birth time.
+- [x] Introduce the interlude with the exact approved explanation: “I'd like to personalise your reflection a little further. These details are optional, but they help Mira recognise your patterns more accurately.”
+- [x] Allow users to skip the birth-intelligence interlude without blocking or weakening the core conversation journey.
+- [x] Parse and validate the full birth name privately for Dakidarts name-derived signals while preserving birth-certificate spelling and never exposing it in public module responses.
+- [x] Calculate only the thirteen approved Dakidarts birth-date and birth-name signals, with all numbers, readings, and vendor terminology hidden.
+- [x] Cache each completed Dakidarts profile and reuse it for unchanged birth details to prevent duplicate provider calls and minimise API cost.
+- [x] Enforce Recognition evidence priority in prompts and code: user answers first, repeated conversational patterns second, uploaded images third, and birth intelligence fourth.
+- [x] Limit birth intelligence to increasing confidence, detecting contradictions, inspiring at most one deeper adaptive question when needed, and improving the three final deliverables.
+- [x] Verify birth intelligence never overrides the user’s own words and is omitted when it lacks multi-evidence conversational support.
+- [x] Normalize all thirteen approved calculations into one internal Recognition Layer rather than preserving or reasoning from thirteen signal-level conclusions.
+- [x] Ensure adaptive prompts, Recognition prompts, persistence, logs, and final documents never identify Life Path, Heart Desire, any other calculation, Dakidarts, numerology, numbers, or the internal system behind a conclusion.
+- [x] Require Recognition wording to synthesize coherent cross-evidence patterns such as “Across all available evidence, one pattern consistently appears,” with conversation remaining the primary authority.
+- [x] Verify the single Recognition Layer can only increase confidence, identify recurring patterns, detect contradictions, and improve adaptive questions and final deliverables.
+- [x] Build the single Recognition Layer from the first conversation, language and writing style, optional images, normalized private birth intelligence, and the adaptive follow-up conversation without storing signal-level conclusions.
+- [x] Permit only conversation-supported synthesis of natural strengths, current growth edges, recurring shadow patterns, possible self-misalignment, zone of genius, and naturally fitting work, environments, and creative modes.
+- [x] Prohibit prediction and ensure the Recognition Layer is framed internally around recognition and alignment rather than destiny, certainty, or future outcomes.
+- [x] Enrich the existing Recognition Engine and its three current deliverables without adding report types, user-facing modules, or unnecessary model calls.
+- [x] Repair private image analysis so a consented supported image produces bounded structured visual observations instead of an empty model-response fallback.
+- [x] Repair final Recognition structured output so the live OpenAI synthesis returns the privacy-safe one-layer context instead of silently falling back during Mirror generation.
+- [x] SUPERSEDED BY USER CREDIT-MINIMIZATION REQUEST — Do not spend model or provider credits on another brand-new journey; use deterministic tests, the full regression suite, production build, and one read-only authenticated smoke pass instead.
+- [x] Deliver a substantive final user-facing summary covering the corrected intake, unified Recognition behavior, validation performed, checkpoint ID, and the intentionally deferred paid end-to-end rerun.
+- [x] Save the user-provided specification verbatim as `docs/MIRA_V3_CONSTITUTION.md` and treat it as the sole active architectural source of truth for Mira V3.
+- [x] Audit the current authenticated journey against the Constitution without reconciling superseded historical product decisions.
+- [x] Move required birth name, birth date, birth place, and birth-time-or-unknown intake before Conversation One; do not allow the entire birth stage to be skipped.
+- [x] Keep Conversation One in deep-listening mode with no conclusions, then run the hidden unified Recognition Layer before a distinct non-repeating adaptive Conversation Two.
+- [x] Make the Brand Soul File the only complete Recognition synthesis and require editable user confirmation before visual translation begins.
+- [x] Move optional consented image upload to Visual Translation only, after Brand Soul File confirmation.
+- [x] Produce exactly three final documents: Brand Soul File, Brand Expression Guide, and Shoot Mood Board, with no additional report type.
+- [x] Preserve the hidden Dakidarts boundary, conversation authority, multi-source observation rule, one calm Mira personality, and recognition-not-prediction language.
+- [x] Reuse existing code and batch all Constitution alignment changes into one implementation pass without unnecessary refactoring or extra model calls.
+- [x] Add or update Vitest coverage for the constitutional journey order, required birth stage, two-conversation separation, confirmation gate, visual-only image upload, and exact three-document contract.
+- [x] Run the complete test suite, TypeScript check, and production build for the Constitution-aligned implementation.
+- [x] SUPERSEDED BY USER CREDIT-MINIMIZATION REQUEST — Do not run another paid full journey; authenticated access and confirmation gating were smoke-tested read-only and current logs were inspected.
+- [x] Do not run repeated end-to-end acceptance journeys during implementation; the implementation used one read-only authenticated smoke pass and did not create another credit-consuming generation journey.
+- [x] Ensure the journey feels like one continuous human conversation in which the user is slowly understood, not an assessment, questionnaire, coaching workflow, or visible process to complete.
+- [x] Remove or soften user-facing progress, completion, instruction, and workflow language wherever it disrupts the conversational experience, while preserving working functionality and accessibility.
+- [x] Verify adaptive reflection prompts acknowledge and build on the user’s prior words before opening the next layer, without sounding formulaic, diagnostic, or source-specific.
+- [x] Extend the existing Shoot Mood Board architecture with a default Brand Mood Board mode and a Project Mood Board mode, without redesigning the journey or creating a separate product.
+- [x] Keep Brand Mood Boards timeless and grounded in the confirmed Brand Soul File and Brand Expression Guide.
+- [x] Add an optional Project Mood Board brief covering purpose, audience, platform, location, desired feeling, clothing ideas, references, and practical constraints.
+- [x] Ensure Project Mood Boards preserve the person’s established identity while adapting only the visual execution to the project brief and optional uploaded references.
+- [x] Add targeted Vitest coverage for mood-board mode selection, project-brief validation, identity-source reuse, and access only after Brand Soul confirmation.
+- [x] Review the complete Mira V3 experience as a first premium user without redesigning the journey or revisiting the Constitution.
+- [x] Verify the conversation feels human rather than questionnaire-like and that emotional transitions feel natural and earned from beginning to end.
+- [x] Verify Conversation Two is observably more perceptive than Conversation One while still sounding like the same calm Mira personality.
+- [x] Verify the Brand Soul File performs genuine cross-pattern Recognition rather than paraphrasing or summarizing answers.
+- [x] Verify Project Mood Board feels like a natural contextual extension of the timeless Brand Mood Board, not a separate workflow or product.
+- [x] Identify and correct only material software-like language, mechanical transitions, or Recognition-quality weaknesses using existing architecture.
+- [x] Add or update focused Vitest guards for every material correction discovered during the premium-user review.
+- [x] Run the complete Vitest suite, TypeScript check, production build, authenticated read-only smoke review, and current log inspection after corrections.
+- [x] Save a final reviewed private-staging checkpoint and deliver the premium-user quality assessment.
+- [x] Identify the most recent stored Mira V3 journey and retrieve its authoritative ordered conversation messages without running AI or provider calls.
+- [x] Verify the latest session transcript is chronologically complete and preserve the user’s and Mira’s wording exactly.
+- [x] Deliver the clean latest-session transcript as a downloadable Markdown file with a concise source-verification note.
+- [x] SUPERSEDED BY USER DIRECTION — Stop the repository-wide audit and use the approved Mira V4 implementation brief as the project specification.
+- [x] SUPERSEDED BY USER DIRECTION — Do not continue the standalone birth-data/Human Design/provider audit before the staged implementation.
+- [x] SUPERSEDED BY USER DIRECTION — Replace the standalone journey-cost audit with the approved credit-saving staged implementation plan.
+- [x] SUPERSEDED BY USER DIRECTION — Do not continue the standalone V3 deliverable-defect audit before the staged implementation.
+- [x] SUPERSEDED BY USER DIRECTION — Defer personal-image work and its security review because images are outside the current Stage 1 scope.
+- [x] SUPERSEDED BY USER DIRECTION — Replace the broad audit report with the approved seven-point pre-implementation review and staged approval process.
+- [x] Stage 1: add isolated Mira V4 database tables and owner-scoped persistence without altering any Mira V3 table or behavior.
+- [x] Stage 1: add Mira V4 procedures for authenticated create, list, load, Quick Context save, and Birth Details save with no AI or external birth-provider calls.
+- [x] Stage 1: add the Mira V4 welcome/start/resume experience by reusing the existing Mira shell and authentication patterns.
+- [x] Stage 1: add the Quick Context and Birth Details screens with responsive, premium editorial presentation and a clear stop before Recognition Conversation.
+- [x] Stage 1: add focused tests for V4 schemas, ownership boundaries, input validation, and source-level route/UI guards.
+- [x] Stage 1: apply the V4 migration, run complete validation, visually review desktop/mobile, inspect logs, and save one private checkpoint.
+- [x] Stage 1: deliver the private checkpoint and stop for written approval before Recognition Conversation or any later V4 stage.
+- [x] Stage 2: add isolated V4 Recognition message persistence and owner-scoped conversation loading without changing any Mira V3 table, route, file, or behavior.
+- [x] Stage 2: seed the first Recognition question locally and complete the normal journey at approximately eight stored user answers.
+- [x] Stage 2: reuse the existing OpenAI helper and model configuration for adaptive reflection with no more than one model call per eligible completed answer.
+- [x] Stage 2: add deterministic bridge messages connecting personal answers to future brand and visual direction without model calls.
+- [x] Stage 2: build the V4 Recognition Conversation UI by reusing V3 loading, error, persistence, and conversational presentation patterns.
+- [x] Stage 2: add mocked regressions for ownership, ordering, answer limits, local first question, deterministic bridges, and the one-call-per-answer ceiling.
+- [x] Stage 2: verify no Brand DNA, Visual Discovery, images, Brand Book, PDF, external provider, or Mira V3 change entered the implementation.
+- [x] Stage 2: run complete validation, capture conversation-flow screenshots, inspect logs, save one private checkpoint, and stop for written Stage 3 approval.
+- [x] Stage 3: read and implement the complete approved specification using the smallest reusable Mira V4/V3 patterns without modifying Mira V3.
+- [x] Stage 3: add only the persistence, procedures, and interface explicitly required by the specification; defer Brand DNA, generated images, Brand World, Brand Book, and PDF.
+- [x] Stage 3: enforce the specification’s AI-call controls with deterministic or mocked automated tests and no unnecessary provider calls.
+- [x] Stage 3: validate the complete approved flow, capture responsive screenshots, verify Mira V3 isolation, inspect logs, and save one private checkpoint.
+- [x] Stage 3: report exact modified/new files, AI-call count, tests, screenshots, V3 isolation, and checkpoint; then stop for written approval.
+- [x] Stage 3: add a deterministic post-generation Creative Discovery scope guard so a live response containing forbidden deliverable terms or multiple questions falls back without another AI call.
+- [x] Stage 4: define one authoritative Creative DNA schema for TypeScript typing, structured model output, runtime validation, persistence, mocks, and tests.
+- [x] Stage 4: add one owner-scoped, journey-linked, versioned Creative DNA JSON record with a unique journey constraint and explicit schema/prompt versions.
+- [x] Stage 4: assemble all authoritative Stage 1–3 journey inputs and conversation history without duplicating raw evidence into Creative DNA.
+- [x] Stage 4: implement exactly one structured OpenAI synthesis call for new Creative DNA, with no repair, summary, inspiration-analysis, render-token, image, or Stage 5 calls.
+- [x] Stage 4: validate before persistence, expose retryable failure behavior, and atomically complete the Stage 4 journey checkpoint without holding a transaction open during the model call.
+- [x] Stage 4: enforce idempotency for repeat, refresh, retry, double-click, and supported concurrent requests so existing Creative DNA returns with zero new model calls.
+- [x] Stage 4: preserve inspiration as a private reference plus user explanation with supporting-evidence-only influence and no image analysis.
+- [x] Stage 4: add mocked automated coverage for authentication, ownership, Stage 3 completion, one-call synthesis, zero-call reuse, input assembly, persistence, invalid output, retryability, idempotency, concurrency protection, versions, transition, and inspiration.
+- [x] Stage 4: verify Mira V3 is unchanged and that no Brand World, image generation, PDF, customer-facing Creative DNA UI, or Stage 5 functionality was added.
+- [x] Stage 4: apply the migration, run complete tests/typecheck/build and focused runtime validation, inspect logs, save checkpoint `MIRA_V4_STAGE_4_CREATIVE_DNA_COMPLETE`, report all requested evidence, and stop for Stage 5 approval.
+- [x] Next phase: prepare and deliver a design-only proposal from the approved guidance in `pasted_content_13.txt`; do not modify Stage 4, redesign the journey, or implement the next phase until written approval.
+- [x] Next phase: revise the moodboard design proposal so Creative DNA is sufficient and primary, optional enrichments cannot block generation, and low-cost versus premium five-scene options are compared; do not modify product functionality or implement either option.
+- [x] Next phase: produce the final design-only Moodboard proposal from `pasted_content_14.txt`, superseding prior Moodboard designs where necessary; do not modify Stage 4, Mira V3, the existing journey, or product functionality.
+- [x] Moodboard V1: prepare a read-only pre-call capability validation package for one manually approved composite-image test; make no provider call and add no feature, route, persistence, migration, UI, or Stage 4/V3 change.
+- [x] Moodboard V1: make exactly one approved synthetic `MODEL_GPT_IMAGE_2` medium-quality capability-test request with the immutable fixture/prompt and `originalImages: []`; do not retry, persist, or implement any product feature.
+- [x] Campaign Compiler V1: add an isolated Campaign Plan contract with campaign language, five connected scenes, and shared consistency rules derived only from Creative DNA.
+- [x] Campaign Compiler V1: implement deterministic Creative DNA → Campaign Plan and Campaign Plan → one composite image prompt functions with no model call, persistence, UI, journey, Stage 4, or V3 change.
+- [x] Campaign Compiler V1: add fixture-based tests proving deterministic output, five-scene continuity, Creative DNA rule preservation, and no external/provider invocation.
+- [x] Campaign Compiler V1: run complete validation, verify V3/Stage 4/journey/database/UI isolation, checkpoint, and deliver the schema, implementation, representative output, prompt, changed files, and test evidence before image generation.
+- [x] UX review: assess the current V4 birth details, opening, Recognition, Creative Discovery, inspiration timing, and product arc against approved Creative Director direction; deliver recommendations only with no implementation.
+- [x] Product Alignment Review: revise the UX review so every journey input is assessed by its direct contribution to Creative DNA, Campaign Plan, Moodboard quality, and Brand World; no implementation or redesign.
+- [x] UX alignment: verify the existing map/city and timezone capability can support city selection with automatic country and timezone derivation without an architectural conflict.
+- [x] UX alignment: revise birth details and pause/transition messaging so the customer reaches the Creative Director collaboration earlier while preserving the visual language and optional birth-time calibration.
+- [x] UX alignment: revise Recognition and Creative Discovery prompt objectives and safeguards so every adaptive question fills a named Creative DNA, Campaign Plan, Moodboard, or Brand World evidence gap.
+- [x] UX alignment: keep Creative Brief calibration, make the inspiration explanation conditional on an uploaded image, and surface the approved Creative DNA → Campaign Plan → Moodboard → Brand World destination sequence.
+- [x] UX alignment: add regression coverage, validate the updated journey and city/timezone behavior, verify no Stage 4, Campaign Compiler, Moodboard pipeline, or Mira V3 behavior changed, then checkpoint and report.
+- [x] SUPERSEDED BY USER DIRECT-IMPLEMENTATION INSTRUCTION — V4 screen-by-screen alignment review: maintain a living implementation specification against the user-provided governing direction, beginning with Screen 1, and recommend only minimal corrective changes after all supplied screens are assessed.
+- [x] V4 Screen 1 review: assess the supplied implementation example against the governing V4 direction, identify root causes of any drift, and add only the smallest corrective recommendation to the living specification.
+- [x] V4 access verification: confirm the restored private staging URL loads and provide the current test route instead of the stale preview URL.
+- [x] V4 access recovery: retry the restored private staging route after the user received an unavailable-space error, then restart and re-verify if required.
+- [x] V4 entry action: diagnose and repair the primary-button new-space creation failure shown to the user after the V4 landing page loads.

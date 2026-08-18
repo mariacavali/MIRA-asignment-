@@ -1,0 +1,1917 @@
+[
+  {
+    "id": "mira-ko-v1-001",
+    "title": "Visual naturalness can support sincerity",
+    "principle": "Natural forms and visual cues of naturalness can support perceived brand sincerity, but the effect depends on category fit and broader brand meaning.",
+    "category": "perception_brand_psychology",
+    "summary": "Treat naturalness as one possible route to warmth or sincerity, not as a proxy for a person’s personality.",
+    "visualImplications": "Use organic contours, environmental texture, unforced daylight or material variation when they fit the person and project.",
+    "applicableWhen": "The user seeks human connection, craft, environmental grounding or a less institutional visual register.",
+    "exclusions": "Do not use as a default for women, wellness brands or introversion; it may conflict with a user’s stated preference for precision or graphic clarity.",
+    "tags": [
+      "sincerity",
+      "human",
+      "naturalness",
+      "environment",
+      "texture"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "The visual naturalness effect: Impact of natural logos on brand personality perception",
+    "sourceUrl": "https://onlinelibrary.wiley.com/doi/10.1111/ijcs.12912",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "The visual naturalness effect: Impact of natural logos on brand personality perception",
+        "sourceUrl": "https://onlinelibrary.wiley.com/doi/10.1111/ijcs.12912",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-002",
+    "title": "Distinctiveness needs semantic coherence",
+    "principle": "Visual deviation can improve distinctiveness when it still makes sense for the brand, audience and purpose.",
+    "category": "perception_brand_psychology",
+    "summary": "Differentiation is not maximised by novelty alone; an unfamiliar visual choice needs a coherent connection to the work or story.",
+    "visualImplications": "Identify category conventions, then use one or two intentional departures in light, setting, composition or material rather than changing everything.",
+    "applicableWhen": "The brand needs to stand apart and the user rejects generic category imagery.",
+    "exclusions": "Avoid visual disruption where clarity, regulated-category reassurance or established recognition is the immediate project priority.",
+    "tags": [
+      "differentiation",
+      "memorability",
+      "category-convention",
+      "creative-risk"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Effects of Brand Visual Identity on Consumer Attitude: A Systematic Literature Review",
+    "sourceUrl": "https://www.researchgate.net/publication/380673140_Effects_of_Brand_Visual_Identity_on_Consumer_Attitude_A_Systematic_Literature_Review",
+    "sourceType": "study",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Effects of Brand Visual Identity on Consumer Attitude: A Systematic Literature Review",
+        "sourceUrl": "https://www.researchgate.net/publication/380673140_Effects_of_Brand_Visual_Identity_on_Consumer_Attitude_A_Systematic_Literature_Review",
+        "sourceType": "study",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-003",
+    "title": "Authenticity is conveyed through congruence",
+    "principle": "Perceived genuineness is more likely when visual presentation, expression and stated brand story appear congruent than when a polished style performs an unrelated identity.",
+    "category": "perception_brand_psychology",
+    "summary": "A candid treatment is not automatically authentic; authenticity is a perceived fit between person, context and presentation.",
+    "visualImplications": "Match pose direction, setting, gesture and degree of polish to the user’s confirmed presence and visible proof of work.",
+    "applicableWhen": "The project needs trust, human connection or a return after personal/business change.",
+    "exclusions": "Do not equate “unpolished” with honesty or assume that formal styling is inauthentic.",
+    "tags": [
+      "authenticity",
+      "trust",
+      "presence",
+      "congruence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Brand authenticity on social media: the impact of Instagram ad model genuineness and trustworthiness",
+    "sourceUrl": "https://www.tandfonline.com/doi/abs/10.1080/15252019.2020.1860168",
+    "sourceType": "paper",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Brand authenticity on social media: the impact of Instagram ad model genuineness and trustworthiness",
+        "sourceUrl": "https://www.tandfonline.com/doi/abs/10.1080/15252019.2020.1860168",
+        "sourceType": "paper",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-004",
+    "title": "Memorability benefits from a clear visual anchor",
+    "principle": "Images are more likely to be remembered when a clear, distinctive subject or concept gives the viewer an efficient route into the image.",
+    "category": "perception_brand_psychology",
+    "summary": "Memorability can be supported by a precise visual anchor rather than decorative overload.",
+    "visualImplications": "Choose one primary subject, gesture, visual metaphor or contrast per hero frame; protect it with hierarchy and surrounding restraint.",
+    "applicableWhen": "A campaign needs recognition, a website hero, launch imagery or a memorable point of view.",
+    "exclusions": "Do not strip an editorial story of needed context merely to make it instantly legible.",
+    "tags": [
+      "memorability",
+      "hierarchy",
+      "hero-image",
+      "clarity"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Memorability of visual stimuli and the role of processing efficiency",
+    "sourceUrl": "https://www.nature.com/articles/s44159-025-00512-3",
+    "sourceType": "paper",
+    "sourceDate": "2025",
+    "sources": [
+      {
+        "sourceTitle": "Memorability of visual stimuli and the role of processing efficiency",
+        "sourceUrl": "https://www.nature.com/articles/s44159-025-00512-3",
+        "sourceType": "paper",
+        "sourceDate": "2025"
+      },
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-005",
+    "title": "Authority and warmth are a design tension",
+    "principle": "Authority and approachability can coexist when the image uses directness or structure without removing signs of human presence.",
+    "category": "perception_brand_psychology",
+    "summary": "Treat authority-warmth as a negotiable tension, not a binary choice.",
+    "visualImplications": "Combine a clear gaze, purposeful framing or architectural structure with accessible light, gesture, expression or conversational evidence.",
+    "applicableWhen": "An expert/founder needs credibility without corporate distance.",
+    "exclusions": "Do not prescribe direct gaze, dark tones or formal clothes as universal authority signals.",
+    "tags": [
+      "authority",
+      "warmth",
+      "authority-warmth",
+      "trust",
+      "presence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      },
+      {
+        "sourceTitle": "Brand authenticity on social media: the impact of Instagram ad model genuineness and trustworthiness",
+        "sourceUrl": "https://www.tandfonline.com/doi/abs/10.1080/15252019.2020.1860168",
+        "sourceType": "paper",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-006",
+    "title": "Visual consistency supports recognition",
+    "principle": "Repeated visual choices across a series can help viewers recognise a coherent system, provided variation remains purposeful.",
+    "category": "perception_brand_psychology",
+    "summary": "Consistency is a campaign property: light, palette, framing or material can recur without making every image identical.",
+    "visualImplications": "Choose two or three recurring production rules and vary scene, gesture or crop within them.",
+    "applicableWhen": "A user needs a multi-channel content library, launch campaign or recurring editorial imagery.",
+    "exclusions": "Do not enforce consistency when the project requires distinct chapters or different audience contexts.",
+    "tags": [
+      "consistency",
+      "campaign",
+      "recognition",
+      "visual-system"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "Effects of Brand Visual Identity on Consumer Attitude: A Systematic Literature Review",
+        "sourceUrl": "https://www.researchgate.net/publication/380673140_Effects_of_Brand_Visual_Identity_on_Consumer_Attitude_A_Systematic_Literature_Review",
+        "sourceType": "study",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-007",
+    "title": "Premium is contextual, not a palette",
+    "principle": "Premium perception can be strengthened by coherent restraint, intentional production and controlled hierarchy, but it is not inherent to black, gold, minimalism or distance.",
+    "category": "perception_brand_psychology",
+    "summary": "“Premium” should be translated into the user’s own tension: craft, precision, rarity, intimacy, quiet confidence or material quality.",
+    "visualImplications": "Use disciplined framing, appropriate finish and material/lighting coherence; retain one human or project-specific signal to avoid generic luxury.",
+    "applicableWhen": "The user wants elevated perception while rejecting obvious luxury tropes.",
+    "exclusions": "Do not map premium directly to dark imagery, empty space or impersonal styling.",
+    "tags": [
+      "premium",
+      "restraint",
+      "craft",
+      "raw-polished"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Effects of Brand Visual Identity on Consumer Attitude: A Systematic Literature Review",
+    "sourceUrl": "https://www.researchgate.net/publication/380673140_Effects_of_Brand_Visual_Identity_on_Consumer_Attitude_A_Systematic_Literature_Review",
+    "sourceType": "study",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Effects of Brand Visual Identity on Consumer Attitude: A Systematic Literature Review",
+        "sourceUrl": "https://www.researchgate.net/publication/380673140_Effects_of_Brand_Visual_Identity_on_Consumer_Attitude_A_Systematic_Literature_Review",
+        "sourceType": "study",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "How Much Does a Personal Branding Photoshoot Cost?",
+        "sourceUrl": "https://www.mateusstudios.com/blog/how-much-does-a-personal-branding-photoshoot-cost/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-008",
+    "title": "Close framing increases interpersonal salience",
+    "principle": "Tighter framing foregrounds facial expression and reduces contextual information, creating a stronger sense of interpersonal address or psychological focus.",
+    "category": "photographic_distance_framing",
+    "summary": "Use close framing as a potential route to proximity, not as a universal intimacy rule.",
+    "visualImplications": "Prioritise face, gaze, hand detail or micro-gesture; reduce background competition.",
+    "applicableWhen": "The user wants closeness, personal voice, direct connection or a strong portrait-led hero image.",
+    "exclusions": "Avoid if the subject marks close framing as intrusive, or when the work/process/environment is the essential proof.",
+    "tags": [
+      "proximity",
+      "close-framing",
+      "intimacy",
+      "portrait"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      },
+      {
+        "sourceTitle": "The Hidden Dimension",
+        "sourceUrl": "https://www.penguinrandomhouse.com/books/188035/the-hidden-dimension-by-edward-t-hall/",
+        "sourceType": "book",
+        "sourceDate": "1966"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-009",
+    "title": "Environmental portraiture can make work visible",
+    "principle": "Wider framing can connect a person to the place, tools, people or conditions in which their work is made.",
+    "category": "photographic_distance_framing",
+    "summary": "An environmental portrait is useful when context carries evidence; it is not merely a lifestyle backdrop.",
+    "visualImplications": "Show scale, material, workstation, audience, landscape or architectural relationship when it explains the work.",
+    "applicableWhen": "The user selected process, craft, leadership-in-room, world-building or transformation as visible proof.",
+    "exclusions": "Avoid cluttered context that does not add meaning, or use it when a close emotional address is the primary job.",
+    "tags": [
+      "environment",
+      "environmental-portrait",
+      "visible-proof",
+      "scale"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-010",
+    "title": "Direct gaze creates an interpersonal address",
+    "principle": "Direct gaze can create a sense of address or accountability between represented subject and viewer.",
+    "category": "photographic_distance_framing",
+    "summary": "Use direct gaze as a variable in the relationship to the viewer, not a mandatory confidence performance.",
+    "visualImplications": "Pair direct gaze with the user’s natural expression and sufficient breathing room; use it selectively for hero or statement frames.",
+    "applicableWhen": "The user confirms directness feels natural and the project needs acknowledgement, leadership or personal accountability.",
+    "exclusions": "Do not use when the user experiences it as performative, or when process/story observation is more appropriate.",
+    "tags": [
+      "gaze",
+      "directness",
+      "authority",
+      "connection"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      },
+      {
+        "sourceTitle": "Perception of direct vs. averted gaze in portrait paintings: An fMRI and eye-tracking study",
+        "sourceUrl": "https://www.sciencedirect.com/science/article/pii/S027826261730221X",
+        "sourceType": "paper",
+        "sourceDate": "2018"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-011",
+    "title": "Averted gaze can preserve observation and narrative",
+    "principle": "Off-camera gaze can invite viewers to observe a person in relation to an activity, thought or wider story rather than demanding reciprocal engagement.",
+    "category": "photographic_distance_framing",
+    "summary": "Averted gaze can support process, thought and environmental narrative without implying shyness or detachment.",
+    "visualImplications": "Use looking, listening, making or moving frames as supportive imagery alongside — not necessarily instead of — direct portraiture.",
+    "applicableWhen": "The user feels most natural while making, explaining, moving or being partly observed.",
+    "exclusions": "Do not infer lack of authority from an averted gaze.",
+    "tags": [
+      "gaze",
+      "observation",
+      "process",
+      "presence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-012",
+    "title": "Subject scale changes what the frame proves",
+    "principle": "The proportion of a person to their setting changes whether a frame privileges face, action, environment or scale.",
+    "category": "photographic_distance_framing",
+    "summary": "Subject scale should be selected from the communication job: person-first, process-first or world-first.",
+    "visualImplications": "Use larger subject scale for presence/recognition; smaller scale when location, collective setting or architectural relationship is evidence.",
+    "applicableWhen": "The project has a clear hero-image requirement or a need to show work in context.",
+    "exclusions": "Avoid treating small scale as automatic vulnerability or large scale as automatic power.",
+    "tags": [
+      "subject-scale",
+      "framing",
+      "environment",
+      "authority"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      },
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-013",
+    "title": "Negative space protects a focal relationship",
+    "principle": "Unoccupied space can make the focal subject, gesture or object easier to identify and can create room for copy or a quieter reading pace.",
+    "category": "photographic_distance_framing",
+    "summary": "Negative space is a hierarchy mechanism, not automatically minimalism, loneliness or luxury.",
+    "visualImplications": "Reserve space around a key subject; place it deliberately for platform copy, cropping and visual breathing room.",
+    "applicableWhen": "Website hero, editorial layout, launch content or an image that needs one clear visual thought.",
+    "exclusions": "Avoid excessive empty space when the user needs density, community, process detail or energetic visual evidence.",
+    "tags": [
+      "negative-space",
+      "hierarchy",
+      "composition",
+      "minimal"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-014",
+    "title": "Camera angle should be used with restraint",
+    "principle": "Vertical camera angle can alter the visual relationship between viewer and subject, but its effect is shaped by expression, lens, light and cultural context.",
+    "category": "photographic_distance_framing",
+    "summary": "Use angle to introduce a subtle relational cue, then test it against the person’s natural presence.",
+    "visualImplications": "Eye level can support peer relationship; modest low or high angles can alter scale or attention when they serve a specific story.",
+    "applicableWhen": "A scene needs a deliberate relationship to scale, setting or audience.",
+    "exclusions": "Avoid exaggerated angles as a shortcut for “power” or “vulnerability”; they can quickly become theatrical.",
+    "tags": [
+      "camera-angle",
+      "framing",
+      "relationship",
+      "authority"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-015",
+    "title": "Light direction shapes form before it shapes mood",
+    "principle": "Lighting direction changes visible gradients, surface texture and the sense of three-dimensional form.",
+    "category": "light",
+    "summary": "Start with the physical role of light — form, separation, texture, reflection — before assigning an emotional label.",
+    "visualImplications": "Use side or directional light when form/material needs definition; use broader diffused light when evenness and gentle transitions are needed.",
+    "applicableWhen": "The chosen visual world requires sculptural form, material detail, calm skin rendering or controlled reflection.",
+    "exclusions": "Do not claim that a specific light direction universally produces a brand trait such as authority or trust.",
+    "tags": [
+      "light",
+      "directional-light",
+      "soft-light",
+      "form",
+      "texture"
+    ],
+    "confidence": "high",
+    "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+    "sourceType": "paper",
+    "sourceDate": "2013",
+    "sources": [
+      {
+        "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+        "sourceType": "paper",
+        "sourceDate": "2013"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-016",
+    "title": "Soft light can reduce harsh visual separation",
+    "principle": "Diffused lighting tends to create gentler luminance transitions and less sharply defined shadow boundaries.",
+    "category": "light",
+    "summary": "Softness can support a quieter or more integrated image, but its meaning comes from framing, expression and context as well.",
+    "visualImplications": "Use a broad source, window diffusion or overcast conditions when contour transitions and reflections should remain restrained.",
+    "applicableWhen": "The user repeatedly chooses calm tonal continuity, approachable presence or material gentleness.",
+    "exclusions": "Avoid assuming it is “feminine,” therapeutic or less authoritative; soft light can also be precise and editorial.",
+    "tags": [
+      "soft-light",
+      "calm",
+      "portrait",
+      "finish"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+    "sourceType": "paper",
+    "sourceDate": "2013",
+    "sources": [
+      {
+        "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+        "sourceType": "paper",
+        "sourceDate": "2013"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-017",
+    "title": "Directional light can emphasise texture and separation",
+    "principle": "More directional illumination can reveal contour, material variation and subject-background separation.",
+    "category": "light",
+    "summary": "Treat directionality as a means to create emphasis, depth and visual structure.",
+    "visualImplications": "Use a lateral/key direction, control fill and protect highlights when fabric, architecture, facial contour or material texture needs definition.",
+    "applicableWhen": "The project calls for graphic structure, depth, visible craft or a more sculptural visual register.",
+    "exclusions": "Avoid when harsh separation conflicts with the user’s stated preference for evenness or when technical product clarity needs a different setup.",
+    "tags": [
+      "directional-light",
+      "contrast",
+      "texture",
+      "depth"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+    "sourceType": "paper",
+    "sourceDate": "2013",
+    "sources": [
+      {
+        "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+        "sourceType": "paper",
+        "sourceDate": "2013"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-018",
+    "title": "Contrast is a hierarchy choice",
+    "principle": "Tonal contrast can direct attention by separating elements; a lower-contrast image can integrate elements into a more continuous field.",
+    "category": "light",
+    "summary": "Contrast should be chosen according to where attention must land and how much tension the project can hold.",
+    "visualImplications": "Use contrast to isolate a face, gesture or key material; use restrained contrast when atmosphere or visual continuity should lead.",
+    "applicableWhen": "The project needs either a clear focal point or a quieter, immersive atmosphere.",
+    "exclusions": "Avoid calling high contrast “bold” or low contrast “safe” without checking the rest of the image and the user’s preference.",
+    "tags": [
+      "contrast",
+      "hierarchy",
+      "shadow",
+      "visual-tension"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+        "sourceType": "paper",
+        "sourceDate": "2013"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-019",
+    "title": "Light-from-above is a common perceptual prior",
+    "principle": "People commonly interpret light as coming from above; unusual directions can change perceived illumination and scene stability in controlled experiments.",
+    "category": "light",
+    "summary": "A common light-from-above prior can make conventional overhead or side daylight a stable naturalistic baseline; markedly unusual direction should be a conscious departure.",
+    "visualImplications": [
+      "Use conventional overhead/side daylight when perceptual familiarity is useful.",
+      "Treat underlight or markedly unusual direction as a deliberate visual intervention rather than default realism."
+    ],
+    "applicableWhen": [
+      "A naturalistic portrait, environment or product rendering needs perceptual familiarity."
+    ],
+    "exclusions": [
+      "The source does not justify emotion labels such as “underlight equals danger” for every project; do not overextend a laboratory finding."
+    ],
+    "tags": [
+      "light",
+      "naturalistic",
+      "illumination",
+      "perception"
+    ],
+    "confidence": "high",
+    "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+    "sourceType": "paper",
+    "sourceDate": "2013",
+    "sources": [
+      {
+        "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+        "sourceType": "paper",
+        "sourceDate": "2013"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-020",
+    "title": "High-key and low-key are tonal distributions, not identities",
+    "principle": "High-key and low-key treatments describe the distribution of tones and shadows; their meaning depends on subject, genre, use and culture.",
+    "category": "light",
+    "summary": "Describe the tonal treatment precisely before adding an interpretive mood hypothesis.",
+    "visualImplications": "Use high-key for a light-dominant tonal field or low-key for selective highlights within a dark field when confirmed by visual preference and purpose.",
+    "applicableWhen": "The user makes a repeated tonal preference and the platform/setting can support the treatment.",
+    "exclusions": "Do not label high-key as automatically joyful or low-key as automatically luxury, serious or mysterious.",
+    "tags": [
+      "high-key",
+      "low-key",
+      "tonal-range",
+      "finish"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+    "sourceType": "paper",
+    "sourceDate": "2013",
+    "sources": [
+      {
+        "sourceTitle": "Lighting direction and visual field modulate perceived intensity of illumination",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3870952/",
+        "sourceType": "paper",
+        "sourceDate": "2013"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-021",
+    "title": "Colour is relational",
+    "principle": "A colour’s appearance and salience are affected by its neighbours, light, material, screen/print context and proportion in the frame.",
+    "category": "colour",
+    "summary": "Treat palette selection as a relationship of tones and placement, not as isolated “meaningful colours.”",
+    "visualImplications": "Test dominant/background/accent roles and ensure the palette works with skin tone, environment and product use.",
+    "applicableWhen": "A campaign needs coherence across scenes or a focal accent is needed.",
+    "exclusions": "Do not generate direction from one named colour alone.",
+    "tags": [
+      "colour",
+      "palette",
+      "context",
+      "salience"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Using Color to Enhance Your Design",
+    "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+    "sourceType": "professional-source",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Using Color to Enhance Your Design",
+        "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+        "sourceType": "professional-source",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Color and Culture: Practice and Meaning from Antiquity to Abstraction",
+        "sourceUrl": "https://books.google.com/books?id=oq_GtjmoTNgC",
+        "sourceType": "book",
+        "sourceDate": "2018"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-022",
+    "title": "Saturation is an attention allocation tool",
+    "principle": "Higher chromatic intensity can increase salience, while restrained saturation can reduce competition and support a more tonal reading.",
+    "category": "colour",
+    "summary": "Use saturation to determine what should lead the eye, not as a universal energy or premium setting.",
+    "visualImplications": "Reserve saturated colour for a focal object, material, set element or moment; keep supporting tones quieter when hierarchy matters.",
+    "applicableWhen": "The visual system needs a clear focal path or the user wants energy without visual overload.",
+    "exclusions": "Avoid blanket rules such as desaturated equals sophisticated or saturated equals playful; audience and visual context matter.",
+    "tags": [
+      "saturation",
+      "salience",
+      "colour",
+      "hierarchy"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Using Color to Enhance Your Design",
+    "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+    "sourceType": "professional-source",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Using Color to Enhance Your Design",
+        "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+        "sourceType": "professional-source",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-023",
+    "title": "Palette consistency supports series coherence",
+    "principle": "Restricting and repeating a palette can help separate images read as one system, especially when scene variables change.",
+    "category": "colour",
+    "summary": "Palette is one of several continuity devices; it works alongside light, composition, styling and story.",
+    "visualImplications": "Define a dominant tonal family and one accent/contrast behaviour across a series.",
+    "applicableWhen": "Campaign, launch, content library or a coherent five-scene direction.",
+    "exclusions": "Do not force an identical palette where the project needs genuinely different locations or narrative chapters.",
+    "tags": [
+      "palette-consistency",
+      "campaign",
+      "colour",
+      "coherence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "Using Color to Enhance Your Design",
+        "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+        "sourceType": "professional-source",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-024",
+    "title": "Monochrome shifts emphasis toward tone and form",
+    "principle": "Removing hue can place greater attention on luminance, line, texture and the relationship between light and shadow.",
+    "category": "colour",
+    "summary": "Use monochrome when colour is not the key carrier of meaning and tonal structure needs to lead.",
+    "visualImplications": "Prioritise lighting, material, gesture and composition; ensure the conversion retains useful separation.",
+    "applicableWhen": "Editorial portraiture, archival-feeling material, sculptural form or a series where palette would distract from structure.",
+    "exclusions": "Avoid when colour conveys product information, cultural relevance or a central part of the brand’s desired expression.",
+    "tags": [
+      "monochrome",
+      "tone",
+      "texture",
+      "form"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Using Color to Enhance Your Design",
+    "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+    "sourceType": "professional-source",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Using Color to Enhance Your Design",
+        "sourceUrl": "https://www.nngroup.com/articles/color-enhance-design/",
+        "sourceType": "professional-source",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Color and Culture: Practice and Meaning from Antiquity to Abstraction",
+        "sourceUrl": "https://books.google.com/books?id=oq_GtjmoTNgC",
+        "sourceType": "book",
+        "sourceDate": "2018"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-025",
+    "title": "Colour symbolism requires audience context",
+    "principle": "Colour associations vary by culture, history, sector and context; a universal colour-psychology lookup table is unreliable.",
+    "category": "colour",
+    "summary": "Use culturally situated colour research and user preference as the primary guides.",
+    "visualImplications": "Ask what a palette must communicate in this audience/context, then validate it against existing brand assets and user references.",
+    "applicableWhen": "International, multicultural or culturally specific projects; any project relying on symbolic colour.",
+    "exclusions": "Never assert that a colour always means trust, femininity, danger, luxury or calm.",
+    "tags": [
+      "colour",
+      "culture",
+      "semiotics",
+      "caveat"
+    ],
+    "confidence": "high",
+    "sourceTitle": "Color and Culture: Practice and Meaning from Antiquity to Abstraction",
+    "sourceUrl": "https://books.google.com/books?id=oq_GtjmoTNgC",
+    "sourceType": "book",
+    "sourceDate": "2018",
+    "sources": [
+      {
+        "sourceTitle": "Color and Culture: Practice and Meaning from Antiquity to Abstraction",
+        "sourceUrl": "https://books.google.com/books?id=oq_GtjmoTNgC",
+        "sourceType": "book",
+        "sourceDate": "2018"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-026",
+    "title": "Movement can make process visible",
+    "principle": "Gesture, walking, making or transitional moments can show how work happens and can reduce the pressure to “pose.”",
+    "category": "movement_stillness",
+    "summary": "Movement should be chosen because it reveals presence, process or energy, not because motion is inherently more authentic.",
+    "visualImplications": "Use hands, turn, walk, conversation or working actions; select shutter/blur treatment according to legibility needs.",
+    "applicableWhen": "The user identifies making, explaining, moving or being observed as their natural presence.",
+    "exclusions": "Avoid movement that obscures the person, compromises a needed still hero portrait or feels forced for a naturally contained subject.",
+    "tags": [
+      "movement",
+      "gesture",
+      "process",
+      "presence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-027",
+    "title": "Stillness can create a deliberate visual pause",
+    "principle": "A held, contained frame can make gaze, posture, material and composition easier to read.",
+    "category": "movement_stillness",
+    "summary": "Stillness is useful for clarity and intention; it does not have to feel rigid or corporate.",
+    "visualImplications": "Use stable stance, quiet gesture and a considered focal relationship; introduce life through expression, texture or light.",
+    "applicableWhen": "The user prefers restraint, focus, precision or a quieter portrait relationship.",
+    "exclusions": "Avoid interpreting stillness as lack of energy, or use it when the project depends on visible action and transformation.",
+    "tags": [
+      "stillness",
+      "restraint",
+      "presence",
+      "portrait"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      },
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-028",
+    "title": "Gesture can carry expertise without props",
+    "principle": "Hands, stance and interaction with a material or space can make thinking, making or explaining legible.",
+    "category": "movement_stillness",
+    "summary": "Gesture is a potential proof surface: it should reveal a real relationship to work, not decorate the frame.",
+    "visualImplications": "Photograph hands in use, an explaining gesture, material handling or a body orientation that follows the activity.",
+    "applicableWhen": "The brand needs to show method, craft, teaching, leadership or transformation.",
+    "exclusions": "Avoid generic laptop, coffee-cup or pointing gestures when they do not reflect the user’s actual work.",
+    "tags": [
+      "gesture",
+      "expertise",
+      "visible-proof",
+      "hands"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-029",
+    "title": "Leading lines can guide attention to a proof point",
+    "principle": "In an eye-tracking study, leading-line composition with a prominent subject influenced attention toward key elements and was associated with longer viewing and higher ratings of direction/aesthetics.",
+    "category": "composition",
+    "summary": "Use leading lines as a controlled route into the image when a key subject or action needs to be discovered quickly.",
+    "visualImplications": "Use architecture, paths, shadows, table edges or repeated forms to direct attention toward the person, gesture or object that carries meaning.",
+    "applicableWhen": "A frame needs a clear visual entry and a primary proof point.",
+    "exclusions": "The study is narrow and does not show that leading lines fit every image; avoid using them when subtlety or visual stillness is the stronger need.",
+    "tags": [
+      "composition",
+      "leading-lines",
+      "hierarchy",
+      "attention"
+    ],
+    "confidence": "high",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-030",
+    "title": "Visual density changes reading pace",
+    "principle": "The number and relationship of elements in a frame affect how much visual information a viewer must organise.",
+    "category": "composition",
+    "summary": "Density should follow the amount of story, community, material or process the image needs to hold.",
+    "visualImplications": "Use fewer elements and more separation for a single statement; use layered detail when multiple proof surfaces or environments create meaning.",
+    "applicableWhen": "The project needs either immediate clarity or rich contextual storytelling.",
+    "exclusions": "Do not make minimalism the default for premium brands or density the default for energetic brands.",
+    "tags": [
+      "visual-density",
+      "composition",
+      "hierarchy",
+      "minimal-expressive"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-031",
+    "title": "Symmetry can stabilise; asymmetry can activate",
+    "principle": "Symmetrical and asymmetrical compositions create different distribution of visual weight, but their meaning depends on subject, context and degree.",
+    "category": "composition",
+    "summary": "Use balance as a way to regulate visual energy and formal structure, not as a shortcut to personality labels.",
+    "visualImplications": "Use symmetry or centred geometry for formal order; use asymmetric weight/diagonal movement for a more active path through a frame.",
+    "applicableWhen": "The creative direction needs a deliberate relation to order, dynamism or architecture.",
+    "exclusions": "Avoid claiming symmetry always means authority or asymmetry always means creativity.",
+    "tags": [
+      "symmetry",
+      "asymmetry",
+      "composition",
+      "controlled-spontaneous"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-032",
+    "title": "Central framing can make the subject the proposition",
+    "principle": "Placing a subject centrally can create directness and reduce ambiguity about what the frame wants the viewer to notice.",
+    "category": "composition",
+    "summary": "Central framing is one valid hierarchy choice; it can feel formal, iconic, intimate or graphic depending on other variables.",
+    "visualImplications": "Use a central subject for a statement portrait, cover/hero frame or a clear campaign anchor.",
+    "applicableWhen": "The project needs immediate personal recognition or a direct proposition.",
+    "exclusions": "Avoid it if the user wants environmental exploration, subtle observation or a more distributed narrative.",
+    "tags": [
+      "central-framing",
+      "hero-image",
+      "hierarchy",
+      "intimate-iconic"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-033",
+    "title": "Off-centre framing can create room for relation",
+    "principle": "Off-centre placement can introduce space for environment, copy, gaze direction or an implied next visual event.",
+    "category": "composition",
+    "summary": "Use off-centre framing to create a relationship between person and space, not merely to follow a formula.",
+    "visualImplications": "Leave look-room, copy space or room for an environmental proof surface; guide the eye with contrast or line.",
+    "applicableWhen": "The image needs platform flexibility, environmental story or a less declarative portrait relationship.",
+    "exclusions": "Avoid when the key subject becomes ambiguous or platform crops remove the intended balance.",
+    "tags": [
+      "off-centre",
+      "composition",
+      "copy-space",
+      "environment"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-034",
+    "title": "Depth and layering can connect a person to a world",
+    "principle": "Foreground, midground and background relationships can help a frame show depth, place and multiple levels of evidence.",
+    "category": "composition",
+    "summary": "Layering is useful only when each plane contributes to the story or directs attention; it is not an automatic mark of sophistication.",
+    "visualImplications": "Use doorways, materials, reflections, working surfaces or people at different distances to create meaningful spatial relation.",
+    "applicableWhen": "The project needs world-building, craft, place or a more cinematic sense of environment.",
+    "exclusions": "Avoid if layers create distraction, crowd the subject or conflict with a minimal desired reading.",
+    "tags": [
+      "depth",
+      "layering",
+      "environment",
+      "cinematic"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-035",
+    "title": "Focal hierarchy should protect the message",
+    "principle": "Composition is stronger when the viewer can identify what should be noticed first, then what is available to discover after.",
+    "category": "composition",
+    "summary": "Prioritise a primary focal point and use contrast, scale, line, focus or colour to support it.",
+    "visualImplications": "Specify the primary visual message for every hero scene; give secondary details a supporting rather than competing role.",
+    "applicableWhen": "A scene has a defined project message, visible proof or key action.",
+    "exclusions": "Avoid an overly simplified focal hierarchy when a deliberate dense editorial or communal scene is the desired message.",
+    "tags": [
+      "hierarchy",
+      "focal-point",
+      "clarity",
+      "composition"
+    ],
+    "confidence": "high",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-036",
+    "title": "Environment can function as evidence",
+    "principle": "A setting can make claims about the work more believable when it shows a real relationship to process, audience, craft or scale.",
+    "category": "environment_architecture_nature",
+    "summary": "Use environment for proof, not for generic lifestyle decoration.",
+    "visualImplications": "Select spaces that reveal how work is made, where leadership happens, what material matters or what world the person is building.",
+    "applicableWhen": "The user needs to show process, craft, leadership, context or transformation.",
+    "exclusions": "Avoid a location merely because it looks aspirational if it contradicts the person’s work or preference.",
+    "tags": [
+      "environment",
+      "visible-proof",
+      "founder",
+      "storytelling"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-037",
+    "title": "Built structure can provide visual order",
+    "principle": "Architecture, repeated geometry and constructed lines can offer a framework for form, scale and visual organisation.",
+    "category": "environment_architecture_nature",
+    "summary": "Built environment can support a need for structure without automatically reading as cold, corporate or masculine.",
+    "visualImplications": "Use rhythm, geometry, thresholds and materials as compositional tools; soften them through light, human scale or tactile detail when appropriate.",
+    "applicableWhen": "The brand needs structure, systems thinking, innovation, precision or a clear visual framework.",
+    "exclusions": "Do not default to offices or glass towers; avoid when nature, domesticity or material craft are more truthful evidence.",
+    "tags": [
+      "architecture",
+      "structure",
+      "environment",
+      "authority-warmth"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+    "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "Impact of Leading Line Composition on Visual Cognition: An Eye-Tracking Study",
+        "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11763225/",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-038",
+    "title": "Organic settings can support continuity with material or place",
+    "principle": "Natural light, landscape, plants, weather and organic material can provide a contextual relationship to care, time, making or physical environment.",
+    "category": "environment_architecture_nature",
+    "summary": "Organic context should be chosen for a real connection to the user’s work, story or desired sensory register.",
+    "visualImplications": "Use natural texture, open air, landscape scale or seasonal material when those are genuine proof or a confirmed preference.",
+    "applicableWhen": "The work connects to place, material, sustainability, body, cyclical process or an unbuilt visual world.",
+    "exclusions": "Do not use plants/nature as a generic shorthand for wellness, softness or femininity.",
+    "tags": [
+      "nature",
+      "organic",
+      "environment",
+      "material"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "The visual naturalness effect: Impact of natural logos on brand personality perception",
+    "sourceUrl": "https://onlinelibrary.wiley.com/doi/10.1111/ijcs.12912",
+    "sourceType": "paper",
+    "sourceDate": "2024",
+    "sources": [
+      {
+        "sourceTitle": "The visual naturalness effect: Impact of natural logos on brand personality perception",
+        "sourceUrl": "https://onlinelibrary.wiley.com/doi/10.1111/ijcs.12912",
+        "sourceType": "paper",
+        "sourceDate": "2024"
+      },
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-039",
+    "title": "Scale can locate a person within a system",
+    "principle": "The relative scale of person, object and environment can show whether the image is about individual presence, collective setting, process or world-building.",
+    "category": "environment_architecture_nature",
+    "summary": "Scale is a story decision that should be set by the project’s proof requirement.",
+    "visualImplications": "Place a person in relation to a large room, site, landscape, work surface or group when the relationship itself communicates something.",
+    "applicableWhen": "The project needs contextual authority, innovation, community, location or a visible operating world.",
+    "exclusions": "Avoid overusing monumental scale when it makes the person anonymous or contradicts desired intimacy.",
+    "tags": [
+      "scale",
+      "environment",
+      "architecture",
+      "world-building"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Reading Images: The Grammar of Visual Design",
+    "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+    "sourceType": "book",
+    "sourceDate": "2021",
+    "sources": [
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      },
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-040",
+    "title": "Material can carry craft and sensory information",
+    "principle": "Material surfaces can make a project feel more specific by showing how light, touch, wear, reflection and making operate in its world.",
+    "category": "material_texture_finish",
+    "summary": "Material selection is strongest when it relates to the actual offer, practice or user preference.",
+    "visualImplications": "Use wood, paper, textile, stone, metal, glass, skin, ink or work materials as visual evidence and as light/texture modifiers.",
+    "applicableWhen": "Craft, embodiment, product/service materiality or a desire for a more tactile visual world is present.",
+    "exclusions": "Do not assign honesty, luxury or gender to a material without project and audience context.",
+    "tags": [
+      "material",
+      "texture",
+      "craft",
+      "tactile"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-041",
+    "title": "Tactile finish can preserve human specificity",
+    "principle": "Visible grain, fibre, weather, skin texture or imperfect surface can retain a sense of material contact and human specificity.",
+    "category": "material_texture_finish",
+    "summary": "A tactile finish is a degree of surface treatment, not an automatic authenticity claim.",
+    "visualImplications": "Allow texture and natural variation where they strengthen craft, place, body or a less generic visual register.",
+    "applicableWhen": "The user values material, lived-in context, craft or a human rather than frictionless image world.",
+    "exclusions": "Avoid using “raw” finish as a default substitute for honest storytelling; technical or premium work may need a cleaner treatment.",
+    "tags": [
+      "tactile",
+      "texture",
+      "raw-polished",
+      "human"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "Brand authenticity on social media: the impact of Instagram ad model genuineness and trustworthiness",
+        "sourceUrl": "https://www.tandfonline.com/doi/abs/10.1080/15252019.2020.1860168",
+        "sourceType": "paper",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-042",
+    "title": "Sleek finish can support precision when it fits",
+    "principle": "Clean surfaces, controlled reflections and restrained retouching can support a reading of precision, system or technical clarity.",
+    "category": "material_texture_finish",
+    "summary": "Sleekness is an execution choice that requires a real link to the work or visual preference.",
+    "visualImplications": "Use controlled materials, neat separation and precise finishing when the project needs legibility, technical process or modern structure.",
+    "applicableWhen": "Technology, design, architecture, product clarity or a user-confirmed desire for a refined visual register.",
+    "exclusions": "Do not equate sleek with impersonal or superior; it may conflict with a craft-led or tactile project.",
+    "tags": [
+      "sleek",
+      "precision",
+      "finish",
+      "modernity"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "How Much Does a Personal Branding Photoshoot Cost?",
+        "sourceUrl": "https://www.mateusstudios.com/blog/how-much-does-a-personal-branding-photoshoot-cost/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-043",
+    "title": "Production finish should match the claim",
+    "principle": "The degree of polish should be calibrated to the work’s promise, the audience’s expectations and the user’s demonstrated preference.",
+    "category": "material_texture_finish",
+    "summary": "High production can signal deliberateness, but it cannot substitute for meaningful visual evidence.",
+    "visualImplications": "Decide where production value belongs: lighting control, location, styling, retouching or set detail; leave other aspects more human where appropriate.",
+    "applicableWhen": "A campaign, launch or premium service needs a controlled visual standard.",
+    "exclusions": "Avoid over-polishing a project that needs ordinary access, process visibility or stated naturalness.",
+    "tags": [
+      "finish",
+      "raw-polished",
+      "production",
+      "congruence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "How Much Does a Personal Branding Photoshoot Cost?",
+    "sourceUrl": "https://www.mateusstudios.com/blog/how-much-does-a-personal-branding-photoshoot-cost/",
+    "sourceType": "professional-source",
+    "sourceDate": "2025",
+    "sources": [
+      {
+        "sourceTitle": "How Much Does a Personal Branding Photoshoot Cost?",
+        "sourceUrl": "https://www.mateusstudios.com/blog/how-much-does-a-personal-branding-photoshoot-cost/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-044",
+    "title": "Founder imagery should show a reason to trust",
+    "principle": "Founder photography can combine recognition of the person with evidence of how they think, make, lead or relate to an audience.",
+    "category": "founder_personal_brand",
+    "summary": "A strong founder image does not need props by default; it needs a visible relationship to the real work.",
+    "visualImplications": "Mix portrait-led recognition with process, environment, gesture, conversation or material evidence selected from the user’s proof surfaces.",
+    "applicableWhen": "Website, launch, press, speaking, expert trust or a personal-brand refresh.",
+    "exclusions": "Avoid generic laptop/desk/coffee imagery unless those objects genuinely explain the person’s work.",
+    "tags": [
+      "founder",
+      "trust",
+      "expertise",
+      "visible-proof"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-045",
+    "title": "Image formats should follow use hierarchy",
+    "principle": "A content library becomes more useful when its crops, orientation and scene variety are planned around actual channel and placement needs.",
+    "category": "founder_personal_brand",
+    "summary": "Platform requirement is a primary project fact, not an aesthetic afterthought.",
+    "visualImplications": "Plan vertical action/gesture frames for short-form use, horizontal contextual frames for website/editorial and clean crops for press/profile use.",
+    "applicableWhen": "The user names multiple channels or needs a versatile image library.",
+    "exclusions": "Do not let platform formats force a visual style that conflicts with the confirmed direction; use framing variations within one system.",
+    "tags": [
+      "formats",
+      "vertical",
+      "website",
+      "social",
+      "image-hierarchy"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-046",
+    "title": "Avoiding clichés requires replacing their function",
+    "principle": "A cliché should be replaced by a more specific visual proof of the same communication need, not simply removed.",
+    "category": "founder_personal_brand",
+    "summary": "If a user rejects generic personal-brand imagery, ask what the cliché was trying to signal — competence, availability, lifestyle, collaboration — and find a truer proof surface.",
+    "visualImplications": "Replace laptop-at-desk with material/process, real teaching/explaining, client-world relation, movement or authored environment when relevant.",
+    "applicableWhen": "The user rejects stock-photo feeling, trend-led imagery or generic founder photography.",
+    "exclusions": "Avoid novelty for novelty’s sake; the replacement must still make the business easy to understand.",
+    "tags": [
+      "anti-cliche",
+      "founder",
+      "differentiation",
+      "visible-proof"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Personal Brand Photography Packages",
+    "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+    "sourceType": "professional-source",
+    "sourceDate": "2026",
+    "sources": [
+      {
+        "sourceTitle": "Personal Brand Photography Packages",
+        "sourceUrl": "https://www.nicole-tyler.com/branding-packages",
+        "sourceType": "professional-source",
+        "sourceDate": "2026"
+      },
+      {
+        "sourceTitle": "Personal Branding Photography Pricing",
+        "sourceUrl": "https://www.shootproof.com/blog/personal-branding-photography-pricing/",
+        "sourceType": "professional-source",
+        "sourceDate": "2025"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-047",
+    "title": "Campaign coherence needs recurring rules",
+    "principle": "A coherent campaign can vary scenes while repeating a limited number of visual rules such as light behaviour, tonal family, framing logic, materials or movement register.",
+    "category": "visual_consistency_campaign",
+    "summary": "Choose a small rule set that can survive different locations and formats.",
+    "visualImplications": "Define 2–3 non-negotiables and 1–2 variables allowed to change across the series.",
+    "applicableWhen": "CREATE later needs five coherent scenes, a launch system or a lasting content library.",
+    "exclusions": "Avoid making every frame identical or treating colour alone as campaign coherence.",
+    "tags": [
+      "campaign",
+      "coherence",
+      "visual-system",
+      "consistency"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "Effects of Brand Visual Identity on Consumer Attitude: A Systematic Literature Review",
+        "sourceUrl": "https://www.researchgate.net/publication/380673140_Effects_of_Brand_Visual_Identity_on_Consumer_Attitude_A_Systematic_Literature_Review",
+        "sourceType": "study",
+        "sourceDate": "2024"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-048",
+    "title": "Variation can reveal range without breaking recognition",
+    "principle": "A visual system can support range when the stable elements are explicit and variation happens in a controlled layer.",
+    "category": "visual_consistency_campaign",
+    "summary": "Plan what repeats and what changes before producing multiple scenes.",
+    "visualImplications": "Keep light/tonal family and relational stance stable while varying location, action, crop or supporting material.",
+    "applicableWhen": "The user needs several platforms, offers or narrative chapters within one campaign.",
+    "exclusions": "Avoid changing light, palette, styling, setting and composition simultaneously; the result may read as unrelated images.",
+    "tags": [
+      "campaign",
+      "variation",
+      "consistency",
+      "visual-system"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-049",
+    "title": "Reference images need property-level interpretation",
+    "principle": "A user may be attracted to light, gesture, texture, composition or an atmosphere in a reference image without wanting every property reproduced.",
+    "category": "visual_consistency_campaign",
+    "summary": "References should be annotated and abstracted before they influence direction.",
+    "visualImplications": "Ask what is doing the work in each reference, then translate only confirmed properties into visual variables.",
+    "applicableWhen": "The user uploads or describes references/inspiration.",
+    "exclusions": "Do not copy a reference’s total aesthetic, model, clothes, location or copyrighted composition by default.",
+    "tags": [
+      "reference",
+      "moodboard",
+      "visual-evidence",
+      "non-copying"
+    ],
+    "confidence": "high",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  },
+  {
+    "id": "mira-ko-v1-050",
+    "title": "Creative direction should retain unresolved tensions",
+    "principle": "Conflicting user signals can be a meaningful creative tension rather than an error to average away.",
+    "category": "visual_consistency_campaign",
+    "summary": "Preserve a named tension when it is supported by evidence; later direction can use it to avoid generic middle-ground output.",
+    "visualImplications": "Record pairs such as authority-warmth, raw-polished, minimal-expressive or controlled-spontaneous, with evidence and context.",
+    "applicableWhen": "The user’s words, image choices or references support both sides under different conditions.",
+    "exclusions": "Do not force a false midpoint or turn a low-confidence conflict into a definitive brand identity.",
+    "tags": [
+      "visual-tension",
+      "conflict",
+      "creative-direction",
+      "evidence"
+    ],
+    "confidence": "medium",
+    "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+    "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+    "sourceType": "professional-source",
+    "sourceDate": "2023",
+    "sources": [
+      {
+        "sourceTitle": "Mood Boards in UX: How and Why to Use Them",
+        "sourceUrl": "https://www.nngroup.com/articles/mood-boards/",
+        "sourceType": "professional-source",
+        "sourceDate": "2023"
+      },
+      {
+        "sourceTitle": "Reading Images: The Grammar of Visual Design",
+        "sourceUrl": "https://www.routledge.com/Reading-Images-The-Grammar-of-Visual-Design/Kress-van-Leeuwen/p/book/9780415672566",
+        "sourceType": "book",
+        "sourceDate": "2021"
+      }
+    ],
+    "sourceVersion": "v1",
+    "status": "approved",
+    "reviewed": true,
+    "reviewNotes": "Research-curated v1. Human editorial review is still required before production publishing.",
+    "evidenceUse": "supporting_intelligence_only"
+  }
+]

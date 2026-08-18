@@ -1,0 +1,584 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --primary: oklch(0.31 0.02 68);
+  --primary-foreground: oklch(0.97 0.01 80);
+  --sidebar-primary: var(--color-blue-600);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --radius: 0.65rem;
+  --background: oklch(0.965 0.012 82);
+  --foreground: oklch(0.235 0.015 65);
+  --card: oklch(0.992 0.006 82);
+  --card-foreground: oklch(0.235 0.015 65);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.235 0.015 65);
+  --secondary: oklch(0.98 0.001 286.375);
+  --secondary-foreground: oklch(0.4 0.015 65);
+  --muted: oklch(0.967 0.001 286.375);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.141 0.005 285.823);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.88 0.014 78);
+  --input: oklch(0.88 0.014 78);
+  --ring: oklch(0.5 0.09 63);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.235 0.015 65);
+  --sidebar-accent: oklch(0.967 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-ring: oklch(0.623 0.214 259.815);
+}
+
+.dark {
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-500);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.85 0.005 65);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.85 0.005 65);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.85 0.005 65);
+  --secondary: oklch(0.24 0.006 286.033);
+  --secondary-foreground: oklch(0.7 0.005 65);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground:  oklch(0.92 0.005 65);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.488 0.243 264.376);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --sidebar: oklch(0.21 0.006 285.885);
+  --sidebar-foreground: oklch(0.85 0.005 65);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.488 0.243 264.376);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "DM Sans", sans-serif;
+    font-feature-settings: "ss01";
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
+  }
+}
+
+.mira-display {
+  font-family: "Italiana", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.mira-kicker {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: oklch(0.48 0.045 67);
+}
+
+.mira-input {
+  margin-top: 0.5rem;
+  height: 2.75rem;
+  width: 100%;
+  border: 1px solid oklch(0.86 0.018 75 / 0.8);
+  border-radius: 0.75rem;
+  background: oklch(0.995 0.006 85);
+  padding-inline: 0.75rem;
+  color: oklch(0.235 0.015 65);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.mira-input:focus {
+  box-shadow: 0 0 0 3px oklch(0.5 0.09 63 / 0.18);
+}
+
+.mira-surface {
+  background:
+    radial-gradient(circle at 12% 8%, oklch(0.94 0.035 70 / 0.7), transparent 28rem),
+    radial-gradient(circle at 88% 80%, oklch(0.92 0.025 150 / 0.35), transparent 30rem),
+    linear-gradient(145deg, oklch(0.975 0.012 85), oklch(0.94 0.012 75));
+}
+
+.mira-panel {
+  width: 100%;
+  border: 1px solid oklch(0.86 0.018 75 / 0.8);
+  border-radius: 2rem;
+  background: oklch(0.995 0.006 85 / 0.88);
+  box-shadow: 0 2rem 6rem oklch(0.34 0.03 65 / 0.1);
+  padding: clamp(1.5rem, 5vw, 4rem);
+  backdrop-filter: blur(18px);
+}
+
+button:not(:disabled) {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms cubic-bezier(0.23, 1, 0.32, 1), color 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.mira-l123-surface {
+  background:
+    radial-gradient(circle at 15% 15%, oklch(0.31 0.05 68 / 0.2), transparent 30rem),
+    radial-gradient(circle at 86% 80%, oklch(0.28 0.045 55 / 0.16), transparent 34rem),
+    linear-gradient(165deg, oklch(0.15 0.008 80), oklch(0.11 0.01 72));
+}
+
+.mira-l123-panel {
+  width: 100%;
+  border: 1px solid oklch(0.78 0.02 75 / 0.25);
+  border-radius: 1.65rem;
+  background: linear-gradient(170deg, oklch(0.17 0.009 78 / 0.88), oklch(0.13 0.01 74 / 0.9));
+  padding: clamp(1.5rem, 4vw, 3.25rem);
+  backdrop-filter: blur(12px);
+}
+
+.mira-l123-kicker {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: oklch(0.82 0.035 72 / 0.8);
+}
+
+.mira-l123-narrow {
+  width: min(680px, 91vw);
+}
+
+.mira-l123-topnav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mira-l123-topnav-item {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding-bottom: 0.28rem;
+  border-bottom: 1px solid transparent;
+}
+
+.mira-l123-topnav-item.is-active {
+  color: oklch(0.94 0.02 86);
+  border-bottom-color: oklch(0.86 0.055 74 / 0.55);
+}
+
+.mira-l123-topnav-item.is-future {
+  color: oklch(0.72 0.02 80 / 0.72);
+  border-bottom-color: oklch(0.74 0.02 80 / 0.25);
+}
+
+.mira-l123-progress {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: oklch(0.82 0.03 78 / 0.78);
+}
+
+.mira-l123-row {
+  min-height: 46px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid oklch(0.78 0.02 75 / 0.28);
+  border-radius: 0.72rem;
+  padding: 0.72rem 0.85rem;
+  text-align: left;
+  color: oklch(0.9 0.02 80 / 0.95);
+  background: oklch(0.14 0.01 78 / 0.54);
+  line-height: 1.45;
+}
+
+.mira-l123-row:hover {
+  border-color: oklch(0.86 0.04 74 / 0.44);
+}
+
+.mira-l123-row:focus-visible {
+  outline: 2px solid oklch(0.86 0.055 74 / 0.5);
+  outline-offset: 1px;
+}
+
+.mira-l123-row.is-selected {
+  border-color: oklch(0.86 0.055 74 / 0.6);
+  background: oklch(0.2 0.015 75 / 0.7);
+}
+
+.mira-l123-indicator {
+  width: 1.1rem;
+  height: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(0.78 0.02 75 / 0.45);
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.mira-l123-inline-link {
+  min-height: 44px;
+  padding: 0.38rem 0;
+  font-size: 0.86rem;
+  color: oklch(0.84 0.03 78 / 0.9);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mira-l123-inline-link.is-selected {
+  color: oklch(0.94 0.02 86);
+}
+
+.mira-l123-chip {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid oklch(0.78 0.02 75 / 0.3);
+  border-radius: 999px;
+  background: oklch(0.15 0.01 78 / 0.62);
+  padding: 0.5rem 0.78rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: oklch(0.88 0.02 80 / 0.9);
+}
+
+.mira-l123-chip:focus-visible {
+  outline: 2px solid oklch(0.86 0.055 74 / 0.5);
+  outline-offset: 1px;
+}
+
+.mira-l123-chip-marker {
+  font-size: 0.74rem;
+  line-height: 1;
+}
+
+.mira-l123-chip-active {
+  border-color: oklch(0.86 0.055 74 / 0.5);
+  background: oklch(0.24 0.02 74 / 0.72);
+  color: oklch(0.96 0.02 90);
+}
+
+.mira-l123-result-block {
+  border: 1px solid oklch(0.78 0.02 75 / 0.24);
+  border-radius: 0.95rem;
+  background: oklch(0.14 0.01 78 / 0.62);
+  padding: 1rem;
+}
+
+.mira-l123-back {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: oklch(0.74 0.02 80 / 0.95);
+  font-size: 0.86rem;
+}
+
+.mira-l123-back:disabled {
+  opacity: 0.45;
+}
+
+.mira-l123-devpanel {
+  margin-top: 0.4rem;
+  border: 1px dashed oklch(0.76 0.02 78 / 0.35);
+  border-radius: 0.72rem;
+  background: oklch(0.14 0.01 78 / 0.44);
+  padding: 0.65rem;
+}
+
+.mira-l123-devchip {
+  min-height: 36px;
+  border: 1px solid oklch(0.78 0.02 75 / 0.28);
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: oklch(0.88 0.02 80 / 0.9);
+}
+
+.mira-l123-cta {
+  border: 1px solid oklch(0.86 0.055 74 / 0.45);
+  background: linear-gradient(145deg, oklch(0.28 0.03 72), oklch(0.22 0.028 70));
+}
+
+.mira-l123-cta:hover {
+  background: linear-gradient(145deg, oklch(0.31 0.035 72), oklch(0.24 0.03 70));
+}
+
+.mira-l123-ghost {
+  border: 1px solid oklch(0.86 0.03 74 / 0.35);
+  background: oklch(0.14 0.01 78 / 0.52);
+}
+
+.mira-l123-ghost:hover {
+  background: oklch(0.18 0.015 76 / 0.62);
+}
+
+.mira-l2-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.mira-create-shell {
+  padding-bottom: 4rem;
+}
+
+.mira-create-header {
+  display: grid;
+  gap: 2rem;
+  align-items: end;
+  padding: clamp(3rem, 8vw, 7rem) 0 clamp(2.5rem, 6vw, 5rem);
+}
+
+.mira-create-story {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(0.85rem, 2vw, 1.5rem);
+}
+
+.mira-create-frame {
+  grid-column: span 4;
+  overflow: hidden;
+  border: 1px solid oklch(0.78 0.02 75 / 0.22);
+  border-radius: 1.1rem;
+  background: oklch(0.14 0.01 78 / 0.7);
+}
+
+.mira-create-frame.frame-1,
+.mira-create-frame.frame-5 {
+  grid-column: span 7;
+}
+
+.mira-create-frame.frame-2,
+.mira-create-frame.frame-4 {
+  grid-column: span 5;
+}
+
+.mira-create-frame.frame-3 {
+  grid-column: 3 / span 8;
+}
+
+.mira-create-frame-visual {
+  position: relative;
+  min-height: clamp(18rem, 40vw, 34rem);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 70% 24%, oklch(0.74 0.05 70 / 0.34), transparent 17%),
+    linear-gradient(135deg, oklch(0.28 0.035 68), oklch(0.11 0.01 72) 68%);
+}
+
+.frame-2 .mira-create-frame-visual {
+  background: radial-gradient(ellipse at 45% 35%, oklch(0.68 0.045 72 / 0.32), transparent 22%), linear-gradient(168deg, oklch(0.13 0.012 75), oklch(0.3 0.03 67));
+}
+
+.frame-3 .mira-create-frame-visual {
+  background: linear-gradient(115deg, oklch(0.15 0.012 74) 0 35%, oklch(0.43 0.045 67) 35% 44%, oklch(0.2 0.02 70) 44% 100%);
+}
+
+.frame-4 .mira-create-frame-visual {
+  background: radial-gradient(circle at 34% 63%, oklch(0.61 0.055 68 / 0.45), transparent 16%), repeating-linear-gradient(145deg, oklch(0.17 0.014 72) 0 26px, oklch(0.21 0.018 69) 26px 52px);
+}
+
+.frame-5 .mira-create-frame-visual {
+  background: radial-gradient(ellipse at 52% 50%, oklch(0.65 0.055 70 / 0.3), transparent 20%), linear-gradient(180deg, oklch(0.25 0.026 69), oklch(0.105 0.008 75));
+}
+
+.mira-create-frame-number {
+  position: absolute;
+  left: 1.25rem;
+  bottom: 0.5rem;
+  font-family: "Italiana", serif;
+  font-size: clamp(5rem, 13vw, 11rem);
+  line-height: 1;
+  color: oklch(0.95 0.02 85 / 0.13);
+}
+
+.mira-create-frame-status {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  border: 1px solid oklch(0.9 0.025 80 / 0.26);
+  border-radius: 999px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  color: oklch(0.9 0.02 82 / 0.76);
+}
+
+.mira-create-frame-copy {
+  padding: 1.25rem;
+}
+
+.mira-create-direction-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: clamp(3rem, 8vw, 6rem);
+  border-top: 1px solid oklch(0.78 0.02 75 / 0.22);
+  border-left: 1px solid oklch(0.78 0.02 75 / 0.22);
+}
+
+.mira-create-direction-item {
+  min-height: 9rem;
+  border-right: 1px solid oklch(0.78 0.02 75 / 0.22);
+  border-bottom: 1px solid oklch(0.78 0.02 75 / 0.22);
+  padding: 1.25rem;
+}
+
+.mira-create-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+@media (min-width: 800px) {
+  .mira-create-header {
+    grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 0.5fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .mira-create-frame,
+  .mira-create-frame.frame-1,
+  .mira-create-frame.frame-2,
+  .mira-create-frame.frame-3,
+  .mira-create-frame.frame-4,
+  .mira-create-frame.frame-5 {
+    grid-column: 1 / -1;
+  }
+
+  .mira-create-direction-grid,
+  .mira-create-evidence {
+    grid-template-columns: 1fr;
+  }
+}

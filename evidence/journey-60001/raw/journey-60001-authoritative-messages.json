@@ -1,0 +1,263 @@
+{
+  "journey": {
+    "id": 60001,
+    "status": "mirror_confirmed",
+    "currentStep": "deliverables",
+    "turnCount": 8,
+    "startedAt": "2026-07-11T20:36:35.000Z",
+    "completedAt": null
+  },
+  "messages": [
+    {
+      "ordinal": 1,
+      "role": "assistant",
+      "content": "When you feel most like yourself, what are you doing—and what becomes possible in that moment?",
+      "provenance": {
+        "model": null,
+        "type": "opening_prompt"
+      },
+      "createdAt": "2026-07-11T20:36:35.000Z"
+    },
+    {
+      "ordinal": 2,
+      "role": "user",
+      "content": "I create, I elevate myself and others to different rhealm it seams and evwn if I am tired or I donb;t feel like doing it. - it elevatges me I love creating, love that wenrfy, it's bright and divine nd givrd me energy leaves me happy and in spired",
+      "provenance": {
+        "turn": 1,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:03:57.000Z"
+    },
+    {
+      "ordinal": 3,
+      "role": "assistant",
+      "content": "What specific, lasting change are you meant to bring into others' inner worlds when your work lights you up and restores your vitality—how do you want people's lives to be different because of your influence?",
+      "provenance": {
+        "fallback": false,
+        "focus": "purpose and the change they are here to create",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 764,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 704,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 221,
+          "prompt_tokens_details": {},
+          "total_tokens": 985
+        }
+      },
+      "createdAt": "2026-07-11T21:03:57.000Z"
+    },
+    {
+      "ordinal": 4,
+      "role": "user",
+      "content": "I want then to leave inspired, eelvated, happy, feelig beutiful ,feelijg inspiored to go and creatw the life they want and busines they want",
+      "provenance": {
+        "turn": 2,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:05:04.000Z"
+    },
+    {
+      "ordinal": 5,
+      "role": "assistant",
+      "content": "Which core values must your work always embody so clients consistently leave feeling empowered, seen, and capable of shaping their lives and businesses—and what, specifically, will you never compromise in delivering that experience?",
+      "provenance": {
+        "fallback": false,
+        "focus": "values and what must remain non-negotiable",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 635,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 576,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 307,
+          "prompt_tokens_details": {},
+          "total_tokens": 942
+        }
+      },
+      "createdAt": "2026-07-11T21:05:04.000Z"
+    },
+    {
+      "ordinal": 6,
+      "role": "user",
+      "content": "holding space f or them ,accepting them n o matter what , seeing the beauty in them I guess, I neevr tolarate abuse",
+      "provenance": {
+        "turn": 3,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:06:42.000Z"
+    },
+    {
+      "ordinal": 7,
+      "role": "assistant",
+      "content": "When you commit to embracing people fully yet also draw firm lines against harm, which internal alarm or habitual defense usually activates and keeps you from remaining open without overextending or withdrawing?",
+      "provenance": {
+        "fallback": false,
+        "focus": "the hidden conflict or protective pattern holding them back",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 1016,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 960,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 383,
+          "prompt_tokens_details": {},
+          "total_tokens": 1399
+        }
+      },
+      "createdAt": "2026-07-11T21:06:42.000Z"
+    },
+    {
+      "ordinal": 8,
+      "role": "user",
+      "content": "I don;t understand the quesiton ,simplify",
+      "provenance": {
+        "turn": 4,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:07:36.000Z"
+    },
+    {
+      "ordinal": 9,
+      "role": "assistant",
+      "content": "When a client moment makes you want to pull back, what's the one honest sentence you keep from saying because it feels risky— the truth your natural voice hesitates to claim?",
+      "provenance": {
+        "fallback": false,
+        "focus": "their natural voice and the truth they hesitate to express",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 759,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 704,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 437,
+          "prompt_tokens_details": {},
+          "total_tokens": 1196
+        }
+      },
+      "createdAt": "2026-07-11T21:07:36.000Z"
+    },
+    {
+      "ordinal": 10,
+      "role": "user",
+      "content": "setting boundaiures sometimes is hard for me, but that;s why at work and business my boundaries are lewarnignt o be very firm,",
+      "provenance": {
+        "turn": 5,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:08:38.000Z"
+    },
+    {
+      "ordinal": 11,
+      "role": "assistant",
+      "content": "As you practice firmer limits in your business, what specific words, gestures, policies, or routines will you use so the people you serve feel respected, supported, and confident to engage without overstepping?",
+      "provenance": {
+        "fallback": false,
+        "focus": "how they lead, serve, and relate to the people they are here for",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 830,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 768,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 514,
+          "prompt_tokens_details": {},
+          "total_tokens": 1344
+        }
+      },
+      "createdAt": "2026-07-11T21:08:38.000Z"
+    },
+    {
+      "ordinal": 12,
+      "role": "user",
+      "content": "clarity, proffesionalim, products that really help them and serve them, value. I really want to give them value",
+      "provenance": {
+        "turn": 6,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:09:32.000Z"
+    },
+    {
+      "ordinal": 13,
+      "role": "assistant",
+      "content": "As you step into the identity of a polished, impact-first creator offering genuinely helpful work and clear limits, what old habit, belief, or role must you release so your influence consistently uplifts rather than appeases?",
+      "provenance": {
+        "fallback": false,
+        "focus": "the identity they are becoming and what it asks them to release",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 1472,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 1408,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 584,
+          "prompt_tokens_details": {},
+          "total_tokens": 2056
+        }
+      },
+      "createdAt": "2026-07-11T21:09:32.000Z"
+    },
+    {
+      "ordinal": 14,
+      "role": "user",
+      "content": "the role which overgives",
+      "provenance": {
+        "turn": 7,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:10:13.000Z"
+    },
+    {
+      "ordinal": 15,
+      "role": "assistant",
+      "content": "What one concrete, public limit will you decide now—phrased as a short sentence or policy—that stops you overgiving while preserving warm, professional, value-driven support for every client?",
+      "provenance": {
+        "fallback": false,
+        "focus": "the clearest decision that integrates everything they have named",
+        "model": "gpt-5-mini",
+        "type": "adaptive_reflection",
+        "usage": {
+          "completion_tokens": 697,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "reasoning_tokens": 640,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 550,
+          "prompt_tokens_details": {},
+          "total_tokens": 1247
+        }
+      },
+      "createdAt": "2026-07-11T21:10:13.000Z"
+    },
+    {
+      "ordinal": 16,
+      "role": "user",
+      "content": "My time and every has value, I choose myself and therefore not not waste it",
+      "provenance": {
+        "turn": 8,
+        "type": "user_reflection"
+      },
+      "createdAt": "2026-07-11T21:11:05.000Z"
+    }
+  ]
+}
