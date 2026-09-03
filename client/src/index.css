@@ -258,6 +258,69 @@ button:not(:disabled):active {
   backdrop-filter: blur(12px);
 }
 
+.mira-dark-surface {
+  background:
+    radial-gradient(circle at 82% 8%, oklch(0.32 0.035 73 / 0.16), transparent 26rem),
+    linear-gradient(160deg, #181715, #0d0d0c 72%);
+}
+
+.mira-dark-panel {
+  width: 100%;
+  border: 1px solid rgb(255 255 255 / 0.11);
+  background: rgb(25 24 22 / 0.86);
+  padding: clamp(1.5rem, 4vw, 3.25rem);
+}
+
+.mira-dark-display {
+  font-family: "Italiana", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.mira-dark-kicker {
+  color: #bba77f;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.mira-dark-surface input,
+.mira-dark-surface textarea {
+  border-color: rgb(255 255 255 / 0.13);
+  border-radius: 0;
+  background: rgb(255 255 255 / 0.04);
+  color: #f1eadc;
+}
+
+.mira-call-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  width: 6.5rem;
+  height: 6.5rem;
+  border: 1px solid rgb(210 185 139 / 0.35);
+  border-radius: 999px;
+}
+
+.mira-call-orb span {
+  width: 2px;
+  height: 1rem;
+  background: #d2b98b;
+  animation: mira-wave 1.4s ease-in-out infinite;
+}
+
+.mira-call-orb span:nth-child(2) { animation-delay: 120ms; height: 1.8rem; }
+.mira-call-orb span:nth-child(3) { animation-delay: 240ms; height: 1.3rem; }
+.mira-call-orb span:nth-child(4) { animation-delay: 360ms; height: 0.8rem; }
+.mira-call-orb.is-listening span { animation-duration: 0.7s; }
+
+@keyframes mira-wave {
+  0%, 100% { transform: scaleY(0.55); opacity: 0.45; }
+  50% { transform: scaleY(1.25); opacity: 1; }
+}
+
 .mira-l123-kicker {
   font-size: 0.68rem;
   font-weight: 600;

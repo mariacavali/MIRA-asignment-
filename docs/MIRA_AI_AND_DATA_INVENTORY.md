@@ -22,4 +22,6 @@ This inventory describes verified implementation behavior without making legal o
 | Database | Application records and state transitions | Drizzle queries and migrations over MySQL/TiDB | Persistent structured records | MySQL/TiDB | Yes | **IMPLEMENTED** |
 | Object/file storage | Images, generated assets, V3 PDFs | Forge presigning, direct S3 upload, signed retrieval | Private object paths/URLs | Forge storage gateway and S3 | Yes | **IMPLEMENTED** |
 
-No n8n workflow is present in the verified repository architecture. Production data locations, processor regions, retention periods, and deletion operations are not confirmed from the available implementation.
+n8n onboarding POC | Allowlisted synthetic photographer lifecycle and separate model/client shoot lifecycle | Validation, ID-based upsert, welcome preparation, lifecycle tracking, and execution logging | Local workflow static data in the POC | n8n | Synthetic records only | **POC; not production integration** |
+
+The POC is documented in `capstone/round2/n8n/`. It never receives authentication cookies, passwords, API keys, payment instruments, private Shoot Room tokens, client conversations, recordings, visual references, Creative DNA, moodboards, or sensitive client data. Production data locations, processor regions, retention periods, and deletion operations are not confirmed from the available implementation.

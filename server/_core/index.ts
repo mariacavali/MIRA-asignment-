@@ -9,6 +9,11 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { ENV } from "./env";
+import { createStripeWebhookHandler } from "../payment/stripeWebhook";
+import { DrizzlePaymentRepository } from "../payment/drizzlePaymentRepository";
+import { createEmailOutboxWorkerHandler } from "../email/outboxWorkerEndpoint";
+import { buildProductionMiraEmailOutboxWorker } from "../miraCore/emailOutboxWorker";
+import { healthHandler, readinessHandler } from "./readiness";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -32,6 +37,17 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  // Stripe requires the untouched JSON bytes for signature verification.
+  app.post("/api/webhooks/stripe", express.raw({ type: "application/json", limit: "2mb" }), createStripeWebhookHandler({
+    repository: ENV.paymentMode === "stripe" && !ENV.miraLocalFileStore ? new DrizzlePaymentRepository() : undefined,
+    webhookSecret: ENV.stripeWebhookSecret,
+    paymentMode: ENV.paymentMode,
+    currency: ENV.stripeCurrency,
+    priceId: ENV.stripePriceId,
+  }));
+  app.post("/api/internal/mira/email-outbox/process", createEmailOutboxWorkerHandler(buildProductionMiraEmailOutboxWorker(), ENV.emailWorkerSecret));
+  app.get("/api/health", healthHandler);
+  app.get("/api/internal/mira/readiness", readinessHandler);
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));

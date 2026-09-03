@@ -33,7 +33,7 @@ export default function MiraV3() {
       <MiraShell>
         <section className="mira-panel max-w-2xl text-center">
           <LockKeyhole className="mx-auto mb-7 size-5 text-amber-700" />
-          <p className="mira-kicker">Private staging</p>
+          <p className="mira-kicker">A private conversation</p>
           <h1 className="mira-display mt-5 text-5xl sm:text-7xl">A quieter place to hear what is already true.</h1>
           <p className="mx-auto mt-7 max-w-lg text-base leading-7 text-stone-600">
             Mira stays with what you say, notices what keeps returning, and reflects the identity and direction already taking shape beneath your words.

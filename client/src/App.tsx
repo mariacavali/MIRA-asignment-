@@ -13,12 +13,23 @@ import MiraLevel1 from "./pages/MiraLevel1";
 import MiraLevel1Journey from "./pages/MiraLevel1Journey";
 import MiraLevel2Journey from "./pages/MiraLevel2Journey";
 import MiraLevel2Create from "./pages/MiraLevel2Create";
+import MiraDashboard from "./pages/MiraDashboard";
+import MiraPhotographerOnboarding from "./pages/MiraPhotographerOnboarding";
+import MiraShoot from "./pages/MiraShoot";
+import MiraShootRoom from "./pages/MiraShootRoom";
+import MiraLanding from "./pages/MiraLanding";
+import MiraPhotographerPricing from "./pages/MiraPhotographerPricing";
+import MiraPhotographerCheckout from "./pages/MiraPhotographerCheckout";
+import MiraPhotographerHome from "./pages/MiraPhotographerHome";
+import MiraPhotographerSignup from "./pages/MiraPhotographerSignup";
+import MiraPhotographerLogin from "./pages/MiraPhotographerLogin";
+import MiraPaymentSuccess from "./pages/MiraPaymentSuccess";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={MiraV3} />
+      <Route path={"/"} component={MiraLanding} />
       <Route path={"/mira-v3"} component={MiraV3} />
       <Route path={"/mira-v3/journey/:journeyId"} component={MiraV3Journey} />
       <Route path={"/mira-v3/results/:journeyId"} component={MiraV3Results} />
@@ -28,6 +39,20 @@ function Router() {
       <Route path={"/mira-1/journey/:journeyId"} component={MiraLevel1Journey} />
       <Route path={"/mira-1/journey/:journeyId/deeper"} component={MiraLevel2Journey} />
       <Route path={"/mira-1/journey/:journeyId/create"} component={MiraLevel2Create} />
+      <Route path={"/mira"} component={MiraLanding} />
+      <Route path={"/for-photographers"} component={MiraLanding} />
+      <Route path={"/mira/account"} component={MiraPhotographerHome} />
+      <Route path={"/mira/login"} component={MiraPhotographerLogin} />
+      <Route path={"/mira/signup"} component={MiraPhotographerSignup} />
+      <Route path={"/mira/checkout"} component={MiraPhotographerCheckout} />
+      <Route path={"/mira/payment-success"} component={MiraPaymentSuccess} />
+      <Route path={"/mira/dashboard"} component={MiraDashboard} />
+      <Route path={"/mira/onboarding"} component={MiraPhotographerOnboarding} />
+      <Route path={"/mira/photographer"} component={MiraPhotographerPricing} />
+      <Route path={"/mira/photographer/checkout"} component={MiraPhotographerCheckout} />
+      <Route path={"/mira/shoots/:shootId"} component={MiraShoot} />
+      <Route path={"/prepare/:token"} component={MiraShootRoom} />
+      <Route path={"/prepare/access/:signedAccessToken"} component={MiraShootRoom} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

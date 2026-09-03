@@ -1,0 +1,31 @@
+{
+  "name": "MIRA Email Outbox Trigger",
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "nodes": [
+    {
+      "id": "schedule",
+      "name": "Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-300, 0],
+      "parameters": { "rule": { "interval": [{ "field": "minutes", "minutesInterval": 5 }] } }
+    },
+    {
+      "id": "request",
+      "name": "Trigger MIRA Outbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [0, 0],
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.MIRA_PUBLIC_APP_BASE_URL}}/api/internal/mira/email-outbox/process",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-MIRA-EMAIL-WORKER-SECRET", "value": "={{$env.MIRA_EMAIL_WORKER_SECRET}}" }] },
+        "options": { "response": { "response": { "responseFormat": "json" } } }
+      }
+    }
+  ],
+  "connections": { "Every 5 minutes": { "main": [[{ "node": "Trigger MIRA Outbox", "type": "main", "index": 0 }]] }, "Trigger MIRA Outbox": { "main": [[]] } },
+  "versionId": "mira-email-outbox-trigger-v1"
+}

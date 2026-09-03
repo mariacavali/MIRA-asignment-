@@ -3,6 +3,21 @@
 // Downloads return /manus-storage/{key} paths served via 307 redirect.
 
 import { ENV } from "./_core/env";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+
+export const LOCAL_STORAGE_ROOT = "/private/tmp/mira-local-storage";
+
+function localStoragePath(key: string) {
+  const root = resolve(LOCAL_STORAGE_ROOT);
+  const path = resolve(root, normalizeKey(key));
+  if (path !== root && !path.startsWith(root + "/")) throw new Error("Invalid local storage key");
+  return path;
+}
+
+function canUseLocalStorage() {
+  return !ENV.isProduction && !ENV.forgeApiUrl && !ENV.forgeApiKey;
+}
 
 function getForgeConfig() {
   const forgeUrl = ENV.forgeApiUrl;
@@ -33,6 +48,13 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
+  if (canUseLocalStorage()) {
+    const key = appendHashSuffix(normalizeKey(relKey));
+    const path = localStoragePath(key);
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, data);
+    return { key, url: `/manus-storage/${key}` };
+  }
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
 
@@ -77,6 +99,12 @@ export async function storageGet(relKey: string): Promise<{ key: string; url: st
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
+  if (canUseLocalStorage()) {
+    const key = normalizeKey(relKey);
+    const bytes = await readFile(localStoragePath(key));
+    const mimeType = /\.png$/i.test(key) ? "image/png" : /\.webp$/i.test(key) ? "image/webp" : /\.jpe?g$/i.test(key) ? "image/jpeg" : "application/octet-stream";
+    return `data:${mimeType};base64,${bytes.toString("base64")}`;
+  }
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
 

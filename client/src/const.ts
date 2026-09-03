@@ -14,13 +14,14 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 // with "invalid oauth state". It returns void by design, so there is no URL to
 // stash across renders.
 export const startLogin = () => {
-  if (import.meta.env.DEV) {
-    window.location.href = window.location.pathname || "/mira-v4";
+  const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
+  const appId = import.meta.env.VITE_APP_ID;
+
+  // Local staging can render public entry routes without an OAuth portal.
+  if (import.meta.env.DEV || !oauthPortalUrl || !appId) {
     return;
   }
 
-  const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
-  const appId = import.meta.env.VITE_APP_ID;
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
 
   const nonce = crypto.randomUUID();

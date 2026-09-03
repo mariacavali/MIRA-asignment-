@@ -1,7 +1,9 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, miraStripeBillingIdentities, users, type User } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { activateLocalPlan, createLocalPaidPhotographer, getLocalAccess, getLocalUserByEmail, getLocalUserByOpenId, isLocalFileStoreEnabled, resetLocalPhotographerJourney, upsertLocalUser } from "./localFileStore";
+import { paymentStateGrantsAccess } from "./payment/paymentEventProcessor";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -19,6 +21,18 @@ export async function getDb() {
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
+    if (isLocalFileStoreEnabled()) {
+      await upsertLocalUser({
+        openId: user.openId,
+        name: user.name ?? null,
+        email: user.email ?? null,
+        loginMethod: user.loginMethod ?? null,
+        role: user.role ?? "user",
+        lastSignedIn: (user.lastSignedIn ?? new Date()).toISOString(),
+      });
+      return;
+    }
+
   if (!user.openId) {
     throw new Error("User openId is required for upsert");
   }
@@ -78,6 +92,15 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 }
 
 export async function getUserByOpenId(openId: string) {
+  if (isLocalFileStoreEnabled()) {
+    const user = await getLocalUserByOpenId(openId);
+    return user ? {
+      ...user,
+      createdAt: new Date(user.createdAt),
+      updatedAt: new Date(user.updatedAt),
+      lastSignedIn: new Date(user.lastSignedIn),
+    } satisfies User : undefined;
+  }
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get user: database not available");
@@ -86,7 +109,48 @@ export async function getUserByOpenId(openId: string) {
 
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
-  return result.length > 0 ? result[0] : undefined;
+  return (result.length > 0 ? result[0] : undefined) as User | undefined;
+}
+
+export async function activateLocalPlanForUser(openId: string, selectedPlan: string) {
+  if (!isLocalFileStoreEnabled()) throw new Error("Local payment is unavailable");
+  const user = await activateLocalPlan(openId, selectedPlan);
+  return user ? { ...user, createdAt: new Date(user.createdAt), updatedAt: new Date(user.updatedAt), lastSignedIn: new Date(user.lastSignedIn) } : null;
+}
+
+export async function getPhotographerAccess(openId: string) {
+  if (!isLocalFileStoreEnabled()) {
+    const db = await getDb();
+    if (!db) return { paymentStatus: "unpaid" as const, selectedPlan: null };
+    try {
+      const billingRows = await db.select({ paymentState: miraStripeBillingIdentities.paymentState, priceId: miraStripeBillingIdentities.stripePriceId, cancelAtPeriodEnd: miraStripeBillingIdentities.cancelAtPeriodEnd, currentPeriodEnd: miraStripeBillingIdentities.currentPeriodEnd })
+        .from(miraStripeBillingIdentities)
+        .innerJoin(users, eq(users.id, miraStripeBillingIdentities.photographerUserId))
+        .where(eq(users.openId, openId)).limit(1);
+      const identity = billingRows[0];
+      return { paymentStatus: paymentStateGrantsAccess(identity?.paymentState) ? "paid" as const : "unpaid" as const, paymentState: identity?.paymentState ?? "pending" as const, selectedPlan: identity?.priceId ?? null, cancelAtPeriodEnd: Boolean(identity?.cancelAtPeriodEnd), currentPeriodEnd: identity?.currentPeriodEnd ?? null };
+    } catch {
+      return { paymentStatus: "unpaid" as const, selectedPlan: null };
+    }
+  }
+  return getLocalAccess(openId);
+}
+
+export async function resetLocalPhotographerJourneyForUser(openId: string) {
+  if (!isLocalFileStoreEnabled()) throw new Error("Local reset is unavailable");
+  return resetLocalPhotographerJourney(openId);
+}
+
+export async function createLocalPaidPhotographerAccount(name: string, email: string) {
+  if (!isLocalFileStoreEnabled()) throw new Error("Local payment is unavailable");
+  const user = await createLocalPaidPhotographer({ name, email });
+  return user ? { ...user, createdAt: new Date(user.createdAt), updatedAt: new Date(user.updatedAt), lastSignedIn: new Date(user.lastSignedIn) } : null;
+}
+
+export async function getLocalPhotographerByEmail(email: string) {
+  if (!isLocalFileStoreEnabled()) return null;
+  const user = await getLocalUserByEmail(email);
+  return user ? { ...user, createdAt: new Date(user.createdAt), updatedAt: new Date(user.updatedAt), lastSignedIn: new Date(user.lastSignedIn) } : null;
 }
 
 // TODO: add feature queries here as your schema grows.

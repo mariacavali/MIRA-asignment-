@@ -55,6 +55,8 @@ export type ToolChoice =
   | ToolChoiceByName
   | ToolChoiceExplicit;
 
+export type LlmProvider = "forge" | "openai";
+
 export type InvokeParams = {
   messages: Message[];
   tools?: Tool[];
@@ -71,6 +73,8 @@ export type InvokeParams = {
   model?: string;
   thinking?: Record<string, unknown>;
   reasoning?: Record<string, unknown>;
+  /** Defaults to "forge" (unchanged behavior for every existing caller). */
+  provider?: LlmProvider;
 };
 
 export type ToolCall = {
@@ -214,14 +218,23 @@ const normalizeToolChoice = (
   return toolChoice;
 };
 
-const resolveApiUrl = () =>
-  ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
-    ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
-    : "https://forge.manus.im/v1/chat/completions";
+const resolveApiUrl = (provider: LlmProvider) =>
+  provider === "openai"
+    ? "https://api.openai.com/v1/chat/completions"
+    : ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
+      ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/chat/completions`
+      : "https://forge.manus.im/v1/chat/completions";
 
-const assertApiKey = () => {
+const resolveApiKey = (provider: LlmProvider) =>
+  provider === "openai" ? ENV.embeddingApiKey : ENV.forgeApiKey;
+
+const assertApiKey = (provider: LlmProvider) => {
+  if (provider === "openai") {
+    if (!ENV.embeddingApiKey) throw new Error("OPENAI_API_KEY is not configured");
+    return;
+  }
   if (!ENV.forgeApiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
+    throw new Error("BUILT_IN_FORGE_API_KEY is not configured");
   }
 };
 
@@ -304,7 +317,9 @@ const computeBackoffDelay = (
 
 // Retries non-2xx responses and network errors with exponential backoff, then
 // returns the final Response so callers keep their existing error handling.
-const fetchWithBackoff = async (
+// Exported so other outbound HTTP calls (e.g. direct OpenAI image generation)
+// can reuse the same retry policy instead of duplicating it.
+export const fetchWithBackoff = async (
   url: string,
   init: FetchInit
 ): Promise<Response> => {
@@ -345,7 +360,8 @@ const fetchWithBackoff = async (
 };
 
 export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
-  assertApiKey();
+  const provider = params.provider ?? "forge";
+  assertApiKey(provider);
 
   const {
     messages,
@@ -414,11 +430,11 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     payload.response_format = normalizedResponseFormat;
   }
 
-  const response = await fetchWithBackoff(resolveApiUrl(), {
+  const response = await fetchWithBackoff(resolveApiUrl(provider), {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${ENV.forgeApiKey}`,
+      authorization: `Bearer ${resolveApiKey(provider)}`,
     },
     body: JSON.stringify(payload),
   });
@@ -460,7 +476,7 @@ export type ModelsResponse = {
 };
 
 export async function listLLMModels(): Promise<ModelsResponse> {
-  assertApiKey();
+  assertApiKey("forge");
 
   const url = ENV.forgeApiUrl && ENV.forgeApiUrl.trim().length > 0
     ? `${ENV.forgeApiUrl.replace(/\/$/, "")}/v1/models`
