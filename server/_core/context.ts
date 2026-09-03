@@ -1,7 +1,7 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
-import { getLocalUserByOpenId } from "../localFileStore";
+import { getLocalUserByOpenId, isLocalFileStoreEnabled } from "../localFileStore";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -17,7 +17,7 @@ export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
   let user: User | null = null;
-  const localAuthEnabled = isLocalAuthEnabled();
+  const localAuthEnabled = isLocalAuthEnabled() || isLocalFileStoreEnabled();
 
   if (localAuthEnabled) {
     const cookieHeader = typeof opts.req.headers.cookie === "string" ? opts.req.headers.cookie : "";

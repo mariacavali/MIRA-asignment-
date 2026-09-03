@@ -28,7 +28,11 @@ function firstPriceId(object: Record<string, any>) {
   const items = record(object.items)?.data;
   const firstItem = Array.isArray(items) ? record(items[0]) : null;
   const itemPrice = record(firstItem?.price);
-  return typeof itemPrice?.id === "string" ? itemPrice.id : null;
+  if (typeof itemPrice?.id === "string") return itemPrice.id;
+  const lineItems = record(object.line_items)?.data;
+  const firstCheckoutLine = Array.isArray(lineItems) ? record(lineItems[0]) : null;
+  const checkoutPrice = record(firstCheckoutLine?.price);
+  return typeof checkoutPrice?.id === "string" ? checkoutPrice.id : null;
 }
 
 function firstCurrency(object: Record<string, any>) {
@@ -40,7 +44,11 @@ function firstCurrency(object: Record<string, any>) {
   const items = record(object.items)?.data;
   const firstItem = Array.isArray(items) ? record(items[0]) : null;
   const itemPrice = record(firstItem?.price);
-  return typeof itemPrice?.currency === "string" ? itemPrice.currency : null;
+  if (typeof itemPrice?.currency === "string") return itemPrice.currency;
+  const lineItems = record(object.line_items)?.data;
+  const firstCheckoutLine = Array.isArray(lineItems) ? record(lineItems[0]) : null;
+  const checkoutPrice = record(firstCheckoutLine?.price);
+  return typeof checkoutPrice?.currency === "string" ? checkoutPrice.currency : null;
 }
 
 function subscriptionStatus(object: Record<string, any>) {
@@ -69,11 +77,13 @@ export function normalizeStripeEvent(event: Stripe.Event): NormalizedPaymentEven
   if (type === "checkout.session.completed") {
     return {
       eventId: event.id,
+      eventCreatedAt: stripeDate(event.created),
       type,
+      checkoutSessionId: typeof object.id === "string" ? object.id : null,
       paymentMode: object.mode === "subscription" ? "subscription" : "payment",
       currency,
       priceId,
-      paid: object.payment_status === "paid" && object.status === "complete",
+      paid: (object.payment_status === "paid" || object.payment_status === "no_payment_required") && object.status === "complete",
       subscriptionStatus: subscriptionStatus(object),
       clientReferenceId: typeof object.client_reference_id === "string" ? object.client_reference_id : null,
       customerId: customer,
@@ -85,6 +95,7 @@ export function normalizeStripeEvent(event: Stripe.Event): NormalizedPaymentEven
   }
   return {
     eventId: event.id,
+    eventCreatedAt: stripeDate(event.created),
     type,
     paymentMode: "subscription",
     currency,
@@ -101,7 +112,7 @@ export function normalizeStripeEvent(event: Stripe.Event): NormalizedPaymentEven
 
 export type StripeWebhookHandlerOptions = {
   repository?: PaymentEventRepository;
-  stripe?: { webhooks: Pick<Stripe.Webhooks, "constructEvent"> };
+  stripe?: { webhooks: Pick<Stripe.Webhooks, "constructEvent">; checkout?: { sessions: { retrieve(id: string, params: { expand: string[] }): Promise<Stripe.Checkout.Session> } } };
   webhookSecret?: string;
   paymentMode?: string;
   currency?: string;
@@ -126,13 +137,39 @@ export function createStripeWebhookHandler(options: StripeWebhookHandlerOptions 
       return res.status(400).json({ error: "Invalid Stripe signature" });
     }
     if (!supportedTypes.has(event.type as NormalizedPaymentEvent["type"])) return res.status(200).json({ received: true, processed: false });
-    const normalized = normalizeStripeEvent(event);
+    const configuredPriceId = options.priceId ?? process.env.STRIPE_PRICE_ID ?? "";
+    let normalized = normalizeStripeEvent(event);
+    if (!normalized && event.type === "checkout.session.completed" && stripe.checkout?.sessions) {
+      const object = record(event.data.object);
+      const sessionId = typeof object?.id === "string" ? object.id : null;
+      if (sessionId) {
+        try {
+          const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ["line_items.data.price"] });
+          normalized = normalizeStripeEvent({ ...event, data: { ...event.data, object: session } } as Stripe.Event);
+        } catch {
+          normalized = null;
+        }
+      }
+    }
+    if (!normalized && event.type === "checkout.session.completed" && configuredPriceId) {
+      const object = record(event.data.object);
+      const metadata = record(object?.metadata) ?? {};
+      if (object?.mode === "payment" && typeof object.client_reference_id === "string" && typeof object.currency === "string") {
+        normalized = normalizeStripeEvent({
+          ...event,
+          data: {
+            ...event.data,
+            object: { ...object, metadata: { ...metadata, mira_price_id: configuredPriceId } },
+          },
+        } as unknown as Stripe.Event);
+      }
+    }
     if (!normalized) return res.status(400).json({ error: "Unsupported Stripe event payload" });
     if (!options.repository) return res.status(503).json({ error: "Payment persistence is not configured" });
     try {
       const result = await processPaymentEvent(normalized, options.repository, {
         currency: options.currency ?? process.env.STRIPE_CURRENCY ?? "eur",
-        priceId: options.priceId ?? process.env.STRIPE_PRICE_ID ?? "",
+        priceId: configuredPriceId,
         now: options.now,
       });
       if (!result.accepted && result.action !== "duplicate") return res.status(400).json({ error: "Payment event was rejected" });

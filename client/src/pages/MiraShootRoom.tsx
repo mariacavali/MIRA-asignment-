@@ -28,6 +28,7 @@ export default function MiraShootRoom() {
   const [consent, setConsent] = useState(false);
   const [callError, setCallError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [conversationMode, setConversationMode] = useState<"voice" | "text">("voice");
   const callStateRef = useRef<"idle" | "calling" | "ended">("idle");
   const acknowledge = trpc.miraCore.acknowledgeInvitation.useMutation({ onSuccess: () => setAccepted(true) });
   
@@ -74,6 +75,13 @@ export default function MiraShootRoom() {
         onConsentChange={setConsent}
         onCallMira={() => {
           if (!consent) return;
+          setConversationMode("voice");
+          setIsConnecting(true);
+          callStateRef.current = "calling";
+        }}
+        onTextMira={() => {
+          if (!consent) return;
+          setConversationMode("text");
           setIsConnecting(true);
           callStateRef.current = "calling";
         }}
@@ -115,6 +123,7 @@ export default function MiraShootRoom() {
           <MiraClientCall
             token={credential}
             consent={consent}
+            initialMode={conversationMode}
             onSessionStart={() => {
               setCallError(null);
             }}

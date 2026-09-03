@@ -25,6 +25,7 @@ import {
 import { getDb } from "../db";
 import {
   createLocalShoot,
+  deleteLocalTextTestMessages,
   getLocalProfile,
   getLocalShoot,
   getLocalInvitation,
@@ -34,9 +35,13 @@ import {
   getLocalInvitationForShoot,
   listLocalInvitations,
   acceptLocalInvitation,
+  endLocalTextTestSession,
   isLocalFileStoreEnabled,
+  listLocalTextTestSessions,
   listLocalShoots,
   saveLocalProfile,
+  startLocalTextTestSession,
+  submitLocalTextTestTurn,
   type LocalShoot,
 } from "../localFileStore";
 import { applyShootMemoryPatch, emptyShootMemory, memoryPatchForTextTestAnswer } from "./memory";
@@ -307,7 +312,7 @@ export async function getShootQaInspection(photographerUserId: number, shootId: 
   if (isLocalFileStoreEnabled()) {
     const shoot = await getOwnedShoot(photographerUserId, shootId);
     if (!shoot) return null;
-    return { profile: await getPhotographerProfile(photographerUserId), shoot, sessions: [], revisions: [], summaries: [] } as any;
+    return { profile: await getPhotographerProfile(photographerUserId), shoot, sessions: await listLocalTextTestSessions(photographerUserId, shootId) ?? [], revisions: [], summaries: [] } as any;
   }
   const db = await requireDb();
   const shoot = await getOwnedShoot(photographerUserId, shootId);
@@ -508,6 +513,16 @@ export async function markInvitationSent(params: {
 
 export async function startTextTestSession(token: string, consentAcknowledged: boolean) {
   if (!consentAcknowledged) throw new Error("Consent acknowledgement is required");
+  if (isLocalFileStoreEnabled()) {
+    const state = await getClientInvitation(token);
+    if (!state || state.invitation.status !== "active") return null;
+    return startLocalTextTestSession({
+      token,
+      prompts: TEXT_TEST_QUESTIONS,
+      allowedSeconds: state.shoot.callAllowanceSeconds,
+      maxSessions: state.invitation.maxSessions ?? 3,
+    });
+  }
   const db = await requireDb();
   const state = await getClientInvitation(token);
   if (!state || state.invitation.status !== "active") return null;
@@ -544,6 +559,16 @@ export async function startTextTestSession(token: string, consentAcknowledged: b
 }
 
 export async function submitTextTestTurn(params: { token: string; sessionId: string; answer: string }) {
+  if (isLocalFileStoreEnabled()) {
+    const result = await submitLocalTextTestTurn({ ...params, prompts: TEXT_TEST_QUESTIONS });
+    if (!result) return null;
+    return {
+      shootId: result.shootId,
+      turnCount: result.turnCount,
+      response: result.nextPrompt ?? "Thank you. I have enough for this preparation. Your photographer will review what you shared.",
+      complete: result.complete,
+    };
+  }
   const db = await requireDb();
   const invitationCondition = await resolveInvitationCondition(params.token);
   if (!invitationCondition) return null;
@@ -632,6 +657,7 @@ export async function submitTextTestTurn(params: { token: string; sessionId: str
 }
 
 export async function endTextTestSession(params: { token: string; sessionId: string }) {
+  if (isLocalFileStoreEnabled()) return endLocalTextTestSession(params);
   const db = await requireDb();
   const invitation = await getClientInvitation(params.token);
   if (!invitation) return false;
@@ -1001,6 +1027,20 @@ export async function appendRealtimeQaEvent(params: { token: string; sessionId: 
 }
 
 export async function listRealtimeQaEventsForOwner(photographerUserId: number, shootId: number) {
+  if (isLocalFileStoreEnabled()) {
+    const sessions = await listLocalTextTestSessions(photographerUserId, shootId);
+    if (!sessions) return null;
+    const retentionMs = (Number.isFinite(ENV.miraPilotQaRetentionDays) ? Math.min(30, Math.max(1, ENV.miraPilotQaRetentionDays)) : 7) * 86_400_000;
+    const now = Date.now();
+    return sessions.flatMap(session => session.messages.map((message, index) => ({
+      id: `${session.id}:${index}`,
+      direction: message.role,
+      modality: "text_fallback" as const,
+      content: message.content,
+      createdAt: new Date(message.createdAt),
+      expiresAt: new Date(new Date(message.createdAt).getTime() + retentionMs),
+    }))).filter(event => event.expiresAt.getTime() > now).sort((left, right) => left.createdAt.getTime() - right.createdAt.getTime());
+  }
   const db = await requireDb();
   if (!await getOwnedShoot(photographerUserId, shootId)) return null;
   await db.delete(miraCallQaEvents).where(lt(miraCallQaEvents.expiresAt, new Date()));
@@ -1009,6 +1049,7 @@ export async function listRealtimeQaEventsForOwner(photographerUserId: number, s
 }
 
 export async function deleteRealtimeQaEventsForOwner(photographerUserId: number, shootId: number) {
+  if (isLocalFileStoreEnabled()) return deleteLocalTextTestMessages(photographerUserId, shootId);
   const db = await requireDb();
   if (!await getOwnedShoot(photographerUserId, shootId)) return false;
   await db.delete(miraCallQaEvents).where(eq(miraCallQaEvents.shootId, shootId));

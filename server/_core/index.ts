@@ -11,6 +11,7 @@ import { serveStatic, setupVite } from "./vite";
 import { ENV } from "./env";
 import { createStripeWebhookHandler } from "../payment/stripeWebhook";
 import { DrizzlePaymentRepository } from "../payment/drizzlePaymentRepository";
+import { LocalPaymentRepository } from "../payment/localPaymentRepository";
 import { createEmailOutboxWorkerHandler } from "../email/outboxWorkerEndpoint";
 import { buildProductionMiraEmailOutboxWorker } from "../miraCore/emailOutboxWorker";
 import { healthHandler, readinessHandler } from "./readiness";
@@ -39,7 +40,7 @@ async function startServer() {
   const server = createServer(app);
   // Stripe requires the untouched JSON bytes for signature verification.
   app.post("/api/webhooks/stripe", express.raw({ type: "application/json", limit: "2mb" }), createStripeWebhookHandler({
-    repository: ENV.paymentMode === "stripe" && !ENV.miraLocalFileStore ? new DrizzlePaymentRepository() : undefined,
+    repository: ENV.paymentMode === "stripe" ? (ENV.miraLocalFileStore ? new LocalPaymentRepository() : new DrizzlePaymentRepository()) : undefined,
     webhookSecret: ENV.stripeWebhookSecret,
     paymentMode: ENV.paymentMode,
     currency: ENV.stripeCurrency,

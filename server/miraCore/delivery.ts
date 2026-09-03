@@ -42,6 +42,7 @@ export async function deliverClientInvitation(params: {
     location: shoot.location,
     accessUntil: params.expiresAt,
     preparationUrl,
+    sentAt: new Date(),
   });
   const { provider, from } = requireEmailConfiguration();
   const replyTo = isValidEmailAddress(params.photographerEmail) ? params.photographerEmail : null;

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Mic } from "lucide-react";
+import { Mic, Type } from "lucide-react";
 
 type Photographer = {
   displayName: string;
@@ -11,6 +11,7 @@ export function ClientShootRoomWelcome({
   consent,
   onConsentChange,
   onCallMira,
+  onTextMira,
   isLoading,
   error,
 }: {
@@ -18,6 +19,7 @@ export function ClientShootRoomWelcome({
   consent: boolean;
   onConsentChange: (checked: boolean) => void;
   onCallMira: () => void;
+  onTextMira: () => void;
   isLoading: boolean;
   error: string | null;
 }) {
@@ -35,7 +37,7 @@ export function ClientShootRoomWelcome({
         Your photographer has already shared the essential details, which you can review below.
       </p>
       <p className="mx-auto mt-5 max-w-2xl text-center text-base leading-7 text-[#c9c3b7]">
-        Now MIRA would like to learn more about you, what you want from the photographs and anything that will help you feel prepared. Call MIRA for a private guided conversation.
+        Now MIRA would like to learn more about you, what you want from the photographs and anything that will help you feel prepared. Call MIRA or continue in text for a private guided conversation.
       </p>
 
       <div className="mx-auto mt-12 max-w-2xl">
@@ -58,13 +60,21 @@ export function ClientShootRoomWelcome({
           </p>
         )}
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button
             disabled={!consent || isLoading}
             onClick={onCallMira}
             className="rounded-full bg-[#d2b98b] px-10 text-base text-[#171613] hover:bg-[#e0c99e]"
           >
             <Mic className="mr-2 size-5" /> Call MIRA
+          </Button>
+          <Button
+            disabled={!consent || isLoading}
+            onClick={onTextMira}
+            variant="outline"
+            className="rounded-full border-white/20 px-8 text-base text-[#f1eadc]"
+          >
+            <Type className="mr-2 size-5" /> Continue with text
           </Button>
         </div>
       </div>

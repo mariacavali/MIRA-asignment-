@@ -34,13 +34,33 @@ export function clientShootRoomInvitationEmail(params: {
   location: string | null;
   accessUntil: string | Date | null;
   preparationUrl: string;
+  sentAt?: string | Date;
 }) {
   const hello = greeting(params.clientFirstName);
   const dateTime = formatShootDateTime(params.scheduledAt, params.timeZone);
   const location = params.location || "Location to be confirmed";
+  const hoursUntilShoot = params.scheduledAt
+    ? (new Date(params.scheduledAt).getTime() - new Date(params.sentAt ?? Date.now()).getTime()) / 3_600_000
+    : Number.POSITIVE_INFINITY;
   const accessUntil = params.accessUntil ? formatShootDateTime(params.accessUntil, params.timeZone) : null;
   const accessText = accessUntil ? `\n\nYour private Shoot Room will remain available until ${accessUntil}.` : "";
   const saveText = "Save this email so you can return to your private Shoot Room at any time before the session and until one day after your shoot.";
+  if (hoursUntilShoot >= 0 && hoursUntilShoot < 24) {
+    const text = `${hello}\n\nYour shoot with ${params.photographerName} is coming up very soon. Open your private Shoot Room now to review the plan and talk to MIRA—or continue in text if voice is unavailable.\n\nOPEN YOUR PRIVATE SHOOT ROOM: ${params.preparationUrl}\n\nDate: ${dateTime}\nLocation: ${location}\n\nThis link is private and intended only for you.`;
+    return {
+      subject: "Your shoot is soon — open your private Shoot Room",
+      text,
+      html: `<p>${escapeHtml(hello)}</p><p>Your shoot with ${escapeHtml(params.photographerName)} is coming up very soon. Open your private Shoot Room now to review the plan and talk to MIRA—or continue in text if voice is unavailable.</p>${ctaHtml("OPEN YOUR PRIVATE SHOOT ROOM", params.preparationUrl)}<p><strong>Date:</strong> ${escapeHtml(dateTime)}<br><strong>Location:</strong> ${escapeHtml(location)}</p><p>This link is private and intended only for you.</p>`,
+    };
+  }
+  if (hoursUntilShoot >= 0 && hoursUntilShoot < 48) {
+    const text = `${hello}\n\n${params.photographerName} has invited you to prepare for your upcoming shoot. Because the shoot is close, everything you need is in this one message.\n\nOpen your private Shoot Room to review the details, talk to MIRA or continue in text, add any useful visual references, and check the practical plan.\n\nOPEN YOUR PRIVATE SHOOT ROOM: ${params.preparationUrl}\n\nShoot: ${params.shootTitle}\nDate: ${dateTime}\nLocation: ${location}${accessText}\n\nThis link is private and intended only for you.`;
+    return {
+      subject: "Your private MIRA Shoot Room is ready",
+      text,
+      html: `<p>${escapeHtml(hello)}</p><p>${escapeHtml(params.photographerName)} has invited you to prepare for your upcoming shoot. Because the shoot is close, everything you need is in this one message.</p><p>Open your private Shoot Room to review the details, talk to MIRA or continue in text, add any useful visual references, and check the practical plan.</p>${ctaHtml("OPEN YOUR PRIVATE SHOOT ROOM", params.preparationUrl)}<p><strong>Shoot:</strong> ${escapeHtml(params.shootTitle)}<br><strong>Date:</strong> ${escapeHtml(dateTime)}<br><strong>Location:</strong> ${escapeHtml(location)}</p>${accessUntil ? `<p>${escapeHtml(`Your private Shoot Room will remain available until ${accessUntil}.`)}</p>` : ""}<p>This link is private and intended only for you.</p>`,
+    };
+  }
   const text = `${hello}\n\n${params.photographerName} has invited you into your private MIRA Shoot Room for your upcoming remote photoshoot.\n\nInside, you can review the shoot details, speak with MIRA and prepare the creative and practical direction together.\n\nOPEN YOUR PRIVATE SHOOT ROOM: ${params.preparationUrl}\n\nShoot: ${params.shootTitle}\nDate: ${dateTime}\nLocation: ${location}${accessText}\n\nThis link is private and intended only for you.\n\n${saveText}`;
   return {
     subject: `${params.photographerName} invited you to prepare for your shoot`,

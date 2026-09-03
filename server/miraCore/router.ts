@@ -1,8 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import { ENV } from "../_core/env";
-import { sdk } from "../_core/sdk";
-import { getSessionCookieOptions } from "../_core/cookies";
-import { COOKIE_NAME } from "@shared/const";
 import { z } from "zod";
 import {
   createShootInputSchema,
@@ -84,30 +81,30 @@ function requestOrigin(req: { protocol: string; get(name: string): string | unde
 }
 
 export const miraCoreRouter = router({
-  completeLocalPurchase: publicProcedure.input(z.object({ name: z.string().trim().min(2).max(160), email: z.string().email() })).mutation(async ({ input, ctx }) => {
+  completeLocalPurchase: protectedProcedure.input(z.object({ email: z.string().email().optional() }).strict()).mutation(async ({ ctx, input }) => {
     if (ENV.paymentMode === "local" && !isLocalFileStoreEnabled()) throw new TRPCError({ code: "FORBIDDEN", message: "Test checkout is unavailable" });
     if (ENV.paymentMode === "stripe") {
       try {
-        const checkout = await createPendingCheckout({ ...input, email: input.email.trim().toLowerCase() }, ctx.user?.id);
-        if (checkout.sessionOpenId) {
-          const sessionToken = await sdk.createSessionToken(checkout.sessionOpenId, { name: input.name });
-          ctx.res.cookie(COOKIE_NAME, sessionToken, getSessionCookieOptions(ctx.req as any));
+        let checkoutUser = ctx.user;
+        let email = checkoutUser.email?.trim().toLowerCase();
+        if (!email && input.email && isLocalFileStoreEnabled()) {
+          const localUser = await (await import("../db")).getLocalPhotographerByEmail(input.email);
+          if (localUser) {
+            checkoutUser = localUser;
+            email = localUser.email?.trim().toLowerCase();
+            ctx.res.cookie("mira_local_session", localUser.openId, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+          }
         }
+        if (!email) throw new Error("The photographer account needs an email before checkout");
+        const checkout = await createPendingCheckout({ name: checkoutUser.name?.trim() || "MIRA Photographer", email }, checkoutUser.id);
         return { mode: "stripe" as const, redirectUrl: checkout.redirectUrl };
       } catch (error) {
         throw new TRPCError({ code: "PRECONDITION_FAILED", message: error instanceof Error ? error.message : "Stripe checkout is unavailable" });
       }
     }
-    if (ctx.user) {
-      const { activateLocalPlanForUser } = await import("../db");
-      const user = await activateLocalPlanForUser(ctx.user.openId, "MIRA Studio");
-      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Photographer account was not found" });
-      return { mode: "local" as const, paid: true as const, paymentStatus: user.paymentStatus, selectedPlan: user.selectedPlan };
-    }
-    const { createLocalPaidPhotographerAccount } = await import("../db");
-    const user = await createLocalPaidPhotographerAccount(input.name, input.email);
-    if (!user) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email" });
-    ctx.res.cookie("mira_local_session", user.openId, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+    const { activateLocalPlanForUser } = await import("../db");
+    const user = await activateLocalPlanForUser(ctx.user.openId, "MIRA Studio");
+    if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Photographer account was not found" });
     return { mode: "local" as const, paid: true as const, paymentStatus: user.paymentStatus, selectedPlan: user.selectedPlan };
   }),
   localPhotographerLogin: publicProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ input, ctx }) => {
@@ -260,7 +257,12 @@ export const miraCoreRouter = router({
         requestOrigin: requestOrigin(ctx.req),
       });
       if (ENV.paymentMode === "stripe" && !ENV.miraLocalFileStore) {
-        try { await recordImmediateInvitationAsSent(new DrizzleEmailOutboxRepository(), { invitationId: invitation.invitationId, shootId: input.shootId, scheduledAt: shoot.shoot.scheduledAt ?? new Date(), idempotencyKey: `mira:shoot:${input.shootId}:milestone:shoot_room_invitation` }); } catch { /* Outbox availability must not change immediate delivery. */ }
+        try {
+          const repository = new DrizzleEmailOutboxRepository();
+          const invitationSentAt = new Date();
+          await recordImmediateInvitationAsSent(repository, { invitationId: invitation.invitationId, shootId: input.shootId, scheduledAt: invitationSentAt, idempotencyKey: `mira:shoot:${input.shootId}:milestone:shoot_room_invitation` }, invitationSentAt);
+          if (shoot.shoot.scheduledAt) await scheduleMiraEmailMilestones(repository, { invitationId: invitation.invitationId, shootId: input.shootId, scheduledAt: shoot.shoot.scheduledAt, timeZone: shoot.shoot.timezone, invitationSentAt });
+        } catch { /* Outbox availability must not change immediate delivery. */ }
       }
       return { ...invitation, ...delivery, deliveryError: null };
     } catch (error) {

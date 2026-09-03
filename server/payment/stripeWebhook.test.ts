@@ -106,6 +106,39 @@ describe("signed Stripe webhook boundary", () => {
     expect(normalized).not.toHaveProperty("email");
   });
 
+  it("accepts a completed one-time no-cost checkout as paid without a subscription", () => {
+    const normalized = normalizeStripeEvent(checkoutPayload({
+      mode: "payment",
+      payment_status: "no_payment_required",
+      subscription: null,
+      metadata: { mira_price_id: "price_synthetic" },
+    }) as Stripe.Event);
+    expect(normalized).toMatchObject({ paymentMode: "payment", paid: true, subscriptionId: null, checkoutSessionId: "cs_synthetic" });
+  });
+
+  it("uses the configured MIRA price for a signed account-bound Payment Link event that omits line items", async () => {
+    const repository = new InMemoryPaymentEventRepository();
+    repository.seedPending({ referenceId: "mira_pc_synthetic", createdAt: new Date("2026-09-03T10:00:00.000Z"), expiresAt: new Date("2026-09-04T10:00:00.000Z"), status: "pending" });
+    const payload = signedPayload(checkoutPayload({
+      mode: "payment",
+      payment_status: "paid",
+      subscription: null,
+      metadata: {},
+    }));
+    const response = await request(appFor(repository, { now: () => new Date("2026-09-03T12:00:00.000Z") }), payload.body, payload.signature);
+    expect(response).toEqual({ status: 200, body: { received: true, processed: true, action: "activated", state: "active" } });
+  });
+
+  it("accepts a delayed signed delivery when Stripe completed checkout before the pending reference expired", async () => {
+    const repository = new InMemoryPaymentEventRepository();
+    repository.seedPending({ referenceId: "mira_pc_synthetic", createdAt: new Date("2026-09-03T10:00:00.000Z"), expiresAt: new Date("2026-09-03T12:10:00.000Z"), status: "pending" });
+    const event = checkoutPayload({ mode: "payment", payment_status: "paid", subscription: null, metadata: {} });
+    event.created = Math.floor(new Date("2026-09-03T12:00:00.000Z").getTime() / 1000);
+    const payload = signedPayload(event);
+    const response = await request(appFor(repository, { now: () => new Date("2026-09-03T13:00:00.000Z") }), payload.body, payload.signature);
+    expect(response).toEqual({ status: 200, body: { received: true, processed: true, action: "activated", state: "active" } });
+  });
+
   it("keeps duplicate verified delivery idempotent", async () => {
     const repository = new InMemoryPaymentEventRepository();
     repository.seedPending({ referenceId: "mira_pc_synthetic", createdAt: new Date("2026-09-03T10:00:00.000Z"), expiresAt: new Date("2026-09-04T10:00:00.000Z"), status: "pending" });

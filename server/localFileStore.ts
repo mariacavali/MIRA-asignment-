@@ -74,11 +74,13 @@ export type LocalInvitation = {
 
 export type LocalPendingCheckout = {
   referenceId: string;
+  userId: number;
+  openId: string;
   name: string;
   email: string;
   createdAt: string;
   expiresAt: string;
-  status: "pending" | "completed" | "expired";
+  status: "pending" | "consumed" | "expired";
 };
 
 export type LocalReference = {
@@ -97,6 +99,20 @@ export type LocalReference = {
   createdAt: string;
 };
 
+export type LocalTextTestSession = {
+  id: string;
+  invitationId: string;
+  shootId: number;
+  photographerUserId: number;
+  status: "active" | "ended";
+  turnCount: number;
+  allowedSeconds: number;
+  startedAt: string;
+  endedAt: string | null;
+  endReason: string | null;
+  messages: Array<{ role: "client" | "assistant"; content: string; createdAt: string }>;
+};
+
 type LocalState = {
   nextUserId: number;
   nextShootId: number;
@@ -106,6 +122,8 @@ type LocalState = {
   invitations: LocalInvitation[];
   references: LocalReference[];
   pendingCheckouts?: LocalPendingCheckout[];
+  processedStripeEvents?: string[];
+  textTestSessions?: LocalTextTestSession[];
 };
 
 const storePath = join(process.cwd(), ".mira-local-data", "store.json");
@@ -131,9 +149,11 @@ export function generatePendingCheckoutReference() {
   return `mira_pc_${randomBytes(24).toString("hex")}`;
 }
 
-export function createPendingCheckoutRecord(input: { name: string; email: string }, now = new Date(), lifetimeMs = 30 * 60_000): LocalPendingCheckout {
+export function createPendingCheckoutRecord(input: { name: string; email: string; userId?: number; openId?: string }, now = new Date(), lifetimeMs = 30 * 60_000): LocalPendingCheckout {
   return {
     referenceId: generatePendingCheckoutReference(),
+    userId: input.userId ?? 0,
+    openId: input.openId ?? "",
     name: input.name,
     email: input.email,
     createdAt: now.toISOString(),
@@ -142,10 +162,13 @@ export function createPendingCheckoutRecord(input: { name: string; email: string
   };
 }
 
-export async function createLocalPendingCheckout(input: { name: string; email: string }) {
+export async function createLocalPendingCheckout(input: { name: string; email: string }, photographerUserId?: number) {
   return update(state => {
     state.pendingCheckouts ??= [];
-    const record = createPendingCheckoutRecord(input);
+    const user = state.users.find(item => item.id === photographerUserId && item.email?.toLowerCase() === input.email.toLowerCase());
+    if (!user) return null;
+    for (const checkout of state.pendingCheckouts) if (checkout.userId === user.id && checkout.status === "pending") checkout.status = "expired";
+    const record = createPendingCheckoutRecord({ ...input, userId: user.id, openId: user.openId });
     state.pendingCheckouts.push(record);
     return record;
   });
@@ -155,6 +178,56 @@ export async function getLocalPendingCheckout(referenceId: string, now = new Dat
   const record = (await load()).pendingCheckouts?.find(item => item.referenceId === referenceId);
   if (!record || record.status !== "pending" || new Date(record.expiresAt).getTime() <= now.getTime()) return null;
   return record;
+}
+
+export async function getLocalPendingCheckoutIdentity(referenceId: string) {
+  const record = (await load()).pendingCheckouts?.find(item => item.referenceId === referenceId);
+  if (!record) return null;
+  return {
+    referenceId: record.referenceId,
+    createdAt: new Date(record.createdAt),
+    expiresAt: new Date(record.expiresAt),
+    status: record.status,
+    name: record.name,
+    email: record.email,
+    userId: record.userId,
+    openId: record.openId,
+  };
+}
+
+export async function consumeLocalPendingCheckout(referenceId: string, identity: { customerId: string; subscriptionId: string; priceId: string; currency: string; cancelAtPeriodEnd?: boolean; cancelAt?: Date | null; currentPeriodEnd?: Date | null }) {
+  return update(state => {
+    const pending = state.pendingCheckouts?.find(item => item.referenceId === referenceId && item.status === "pending");
+    if (!pending) return null;
+    const user = state.users.find(item => item.id === pending.userId && item.openId === pending.openId);
+    if (!user) return null;
+    pending.status = "consumed";
+    user.paymentStatus = "paid";
+    user.selectedPlan = identity.priceId;
+    user.updatedAt = new Date().toISOString();
+    return {
+      openId: user.openId,
+      state: "active" as const,
+      customerId: identity.customerId,
+      subscriptionId: identity.subscriptionId,
+      priceId: identity.priceId,
+      currency: identity.currency,
+      cancelAtPeriodEnd: identity.cancelAtPeriodEnd ?? false,
+      cancelAt: identity.cancelAt ?? null,
+      currentPeriodEnd: identity.currentPeriodEnd ?? null,
+    };
+  });
+}
+
+export async function hasProcessedLocalStripeEvent(eventId: string) {
+  return Boolean((await load()).processedStripeEvents?.includes(eventId));
+}
+
+export async function recordProcessedLocalStripeEvent(eventId: string) {
+  await update(state => {
+    state.processedStripeEvents ??= [];
+    if (!state.processedStripeEvents.includes(eventId)) state.processedStripeEvents.push(eventId);
+  });
 }
 
 async function save(state: LocalState) {
@@ -380,6 +453,108 @@ export async function updateLocalShoot(userId: number, shootId: number, patch: P
     if (!shoot) return null;
     Object.assign(shoot, patch, { updatedAt: new Date().toISOString() });
     return shoot;
+  });
+}
+
+export async function startLocalTextTestSession(input: { token: string; prompts: readonly string[]; allowedSeconds: number; maxSessions?: number }) {
+  return update(state => {
+    const invitation = (state.invitations ?? []).find(item => item.token === input.token && item.status === "active");
+    if (!invitation || !input.prompts[0]) return null;
+    const shoot = state.shoots.find(item => item.id === invitation.shootId && item.photographerUserId === invitation.photographerUserId);
+    if (!shoot) return null;
+    state.textTestSessions ??= [];
+    const active = state.textTestSessions.find(item => item.invitationId === invitation.id && item.status === "active");
+    if (active) {
+      return { sessionId: active.id, prompt: input.prompts[active.turnCount] ?? input.prompts[0], allowedSeconds: active.allowedSeconds };
+    }
+    if (state.textTestSessions.filter(item => item.invitationId === invitation.id).length >= (input.maxSessions ?? 3)) return null;
+    const now = new Date().toISOString();
+    const session: LocalTextTestSession = {
+      id: randomUUID(),
+      invitationId: invitation.id,
+      shootId: shoot.id,
+      photographerUserId: shoot.photographerUserId,
+      status: "active",
+      turnCount: 0,
+      allowedSeconds: input.allowedSeconds,
+      startedAt: now,
+      endedAt: null,
+      endReason: null,
+      messages: [{ role: "assistant", content: input.prompts[0], createdAt: now }],
+    };
+    state.textTestSessions.push(session);
+    invitation.consentAcknowledgedAt ??= now;
+    invitation.lastOpenedAt ??= now;
+    invitation.deliveryStatus = "preparation_in_progress";
+    invitation.preparationStartedAt ??= now;
+    shoot.status = "conversation_in_progress";
+    if (shoot.roomState === "welcome") shoot.roomState = "discovery_offered";
+    shoot.updatedAt = now;
+    return { sessionId: session.id, prompt: input.prompts[0], allowedSeconds: session.allowedSeconds };
+  });
+}
+
+export async function submitLocalTextTestTurn(input: { token: string; sessionId: string; answer: string; prompts: readonly string[] }) {
+  return update(state => {
+    const invitation = (state.invitations ?? []).find(item => item.token === input.token && item.status === "active");
+    const session = state.textTestSessions?.find(item => item.id === input.sessionId && item.status === "active" && item.invitationId === invitation?.id);
+    if (!invitation || !session) return null;
+    const now = new Date();
+    const consumedSeconds = Math.max(0, Math.floor((now.getTime() - new Date(session.startedAt).getTime()) / 1000));
+    if (consumedSeconds >= session.allowedSeconds) {
+      session.status = "ended";
+      session.endedAt = now.toISOString();
+      session.endReason = "allowance_exhausted";
+      invitation.status = "completed";
+      invitation.deliveryStatus = "completed";
+      invitation.completedAt = now.toISOString();
+      return null;
+    }
+    session.messages.push({ role: "client", content: input.answer, createdAt: now.toISOString() });
+    session.turnCount += 1;
+    const nextPrompt = input.prompts[session.turnCount] ?? null;
+    if (nextPrompt) session.messages.push({ role: "assistant", content: nextPrompt, createdAt: now.toISOString() });
+    else {
+      session.status = "ended";
+      session.endedAt = now.toISOString();
+      session.endReason = "test_complete";
+      invitation.status = "completed";
+      invitation.deliveryStatus = "completed";
+      invitation.completedAt = now.toISOString();
+    }
+    return { shootId: session.shootId, turnCount: session.turnCount, nextPrompt, complete: !nextPrompt };
+  });
+}
+
+export async function endLocalTextTestSession(input: { token: string; sessionId: string }) {
+  return update(state => {
+    const invitation = (state.invitations ?? []).find(item => item.token === input.token && item.status === "active");
+    const session = state.textTestSessions?.find(item => item.id === input.sessionId && item.status === "active" && item.invitationId === invitation?.id);
+    if (!invitation || !session) return false;
+    const now = new Date().toISOString();
+    session.status = "ended";
+    session.endedAt = now;
+    session.endReason = "client_ended";
+    invitation.status = "completed";
+    invitation.deliveryStatus = "completed";
+    invitation.completedAt = now;
+    return true;
+  });
+}
+
+export async function listLocalTextTestSessions(userId: number, shootId: number) {
+  const state = await load();
+  if (!state.shoots.some(item => item.id === shootId && item.photographerUserId === userId)) return null;
+  return (state.textTestSessions ?? []).filter(item => item.shootId === shootId && item.photographerUserId === userId);
+}
+
+export async function deleteLocalTextTestMessages(userId: number, shootId: number) {
+  return update(state => {
+    if (!state.shoots.some(item => item.id === shootId && item.photographerUserId === userId)) return false;
+    for (const session of state.textTestSessions ?? []) {
+      if (session.shootId === shootId && session.photographerUserId === userId) session.messages = [];
+    }
+    return true;
   });
 }
 

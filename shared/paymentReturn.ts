@@ -24,9 +24,9 @@ export function isBlockedPaymentState(state: StoredPaymentState) {
   return state === "past_due" || state === "cancelled" || state === "expired";
 }
 
-export function paymentReturnDestination(paymentState: StoredPaymentState, onboardingStatus: "started" | "complete" | null, paymentStatus?: string | null) {
+export function paymentReturnDestination(paymentState: StoredPaymentState, _onboardingStatus: "started" | "complete" | null, paymentStatus?: string | null) {
   if (!isPaidPaymentState(paymentState, paymentStatus)) return null;
-  return onboardingStatus === "complete" ? "/mira/dashboard" : "/mira/onboarding";
+  return "/mira/dashboard";
 }
 
 export function startPaymentConfirmationPoll(onPoll: () => void, onTimeout: () => void) {

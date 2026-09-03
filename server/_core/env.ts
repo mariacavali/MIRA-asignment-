@@ -24,7 +24,7 @@ export const ENV = {
   paymentMode: (process.env.MIRA_PAYMENT_MODE ?? (process.env.NODE_ENV === "production" ? "stripe" : "local")) as "local" | "stripe",
   stripePaymentLinkUrl: process.env.STRIPE_PAYMENT_LINK_URL ?? "",
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
+  stripeWebhookSecret: process.env.MIRA_STRIPE_WEBHOOK_SECRET ?? process.env.STRIPE_WEBHOOK_SECRET ?? "",
   stripePriceId: process.env.STRIPE_PRICE_ID ?? "",
   stripeCurrency: process.env.STRIPE_CURRENCY ?? "eur",
   emailWorkerSecret: process.env.MIRA_EMAIL_WORKER_SECRET ?? "",

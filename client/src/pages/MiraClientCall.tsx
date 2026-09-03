@@ -23,9 +23,12 @@ type CallState =
   | "error"
   | "ended";
 
+type ConversationMessage = { role: "client" | "assistant"; content: string };
+
 type MiraClientCallProps = {
   token: string;
   consent: boolean;
+  initialMode?: "voice" | "text";
   onSessionStart?: () => void;
   onSessionError?: (error: string) => void;
   onSessionEnd?: () => void;
@@ -37,6 +40,7 @@ type MiraClientCallProps = {
 export default function MiraClientCall({
   token,
   consent,
+  initialMode = "voice",
   onSessionStart,
   onSessionError,
   onSessionEnd,
@@ -48,6 +52,8 @@ export default function MiraClientCall({
   const [muted, setMuted] = useState(false);
   const [textOpen, setTextOpen] = useState(false);
   const [text, setText] = useState("");
+  const [conversationMode, setConversationMode] = useState<"voice" | "text">(initialMode);
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
@@ -66,6 +72,9 @@ export default function MiraClientCall({
   const pauseCall = trpc.miraCore.setRealtimePaused.useMutation();
   const finalize = trpc.miraCore.finalizeRealtime.useMutation();
   const checkStatus = trpc.miraCore.checkPreparationStatus.useMutation();
+  const startTextSession = trpc.miraCore.startTextTestSession.useMutation();
+  const submitTextTurn = trpc.miraCore.submitTextTestTurn.useMutation();
+  const endTextSession = trpc.miraCore.endTextTestSession.useMutation();
 
   const closeMedia = useCallback(() => {
     if (reconnectTimerRef.current)
@@ -245,6 +254,7 @@ export default function MiraClientCall({
     async (reconnecting = false) => {
       if (connectingRef.current || finalizedRef.current) return;
       connectingRef.current = true;
+      setConversationMode("voice");
       setError(null);
       setState(reconnecting ? "reconnecting" : "connecting");
       try {
@@ -319,6 +329,7 @@ export default function MiraClientCall({
           sdp: result.answerSdp,
         });
       } catch (cause) {
+        closeMedia();
         const errorMessage =
           cause instanceof DOMException && cause.name === "NotAllowedError"
             ? "Microphone access was declined. Allow access and try again."
@@ -330,8 +341,31 @@ export default function MiraClientCall({
         connectingRef.current = false;
       }
     },
-    [createCall, handleEvent, token, consent, onSessionStart, onSessionError]
+    [closeMedia, createCall, handleEvent, token, consent, onSessionStart, onSessionError]
   );
+
+  const startTextFallback = useCallback(async () => {
+    if (startTextSession.isPending) return;
+    closeMedia();
+    setConversationMode("text");
+    setTextOpen(true);
+    setError(null);
+    setState("connecting");
+    try {
+      const result = await startTextSession.mutateAsync({ token, consentAcknowledged: true });
+      sessionIdRef.current = result.sessionId;
+      setSessionId(result.sessionId);
+      setRemaining(result.allowedSeconds);
+      setMessages([{ role: "assistant", content: result.prompt }]);
+      setState("listening");
+      onSessionStart?.();
+    } catch {
+      const message = "Text preparation is unavailable right now. Please return to the Shoot Room and contact your photographer.";
+      setError(message);
+      setState("error");
+      onSessionError?.(message);
+    }
+  }, [closeMedia, onSessionError, onSessionStart, startTextSession, token]);
 
   useEffect(() => {
     if (!sessionId || state === "ended") return;
@@ -350,13 +384,15 @@ export default function MiraClientCall({
   }, [endCall, sessionId, state]);
   useEffect(() => closeMedia, [closeMedia]);
 
-  // Auto-connect when component mounts (consent already obtained from parent)
+  // Start the mode selected in the Shoot Room (consent already obtained there).
   useEffect(() => {
-    void connect();
+    if (initialMode === "text") void startTextFallback();
+    else void connect();
   }, []);
 
-  const status =
-    state === "speaking"
+  const status = conversationMode === "text"
+    ? state === "ended" ? "PREPARATION COMPLETE" : state === "connecting" ? "OPENING TEXT PREPARATION" : "TEXT PREPARATION"
+    : state === "speaking"
       ? "SPEAKING"
       : state === "listening"
         ? "LISTENING"
@@ -374,32 +410,67 @@ export default function MiraClientCall({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#171613]">
       <section className="flex w-full max-w-2xl flex-col items-center text-center px-4 py-8">
         <p className="mira-dark-kicker">MIRA · {status}</p>
-        <div
-          className={`mira-call-orb mt-10 ${state === "listening" ? "is-listening" : ""}`}
-          aria-hidden="true"
-        >
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-        <p className="mt-8 font-mono text-sm tabular-nums text-[#b7a98f]">
-          {String(Math.floor(remaining / 60)).padStart(2, "0")}:
-          {String(remaining % 60).padStart(2, "0")} remaining
-        </p>
+        {conversationMode === "voice" ? <>
+          <div
+            className={`mira-call-orb mt-10 ${state === "listening" ? "is-listening" : ""}`}
+            aria-hidden="true"
+          >
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <p className="mt-8 font-mono text-sm tabular-nums text-[#b7a98f]">
+            {String(Math.floor(remaining / 60)).padStart(2, "0")}:
+            {String(remaining % 60).padStart(2, "0")} remaining
+          </p>
+        </> : <p className="mt-4 max-w-lg text-sm leading-6 text-[#b7a98f]">Share your answers in writing. They stay connected to this private Shoot Room for your photographer.</p>}
         {error && (
           <p role="alert" className="mt-6 text-sm text-red-200">
             {error}
           </p>
         )}
+        {state === "error" && conversationMode === "voice" && (
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Button type="button" onClick={() => void startTextFallback()} className="rounded-full bg-[#d2b98b] text-[#171613]">
+              <Type className="mr-2 size-4" /> Continue with text
+            </Button>
+            <Button type="button" variant="outline" onClick={() => void connect()} className="rounded-full border-white/20 text-[#f1eadc]">
+              Try voice again
+            </Button>
+          </div>
+        )}
+        {conversationMode === "text" && messages.length > 0 && (
+          <div aria-live="polite" className="mt-7 max-h-[42vh] w-full space-y-3 overflow-y-auto pr-1 text-left">
+            {messages.map((message, index) => (
+              <div key={`${message.role}-${index}`} className={message.role === "assistant" ? "mr-10 rounded-2xl border border-white/10 bg-white/5 p-4 text-[#eee5d5]" : "ml-10 rounded-2xl bg-[#d2b98b] p-4 text-[#171613]"}>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-70">{message.role === "assistant" ? "MIRA" : "You"}</p>
+                <p className="mt-2 text-sm leading-6">{message.content}</p>
+              </div>
+            ))}
+          </div>
+        )}
         {textOpen && state !== "ended" && (
           <form
             className="mt-8 w-full"
-            onSubmit={e => {
+            onSubmit={async e => {
               e.preventDefault();
               const message = text.trim();
               const activeSessionId = sessionIdRef.current;
-              if (!message || dcRef.current?.readyState !== "open" || !activeSessionId) return;
+              if (!message || !activeSessionId) return;
+              if (conversationMode === "text") {
+                setMessages(current => [...current, { role: "client", content: message }]);
+                setText("");
+                try {
+                  const result = await submitTextTurn.mutateAsync({ token, sessionId: activeSessionId, answer: message });
+                  setMessages(current => [...current, { role: "assistant", content: result.response }]);
+                  if (result.complete) setState("ended");
+                } catch {
+                  setError("Your answer could not be saved. Please try once more.");
+                }
+                return;
+              }
+              if (dcRef.current?.readyState !== "open") return;
               dcRef.current.send(
                 JSON.stringify({
                   type: "conversation.item.create",
@@ -423,7 +494,7 @@ export default function MiraClientCall({
               className="min-h-24 border-white/15 bg-white/5 text-[#f1eadc]"
             />
             <Button
-              disabled={!text.trim()}
+              disabled={!text.trim() || submitTextTurn.isPending}
               className="mt-3 rounded-full bg-[#d2b98b] text-[#171613]"
             >
               <Send className="mr-2 size-4" /> Send
@@ -431,7 +502,7 @@ export default function MiraClientCall({
           </form>
         )}
         <div className="mt-10 flex gap-3">
-          <CallControl
+          {conversationMode === "voice" && <><CallControl
             label={muted ? "Unmute" : "Mute"}
             onClick={() => {
               const next = !muted;
@@ -462,16 +533,29 @@ export default function MiraClientCall({
             }}
           >
             {state === "paused" ? <Play /> : <Pause />}
-          </CallControl>
+          </CallControl></>}
           <CallControl
-            label="Text"
-            onClick={() => setTextOpen(value => !value)}
+            label={conversationMode === "text" ? "Text conversation" : "Text"}
+            onClick={() => {
+              if (conversationMode === "text" || dcRef.current?.readyState === "open") setTextOpen(value => !value);
+              else void startTextFallback();
+            }}
           >
             <Type />
           </CallControl>
           <CallControl
-            label="End"
-            onClick={() => void endCall(false, "client_ended")}
+            label={state === "ended" ? "Return to room" : "End"}
+            onClick={() => {
+              const activeSessionId = sessionIdRef.current;
+              if (conversationMode === "text") {
+                const close = async () => {
+                  if (state !== "ended" && activeSessionId) await endTextSession.mutateAsync({ token, sessionId: activeSessionId });
+                  closeMedia();
+                  onSessionEnd?.();
+                };
+                void close();
+              } else void endCall(false, "client_ended");
+            }}
             danger
           >
             <PhoneOff />
