@@ -14,6 +14,8 @@ import { DrizzlePaymentRepository } from "../payment/drizzlePaymentRepository";
 import { LocalPaymentRepository } from "../payment/localPaymentRepository";
 import { createEmailOutboxWorkerHandler } from "../email/outboxWorkerEndpoint";
 import { buildProductionMiraEmailOutboxWorker } from "../miraCore/emailOutboxWorker";
+import { createResendWebhookHandler } from "../email/resendWebhook";
+import { DrizzleEmailOutboxRepository } from "../email/outbox";
 import { healthHandler, readinessHandler } from "./readiness";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -47,6 +49,11 @@ async function startServer() {
     priceId: ENV.stripePriceId,
   }));
   app.post("/api/internal/mira/email-outbox/process", createEmailOutboxWorkerHandler(buildProductionMiraEmailOutboxWorker(), ENV.emailWorkerSecret));
+  // Resend requires the untouched JSON bytes for svix-style signature verification.
+  app.post("/api/webhooks/resend", express.raw({ type: "application/json", limit: "2mb" }), createResendWebhookHandler({
+    secret: ENV.resendWebhookSecret,
+    outboxRepository: ENV.paymentMode === "stripe" && !ENV.miraLocalFileStore ? new DrizzleEmailOutboxRepository() : undefined,
+  }));
   app.get("/api/health", healthHandler);
   app.get("/api/internal/mira/readiness", readinessHandler);
   // Configure body parser with larger size limit for file uploads

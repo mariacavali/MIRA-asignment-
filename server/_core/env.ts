@@ -31,6 +31,7 @@ export const ENV = {
   invitationLinkSecret: process.env.MIRA_INVITATION_LINK_SECRET ?? "",
   emailProvider: process.env.MIRA_EMAIL_PROVIDER ?? "",
   resendApiKey: process.env.RESEND_API_KEY ?? "",
+  resendWebhookSecret: process.env.RESEND_WEBHOOK_SECRET ?? "",
   invitationFrom: process.env.MIRA_INVITATION_FROM ?? "",
   publicAppBaseUrl: process.env.MIRA_PUBLIC_APP_BASE_URL ?? "",
   openAiRealtimeModel: process.env.OPENAI_REALTIME_MODEL ?? "gpt-realtime-2.1",

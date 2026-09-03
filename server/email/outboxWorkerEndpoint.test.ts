@@ -28,7 +28,7 @@ describe("email outbox worker endpoint", () => {
   it("returns aggregate counts for a valid synthetic worker request", async () => {
     const repository = new InMemoryEmailOutboxRepository();
     const provider = { send: vi.fn(async () => ({ provider: "fake", messageId: "synthetic" })) };
-    const worker = new MiraEmailOutboxWorker(repository, async () => ({ clientFirstName: "Synthetic", photographerName: "Synthetic Studio", shootTitle: "Synthetic shoot", scheduledAt: new Date(), shootEndsAt: new Date(Date.now() + 60_000), timeZone: "UTC", location: null, accessUntil: null, preparationUrl: "https://example.test/room", clientEmail: "synthetic@example.test", preparationCompleted: false, invitationValid: true, shootCancelled: false }), provider, "MIRA <prepare@example.test>");
+    const worker = new MiraEmailOutboxWorker(repository, async () => ({ clientFirstName: "Synthetic", photographerName: "Synthetic Studio", shootTitle: "Synthetic shoot", scheduledAt: new Date(Date.now() + 3_600_000), shootEndsAt: new Date(Date.now() + 7_200_000), timeZone: "UTC", location: null, accessUntil: null, preparationUrl: "https://example.test/room", clientEmail: "synthetic@example.test", preparationCompleted: false, invitationValid: true, shootCancelled: false }), provider, "MIRA <prepare@example.test>");
     await repository.schedule({ shootId: 1, invitationId: "invitation", milestoneId: "shoot_room_invitation", scheduledAt: new Date(0), idempotencyKey: "synthetic" });
     const output = response();
     await createEmailOutboxWorkerHandler(worker, "synthetic-secret")({ header: name => name === "X-MIRA-EMAIL-WORKER-SECRET" ? "synthetic-secret" : undefined } as never, output.res as never, (() => undefined) as never);

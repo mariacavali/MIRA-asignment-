@@ -17,6 +17,9 @@ import {
   appendRealtimeQaEvent,
   confirmRealtimeDiscoverySummary,
   createClientInvitation,
+  invitationAlreadySentToClient,
+  markInvitationQueued,
+  markInvitationFailed,
   endTextTestSession,
   finalizeRealtimeSession,
   getClientInvitation,
@@ -236,9 +239,17 @@ export const miraCoreRouter = router({
   sendInvitation: protectedProcedure.input(z.object({
     shootId: z.number().int().positive(),
     expiresInDays: z.number().int().min(1).max(30).default(7),
+    // A plain "Send invitation" click never resends once delivery has
+    // already been attempted for the current active invitation - that
+    // guards against a double click or a retried request firing two emails.
+    // Resending is still possible, but only as an explicit, separate action.
+    force: z.boolean().default(false),
   })).mutation(async ({ ctx, input }) => {
     const shoot = await getOwnedShootState(ctx.user.id, input.shootId);
     if (!shoot) notFound();
+    if (!input.force && invitationAlreadySentToClient(shoot.invitations[0])) {
+      throw new TRPCError({ code: "CONFLICT", message: "An invitation was already sent for this shoot. Use Resend invitation to send another one." });
+    }
     const expiresAt = calculateInvitationExpiry(shoot.shoot.scheduledAt, shoot.shoot.timezone, input.expiresInDays, shoot.shoot.durationMinutes);
     const invitation = await createClientInvitation({
       photographerUserId: ctx.user.id,
@@ -246,6 +257,7 @@ export const miraCoreRouter = router({
       expiresAt,
     });
     if (!invitation) notFound();
+    await markInvitationQueued({ invitationId: invitation.invitationId, photographerUserId: ctx.user.id });
     try {
       const delivery = await deliverClientInvitation({
         photographerUserId: ctx.user.id,
@@ -260,18 +272,20 @@ export const miraCoreRouter = router({
         try {
           const repository = new DrizzleEmailOutboxRepository();
           const invitationSentAt = new Date();
-          await recordImmediateInvitationAsSent(repository, { invitationId: invitation.invitationId, shootId: input.shootId, scheduledAt: invitationSentAt, idempotencyKey: `mira:shoot:${input.shootId}:milestone:shoot_room_invitation` }, invitationSentAt);
+          await recordImmediateInvitationAsSent(repository, { invitationId: invitation.invitationId, shootId: input.shootId, scheduledAt: invitationSentAt, idempotencyKey: `mira:shoot:${input.shootId}:milestone:shoot_room_invitation`, providerMessageId: delivery.providerMessageId }, invitationSentAt);
           if (shoot.shoot.scheduledAt) await scheduleMiraEmailMilestones(repository, { invitationId: invitation.invitationId, shootId: input.shootId, scheduledAt: shoot.shoot.scheduledAt, timeZone: shoot.shoot.timezone, invitationSentAt });
         } catch { /* Outbox availability must not change immediate delivery. */ }
       }
       return { ...invitation, ...delivery, deliveryError: null };
     } catch (error) {
       console.warn("MIRA invitation email was not delivered", error instanceof Error ? error.message : "unknown error");
+      await markInvitationFailed({ invitationId: invitation.invitationId, photographerUserId: ctx.user.id }).catch(() => undefined);
       return {
         ...invitation,
         preparationUrl: `${requestOrigin(ctx.req) ?? ""}/prepare/${invitation.token}`,
         provider: null,
-        deliveryStatus: "created" as const,
+        providerMessageId: null,
+        deliveryStatus: "failed" as const,
         deliveryError: "Email delivery failed. Copy the secure link instead.",
         replyToWarning: null,
       };

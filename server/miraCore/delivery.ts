@@ -59,7 +59,7 @@ export async function deliverClientInvitation(params: {
     provider: delivery.provider,
     messageId: delivery.messageId,
   });
-  return { preparationUrl, provider: delivery.provider, deliveryStatus: "sent" as const, replyToWarning: replyTo ? null : "Photographer Reply-To is missing or invalid; invitation was sent without it." };
+  return { preparationUrl, provider: delivery.provider, providerMessageId: delivery.messageId, deliveryStatus: "sent" as const, replyToWarning: replyTo ? null : "Photographer Reply-To is missing or invalid; invitation was sent without it." };
 }
 
 export async function notifyPhotographerOfCompletion(params: {

@@ -50,6 +50,8 @@ describe("MIRA transactional email templates", () => {
     for (const email of [invitation, guidance, reminder, day]) {
       expect(email.text).toContain(preparationUrl);
       expect(email.html).toContain(`href="${preparationUrl}"`);
+      expect(email.text).toContain("TALK TO MIRA");
+      expect(email.html).toContain(">Talk to MIRA<");
     }
     expect(guidance.subject).toBe("Let’s prepare for your remote photoshoot");
     expect(reminder.subject).toBe("A reminder to prepare with MIRA");
@@ -73,7 +75,9 @@ describe("MIRA transactional email templates", () => {
 
     expect(combined.text).toContain("everything you need is in this one message");
     expect(combined.text).toContain("continue in text");
+    expect(combined.text).toContain("TALK TO MIRA");
     expect(urgent.subject).toContain("shoot is soon");
     expect(urgent.text).toContain("talk to MIRA—or continue in text");
+    expect(urgent.text).toContain("TALK TO MIRA");
   });
 });

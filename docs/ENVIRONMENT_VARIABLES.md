@@ -22,6 +22,7 @@ MIRA_INVITATION_LINK_SECRET=
 # Pilot transactional email (Resend). Keep blank to use secure-link fallback only.
 MIRA_EMAIL_PROVIDER=resend
 RESEND_API_KEY=
+RESEND_WEBHOOK_SECRET=
 MIRA_INVITATION_FROM=
 MIRA_PUBLIC_APP_BASE_URL=
 
@@ -63,5 +64,7 @@ The application reads the active server-side configuration through `server/_core
 The future internal email worker endpoint uses `MIRA_EMAIL_WORKER_SECRET` with a fixed batch of 10 jobs and should be triggered by either a Manus scheduler or secured n8n workflow every 5 minutes, never both. Keep the secret server-side.
 
 `MIRA_INVITATION_LINK_SECRET` signs the access links the email outbox worker generates for reminder emails (`/prepare/access/:signedAccessToken`), so a client can return to their private Shoot Room without the raw invitation token ever being stored outside the original invitation email. The link is derived from the invitation's id and its *current* `tokenHash`, so rotating an invitation's token automatically invalidates every signed link issued for it. Without this secret configured, the worker stays unavailable and sends nothing. Keep it server-side only; it is a distinct secret from `MIRA_EMAIL_WORKER_SECRET`, which only authenticates the worker HTTP endpoint itself.
+
+`RESEND_WEBHOOK_SECRET` verifies the `POST /api/webhooks/resend` delivery-event webhook (Resend signs payloads the same way Svix does: `svix-id`/`svix-timestamp`/`svix-signature` headers, HMAC-SHA256 over the raw body). Configure this in the Resend dashboard against the deployed `/api/webhooks/resend` URL once a verified sending domain is live. Without it, the webhook route stays disabled (503) and an invitation's stored delivery status advances only as far as `sent` — it never becomes `delivered`, and a bounce or complaint never becomes `failed`. No client library is required; verification is done with Node's built-in `crypto`.
 
 After hosting, configure the Stripe Payment Link after-payment redirect as `https://www.mariacavali.com/mira/payment-success?session_id={CHECKOUT_SESSION_ID}` (production domain confirmed — see `docs/MANUS_DEPLOYMENT_RUNBOOK.md` §0 for the full route map). Payment Links support `client_reference_id` and this after-payment redirect. The `session_id` is informational only: it never grants access; verified webhook processing and stored active payment state remain authoritative. Stripe Payment Links do not provide a separate configurable cancellation URL. `/mira/checkout?cancelled=true` is MIRA's own safe application UI for a manual return or cancellation flow. `MIRA_PUBLIC_APP_BASE_URL` is set to this same production origin once the MIRA host is live (Runbook Step 6); no server code hard-codes the domain.

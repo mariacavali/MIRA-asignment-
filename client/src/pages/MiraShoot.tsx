@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Check, Copy, ImagePlus, Link2, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Copy, ImagePlus, Link2, Loader2, RefreshCw, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "wouter";
 import { EmailSequencePreview } from "@/components/mira/EmailSequencePreview";
@@ -44,11 +44,14 @@ export default function MiraShoot() {
     setDeliveryMessage("Private client link created.");
     void state.refetch();
   }});
-  const sendInvitation = trpc.miraCore.sendInvitation.useMutation({ onSuccess: result => {
-    setLink(result.preparationUrl);
-    setDeliveryMessage(result.deliveryError || `Invitation sent. If your client cannot find it within a few minutes, ask them to check Spam or Promotions.${result.replyToWarning ? ` ${result.replyToWarning}` : ""}`);
-    void state.refetch();
-  }});
+  const sendInvitation = trpc.miraCore.sendInvitation.useMutation({
+    onSuccess: result => {
+      setLink(result.preparationUrl);
+      setDeliveryMessage(result.deliveryError || `Invitation sent. If your client cannot find it within a few minutes, ask them to check Spam or Promotions.${result.replyToWarning ? ` ${result.replyToWarning}` : ""}`);
+      void state.refetch();
+    },
+    onError: error => setDeliveryMessage(error.message || "The invitation could not be sent."),
+  });
   useEffect(() => {
     if (!state.data || state.data.invitations.length > 0 || link || invitation.isPending) return;
     invitation.mutate({ shootId, expiresInDays: 7 });
@@ -57,6 +60,8 @@ export default function MiraShoot() {
   if (loading || state.isLoading) return <PhotographerShell><Loader2 className="size-5 animate-spin" /></PhotographerShell>;
   if (!state.data) return <PhotographerShell><p>Shoot not found.</p></PhotographerShell>;
   const { shoot, invitations } = state.data;
+  const latestInvitation = invitations[0];
+  const invitationAlreadySent = Boolean(latestInvitation && ["queued", "sent", "delivered", "opened", "preparation_in_progress", "completed"].includes(latestInvitation.deliveryStatus));
   const latestRevision = inspection.data?.revisions?.[inspection.data.revisions.length - 1];
   const scheduleValue = latestRevision?.snapshotJson?.shootContext?.scheduleConfirmation?.value;
   const scheduleResponse = Array.isArray(scheduleValue) ? scheduleValue : null;
@@ -100,6 +105,19 @@ export default function MiraShoot() {
           <Button type="submit" variant="outline" disabled={updateContact.isPending} className="w-full border-white/15 bg-transparent text-[#ded5c5]">Save client details</Button>
         </form>
         <Button variant="ghost" disabled={invitation.isPending || updateContact.isPending} onClick={async () => { await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null }); invitation.mutate({ shootId, expiresInDays: 7 }); }} className="mt-2 w-full text-[#d2b98b]"><Link2 className="mr-2 size-4" /> Create or regenerate private link</Button>
+        <Button
+          variant="outline"
+          disabled={sendInvitation.isPending || updateContact.isPending || !contact.clientEmail.trim()}
+          onClick={async () => {
+            await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null });
+            sendInvitation.mutate({ shootId, expiresInDays: 7, force: invitationAlreadySent });
+          }}
+          className="mt-2 w-full border-[#d2b98b]/40 bg-transparent text-[#d2b98b]"
+        >
+          {sendInvitation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : invitationAlreadySent ? <RefreshCw className="mr-2 size-4" /> : <Send className="mr-2 size-4" />}
+          {invitationAlreadySent ? "Resend invitation" : "Send invitation"}
+        </Button>
+        {!contact.clientEmail.trim() ? <p className="mt-2 text-xs text-[#9e978b]">Add a client email to send the invitation by email.</p> : null}
           <section className="mt-6 border-t border-white/10 pt-5">
             <p className="mira-dark-kicker">Client communications</p>
             <h2 className="mira-dark-display mt-3 text-3xl">Preparation email sequence</h2>

@@ -62,12 +62,15 @@ export type LocalInvitation = {
   photographerUserId: number;
   token: string;
   status: "active" | "completed" | "expired" | "revoked";
-  deliveryStatus: "created" | "opened" | "preparation_in_progress" | "completed";
+  deliveryStatus: "created" | "queued" | "sent" | "delivered" | "failed" | "opened" | "preparation_in_progress" | "completed";
+  deliveryProvider: string | null;
+  providerMessageId: string | null;
   expiresAt: string;
   consentAcknowledgedAt: string | null;
   lastOpenedAt: string | null;
   preparationStartedAt: string | null;
   completedAt: string | null;
+  sentAt: string | null;
   scheduleResponse: { response: "confirmed" | "change_requested"; note: string | null } | null;
   createdAt: string;
 };
@@ -378,7 +381,7 @@ export async function getLocalInvitation(token: string, markOpened = false) {
   if (!shoot) return null;
   if (markOpened && invitation.status === "active") {
     invitation.lastOpenedAt ??= new Date().toISOString();
-    if (invitation.deliveryStatus === "created") invitation.deliveryStatus = "opened";
+    if (["created", "queued", "sent", "delivered"].includes(invitation.deliveryStatus)) invitation.deliveryStatus = "opened";
     await save(state);
   }
   const profile = (state.profiles ?? []).find(item => item.userId === shoot.photographerUserId);
