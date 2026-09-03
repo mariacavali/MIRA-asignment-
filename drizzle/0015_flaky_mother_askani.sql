@@ -1,0 +1,1 @@
+ALTER TABLE `mira_shoot_visual_references` ADD `referencePurpose` enum('like','dislike','current_identity','direction_to_explore','portrait','location','other');

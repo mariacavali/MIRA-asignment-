@@ -22,7 +22,7 @@ These documents provide factual system information for an independent audit and 
 
 The product application uses React and Vite in `client/`, Express and tRPC in `server/`, shared TypeScript contracts in `shared/`, and Drizzle migrations for MySQL/TiDB in `drizzle/`. Model, image, storage, authentication, and optional provider integrations are server-side boundaries.
 
-n8n is not part of the current application architecture, and no n8n workflow export is included. The implemented workflow is encoded in the application routers, services, state transitions, and database schema.
+n8n is an optional automation boundary, not the application source of truth. The importable synthetic photographer/model-client lifecycle POC is documented in [`capstone/round2/n8n/`](capstone/round2/n8n/); it does not authenticate users, store payment instruments, send email, or replace MIRA persistence.
 
 ## Run locally
 
@@ -67,7 +67,7 @@ pnpm build
 - **Implemented:** V3 recognition and confirmed document outputs; V4 Brand World journey, structured Creative DNA, initial visual directions, one refinement, and final five-image moodboard generation.
 - **Partial:** the `/mira-1` Level 1/Level 2 extension, optional Notion retrieval, provider-dependent live revalidation, and some schema-declared V4 stages without customer-facing implementations.
 - **Optional:** V3 Dakidarts numerology context and consent-gated reference-image analysis.
-- **Not implemented:** an active Human Design provider, automatic V3-to-V4 data transfer, V4 Brand Book/PDF export, or n8n workflow.
+- **Not implemented:** an active Human Design provider, automatic V3-to-V4 data transfer, V4 Brand Book/PDF export, or production n8n integration. A synthetic, local-only n8n POC is included for assignment evidence.
 - **Legacy/retained:** older route and field names remain for compatibility; current behavior should be verified from client routing, tRPC procedures, schemas, and tests rather than inferred from names alone.
 
 Useful evidence includes the [V3 screenshot/PDF journey](evidence/journey-30001/), the [V3 transcript package](evidence/journey-60001/), and the [V4 refinement validation](docs/V4_REFINEMENT_RETRY_VALIDATION.md).

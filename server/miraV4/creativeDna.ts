@@ -154,6 +154,9 @@ Apply this evidence precedence: direct user answers; consistent recognition and 
         schema: azureCompatibleSchema,
       },
     },
+    // Calls OpenAI directly with the existing OPENAI_API_KEY, which already
+    // has access to this model, rather than the Forge gateway.
+    provider: "openai",
   });
 
   const choice = result.choices?.[0];

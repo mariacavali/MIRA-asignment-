@@ -963,8 +963,8 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "mira_v3_render_artifacts_reflectionRevisionId_mira_v3_reflection_revisions_id_fk": {
-          "name": "mira_v3_render_artifacts_reflectionRevisionId_mira_v3_reflection_revisions_id_fk",
+        "mira_render_artifacts_reflection_revision_fk": {
+          "name": "mira_render_artifacts_reflection_revision_fk",
           "tableFrom": "mira_v3_render_artifacts",
           "tableTo": "mira_v3_reflection_revisions",
           "columnsFrom": [
