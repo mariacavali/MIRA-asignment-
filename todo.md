@@ -20,7 +20,7 @@
 - [x] Translate image-provider usage exhaustion into an explicit V4 Visual Direction retry message while retaining the existing retryable visual-set state.
 - [x] Prepare separate current-state documents for Mira V3, Mira V4, and their implementation differences with practical next-step options for product direction.
 - [x] Produce a repository-grounded, read-only technical handoff of existing Mira V3 and V4 implementation status, seams, schemas, integrations, constraints, and known issues for Codex takeover.
-- [ ] Prepare and deliver a complete secret-safe transfer of the current `mira-v3-staging` source tree through a new private GitHub repository when available, or a VS Code-ready ZIP fallback, including `.env.example` and excluding secrets, dependencies, caches, build output, uploads, and private data.
+- Deferred backlog: prepare a secret-safe private-repository or ZIP transfer only in a future task if the user requests it; do not begin it during this payment checkpoint.
 - [x] Diagnose and repair the observed authenticated private V4 Creative DNA synthesis failure, retaining safe stage-specific retry behavior and avoiding duplicate image-generation work.
 - [x] Diagnose and repair the refined visual-set persistence failure exposed by the authenticated test journey, retaining the completed initial set and preventing duplicate generation on retry.
 - [x] Diagnose and repair the remaining refined-image generation failure after a successful refined visual-set claim, retaining the user’s selected reference and safe retry behavior.
@@ -283,3 +283,84 @@
 - [x] V4 access verification: confirm the restored private staging URL loads and provide the current test route instead of the stale preview URL.
 - [x] V4 access recovery: retry the restored private staging route after the user received an unavailable-space error, then restart and re-verify if required.
 - [x] V4 entry action: diagnose and repair the primary-button new-space creation failure shown to the user after the V4 landing page loads.
+- [x] Private photographer preview: import the complete current `main` branch from `https://github.com/mariacavali/MIRA-asignment-` into this separate workspace without altering application code or design.
+- [x] Private photographer preview: install only the dependencies declared by the imported lockfile, with lifecycle scripts disabled.
+- [x] Private photographer preview: confirm the development startup command does not run database migrations or resets and that payment and email providers remain inactive in local mode.
+- [x] Private photographer preview: start the existing application in safe local/test mode.
+- [x] Private photographer preview: verify the existing `/for-photographers` route renders in the private preview.
+- [x] Private photographer preview: preserve private-only status and stop for visual approval without publishing or making design changes.
+- [x] Payment segment: inspect the live Stripe Payment Link, recurring product/price, coupon `nEH2OgQB`, promotion codes `MARIATEST` and `TEST`, and all relevant mode, activity, restriction, expiry, redemption, currency, and promotion-code settings through the secure server-side Stripe boundary without exposing secrets or personal data.
+- [x] SUPERSEDED BY USER LOWEST-CREDIT INSTRUCTION — stop the exact legacy-code API diagnosis after Stripe confirmed the objects were live and valid but the recurring Payment Link rejected zero-amount codes; replace it with one verified non-zero code instead.
+- [x] Payment segment: apply only the smallest verified Stripe configuration repair, preserving the existing Payment Link unless the API proves it cannot be repaired; create private code `MIRADEMO` only if required by the specification.
+- [x] Payment segment: refine only the desktop purchase area on `/for-photographers` with the approved commercial copy, three benefits, dominant `BUY MIRA` action, login link, and Stripe trust line while preserving the page’s editorial character.
+- [x] Payment segment: route both purchase CTAs, including `Prepare your next shoot`, to the same existing Stripe Payment Link in the current browser tab, with no developer wording, private code, secret, internal ID, token, or unsupported claim exposed.
+- [x] Payment segment: preserve webhook-signature verification, webhook-only access activation, pending-checkout identity, stored payment state, Customer Portal foundations, and the server-side Stripe boundary.
+- [x] Payment segment: verify the intended secure post-checkout return to photographer onboarding/profile without granting access from the browser return alone.
+- [x] Payment segment: add or update only focused Vitest coverage required for the commercial purchase and Stripe security changes.
+- [x] SUPERSEDED BY USER LOWEST-CREDIT INSTRUCTION — browser-verify both purchase CTAs and MIRA at €33.33/month, then use the working `MIRADEMO` replacement at €0.67 rather than continuing to pursue a rejected zero-amount subscription checkout; no payment submitted.
+- [x] Payment segment: inspect the private desktop preview for secret-safe commercial presentation, save the verified state if possible, and stop for visual approval without publishing.
+- [x] SUPERSEDED BY VERIFIED STRIPE BEHAVIOR — preserve the existing live Payment Link, attempt one unrestricted private `MIRADEMO` code, then replace the rejected zero-amount version with the working non-zero configuration.
+- [x] SUPERSEDED BY VERIFIED STRIPE BEHAVIOR — Stripe’s supported Create coupon flow produced a valid unrestricted 100% code, but the recurring Payment Link rejected the zero-amount checkout; the code was archived and replaced without modifying the link.
+- [x] Payment segment: archive the active 100%-off `MIRADEMO` promotion code that Stripe Checkout rejects as invalid, while leaving its coupon and the existing Payment Link unchanged.
+- [x] Payment segment: create one replacement unrestricted live `MIRADEMO` promotion whose discounted amount remains above Stripe’s minimum charge, then verify acceptance without submitting checkout.
+- [x] Payment segment: verify the live replacement `MIRADEMO` code applies 98% off and reduces the initial €33.33 amount to €0.67 without submitting checkout or processing payment.
+- [x] Payment segment: run the five focused payment test files (22 tests), TypeScript check, local `/for-photographers` HTTP check, and private desktop screenshots with no payment or external communication submitted.
+- [x] Stripe correction: remove the optional `Mira TEST €0.00` product from the existing live MIRA Payment Link.
+- [x] Stripe correction: archive the active 98%-off `MIRADEMO` promotion and restore the customer-facing `MIRADEMO` code at 100% off, then stop without submitting payment or running further tests.
+- [x] Checkout bug: fix the `/mira/checkout` BUY MIRA action that currently displays `Secure checkout is temporarily unavailable`, preserving pending-checkout identity and webhook-only access activation.
+- [x] Checkout bug: add or update one focused regression and verify one redirect to the existing live Stripe Payment Link without submitting payment.
+- [x] Checkout bug: activate only the existing live MIRA Payment Link, which currently returns `The link is no longer active`, then confirm checkout opens without submitting payment.
+- [x] Stripe correction: make the MIRA offer exactly €33.33 one-time instead of recurring, using the existing live purchase path and no unrelated changes.
+- [x] Stripe correction: verify the active 100%-off `MIRADEMO` code reduces the one-time MIRA checkout to €0.00 without submitting payment.
+- [x] Stripe correction: after explicit approval, enable Stripe Checkout no-cost orders for live Payment Links, acknowledging Stripe’s 3-day reversal grace period, then verify MIRADEMO without payment.
+- [x] SUPERSEDED BY USER-AUTHORIZED CHECKPOINT EXCEPTION — preserve `client/public/mira/level2/visual-pairs/v1/source-contact-sheet.png` exactly as-is unless explicitly authorized to compress it in place below the checkpoint limit.
+- [x] Payment handoff: wait for and verify the private `/for-photographers` and `/mira/checkout` desktop previews finish loading with the corrected €33.33 one-time purchase copy.
+- [x] SUPERSEDED BY USER-AUTHORIZED CHECKPOINT EXCEPTION — use the successful checkpoint path instead of the fallback patch-only handoff, without publishing, pushing, or beginning Segment 2.
+- [x] Payment checkpoint: compress only `client/public/mira/level2/visual-pairs/v1/source-contact-sheet.png` in place to below 1 MB, preserving filename, path, composition, and acceptable quality.
+- [x] Payment checkpoint: verify the working private payment-button preview, save the checkpoint, and stop without publishing or beginning Segment 2.
+- [x] Segment 1 final return flow: reuse the existing payment-success, photographer onboarding/profile, and photographer dashboard routes for both new and existing approved photographers.
+- [x] Segment 1 final return flow: preserve webhook-only access activation and never grant access from the success URL, browser arrival, or Stripe session parameter alone.
+- [x] Segment 1 final return flow: show a clear payment-verification loading state, then either `Continue to your dashboard` or an actionable payment-verification error.
+- [x] Segment 1 final return flow: ensure the €0 `MIRADEMO` checkout follows the identical verified webhook-driven journey.
+- [x] Segment 1 final return flow: add focused route and payment tests, verify the private desktop flow, save the checkpoint, and stop without dashboard-layout or Segment 2 changes.
+- [x] Segment 1 post-payment correction: configure the existing live Stripe Payment Link after-completion redirect to the existing `/mira/payment-success` route using the configured public application base URL.
+- [x] Segment 1 post-payment correction: preserve webhook-only access activation; browser arrival, success URL, or Stripe session parameters must never activate access.
+- [x] Segment 1 post-payment correction: verify €0 `MIRADEMO` checkout return configuration, existing payment-verification state resolution, new-photographer onboarding routing, and completed-photographer dashboard routing.
+- [x] Segment 1 post-payment correction: verify the private desktop preview, save the corrected checkpoint, provide an exact verification report, and stop without publishing, committing, pushing, dashboard changes, or Segment 2 work.
+- Deferred payment backlog: complete fresh live verification of the account-first `Buy MIRA` signup, authenticated pending-checkout identity, signed webhook activation, and dashboard return in a future payment task.
+- Deferred payment security requirement: preserve webhook-only activation and never grant access from the success URL or Stripe session parameter alone.
+- Deferred payment issue: Stripe checkout and MIRADEMO €0 order work, but verified payment-to-photographer-dashboard account continuity still requires final testing.
+- [x] Segment 2 desktop dashboard: increase useful content width, reduce excessive margins, blank space, and vertical scrolling, and make `Your shoots` the dominant section.
+- [x] Segment 2 desktop dashboard: make the existing create/open shoot actions visually obvious while keeping billing and secondary information compact.
+- [x] Segment 2 desktop shoot page: make the existing page wider, shorter, and clearer, and group invitation actions in one compact panel.
+- [x] Segment 2 privacy: remove any visible raw JSON, internal IDs, tokens, debug output, or developer state from the dashboard and shoot page presentation.
+- [x] Segment 2 preservation: retain editorial typography, colours, and visual identity without changing business logic, Stripe, authentication, tRPC, invitations, email, client room, voice, moodboard, database architecture, or mobile design.
+- [x] Segment 2 handoff: run focused non-payment checks, provide one private desktop preview at 100% zoom, list exact changed files, confirm no business logic changed, and stop without committing, pushing, or publishing.
+- [x] Purchase continuation: preserve `Buy MIRA → signup` for new photographers and make the existing-account login return directly to the authenticated `/mira/checkout` flow.
+- [x] Purchase continuation: run one focused browser test proving existing-account login opens Stripe checkout through the existing pending-checkout identity, without submitting a charge.
+- [x] Purchase continuation: when signup detects an existing email, open the existing login flow with that email prefilled and `returnTo=/mira/checkout` preserved.
+- [x] Purchase continuation: run one focused duplicate-signup → prefilled login → Stripe checkout browser check without submitting a charge.
+- [x] Purchase blocker: fix the current authenticated `BUY MIRA` request that shows “Secure checkout is temporarily unavailable” using the smallest identity/runtime correction.
+- [x] Purchase blocker: verify authenticated checkout opens Stripe without submitting a charge and verified completion resolves through the existing `/mira/payment-success` route to `/mira/dashboard`.
+- [x] Payment activation: identify why the completed Stripe checkout is not reaching webhook-confirmed active status and provide the exact lowest-effort manual correction without another payment test. Diagnosis: no `/api/stripe/webhook` request reached MIRA; runtime Stripe configuration is present, so the live Stripe endpoint must be added or corrected.
+- [x] Payment activation: identify the exact remaining `Payment event was rejected` validation condition, fix only that mismatch, resend the same completed Stripe event, verify HTTP 200 and authenticated paid status, then confirm `/mira/payment-success` reaches `/mira/dashboard` without another account or payment.
+- [x] Payment activation: use `MIRA_STRIPE_WEBHOOK_SECRET` as the private-preview verification-secret fallback, restart, resend the existing completed event, and confirm dashboard access without a new checkout.
+- [x] Dashboard cleanup: apply one restrained responsive layout pass with a comfortable centered width, consistent spacing and columns, reduced empty space/page length, larger readable text, and preserved dark editorial styling.
+- [x] Dashboard cleanup: preserve every existing dashboard/shoot field, action, route, and function; verify paid access does not display a stale inactive status or purchase prompt.
+- [x] Dashboard cleanup: make the shoot-detail invitation area and lower-page information compact, balanced, and responsive on desktop and mobile.
+- [x] MIRA conversation: diagnose the exact private-room Realtime connection failure from current logs and configuration without exposing secrets or invoking paid voice/AI usage.
+- [x] MIRA conversation: make the smallest reliable connection correction, or expose a clearly usable existing text-conversation fallback when real voice is externally unavailable.
+- [x] Email delivery: reuse the existing templates, outbox, shoot date/time, timezone, and private invitation link to calculate the specified shortened date-aware schedule.
+- [x] Email delivery: send only the immediate invitation when a safe verified Resend configuration already exists; otherwise queue/verify without delivery, never sending reminders after the shoot or duplicating messages.
+- [x] Validation: reuse the existing test shoot and private invitation link, preserve payment and paid access, verify responsive dashboard, MIRA voice/text reachability, adaptive schedule, and Resend status without creating payment/account data.
+- [x] Handoff: report what works, what is queued/simulated, external credential/domain/scheduler needs, exact changed files, and evidence that payment and the client link remain intact.
+
+## Verified Stripe GitHub checkpoint
+
+- [x] Audit git status, current branch, configured remotes, recent commits, and confirm the active workspace contains the newest verified Stripe checkout/webhook implementation.
+- [x] Run the focused Stripe, payment-flow, webhook, and webhook-secret tests plus the existing production build.
+- [x] Reconcile the stale payment-event test that still rejects one-time `payment` mode even though the verified implementation intentionally supports signed one-time Payment Link completion.
+- [x] Audit tracked and changed files for credentials, personal emails, invitation tokens, environment files, local databases, private logs, and dependencies; ensure private artifacts remain excluded.
+- [x] Create or update `docs/stripe-integration.md` with credential-safe architecture, journey, verification, test, environment-name, limitation, and production-next-step documentation.
+- [x] Create or reuse `fix/mira-final-ux-runtime`, commit only verified project files with the requested message, and preserve all history without merging or force-pushing.
+- [x] Push the branch to the existing GitHub repository, verify the remote commit, and report the repository, branch, hash, files, validation, deliberate exclusions, and remaining uncommitted changes.

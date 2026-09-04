@@ -32,6 +32,12 @@ const CATEGORIES = [
     vars: ["MIRA_EMAIL_PROVIDER", "RESEND_API_KEY", "MIRA_INVITATION_FROM"],
   },
   {
+    title: "Required for Resend delivery-status webhooks",
+    blocking: false,
+    note: "Without this, /api/webhooks/resend stays disabled and delivery status never advances past 'sent' to 'delivered'/'failed'.",
+    vars: ["RESEND_WEBHOOK_SECRET"],
+  },
+  {
     title: "Required for signed invitation links",
     blocking: false,
     note: "Without this, the email-worker's reminder links cannot be generated and the worker stays unavailable.",

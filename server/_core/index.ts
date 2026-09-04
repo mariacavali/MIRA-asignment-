@@ -11,8 +11,11 @@ import { serveStatic, setupVite } from "./vite";
 import { ENV } from "./env";
 import { createStripeWebhookHandler } from "../payment/stripeWebhook";
 import { DrizzlePaymentRepository } from "../payment/drizzlePaymentRepository";
+import { LocalPaymentRepository } from "../payment/localPaymentRepository";
 import { createEmailOutboxWorkerHandler } from "../email/outboxWorkerEndpoint";
 import { buildProductionMiraEmailOutboxWorker } from "../miraCore/emailOutboxWorker";
+import { createResendWebhookHandler } from "../email/resendWebhook";
+import { DrizzleEmailOutboxRepository } from "../email/outbox";
 import { healthHandler, readinessHandler } from "./readiness";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -39,13 +42,18 @@ async function startServer() {
   const server = createServer(app);
   // Stripe requires the untouched JSON bytes for signature verification.
   app.post("/api/webhooks/stripe", express.raw({ type: "application/json", limit: "2mb" }), createStripeWebhookHandler({
-    repository: ENV.paymentMode === "stripe" && !ENV.miraLocalFileStore ? new DrizzlePaymentRepository() : undefined,
+    repository: ENV.paymentMode === "stripe" ? (ENV.miraLocalFileStore ? new LocalPaymentRepository() : new DrizzlePaymentRepository()) : undefined,
     webhookSecret: ENV.stripeWebhookSecret,
     paymentMode: ENV.paymentMode,
     currency: ENV.stripeCurrency,
     priceId: ENV.stripePriceId,
   }));
   app.post("/api/internal/mira/email-outbox/process", createEmailOutboxWorkerHandler(buildProductionMiraEmailOutboxWorker(), ENV.emailWorkerSecret));
+  // Resend requires the untouched JSON bytes for svix-style signature verification.
+  app.post("/api/webhooks/resend", express.raw({ type: "application/json", limit: "2mb" }), createResendWebhookHandler({
+    secret: ENV.resendWebhookSecret,
+    outboxRepository: ENV.paymentMode === "stripe" && !ENV.miraLocalFileStore ? new DrizzleEmailOutboxRepository() : undefined,
+  }));
   app.get("/api/health", healthHandler);
   app.get("/api/internal/mira/readiness", readinessHandler);
   // Configure body parser with larger size limit for file uploads

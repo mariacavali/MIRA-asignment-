@@ -75,8 +75,18 @@ describe("provider-neutral payment event processor", () => {
     expect(result).toEqual({ accepted: true, action: "updated", state });
   });
 
-  it("rejects unsupported payment mode", async () => {
-    expect((await process({ ...baseEvent, paymentMode: "payment" })).reason).toBe("wrong_payment_mode");
+  it("activates a verified one-time Payment Link checkout", async () => {
+    const repository = repositoryWithPending();
+    const result = await process({
+      ...baseEvent,
+      eventId: "evt-one-time-payment",
+      paymentMode: "payment",
+      subscriptionStatus: null,
+      subscriptionId: null,
+      checkoutSessionId: "cs_one_time",
+    }, repository);
+    expect(result).toEqual({ accepted: true, action: "activated", state: "active" });
+    expect(repository.getIdentityByCustomer("cus-test")?.state).toBe("active");
   });
 
   it.each(["pending", "past_due", "cancelled", "expired"] as const)("denies access for %s payment state", state => {

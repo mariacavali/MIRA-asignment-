@@ -35,20 +35,20 @@ function checkoutPayload(referenceId: string, overrides: Record<string, unknown>
       id: "cs_synthetic_flow",
       object: "checkout.session",
       client_reference_id: referenceId,
-      mode: "subscription",
-      payment_status: "paid",
+      mode: "payment",
+      payment_status: "no_payment_required",
       status: "complete",
       currency: "eur",
       customer: "cus_synthetic_flow",
-      subscription: "sub_synthetic_flow",
-      metadata: { mira_price_id: "price_synthetic", mira_subscription_status: "active" },
+      subscription: null,
+      metadata: { mira_price_id: "price_synthetic" },
       ...overrides,
     } },
   };
 }
 
 describe("isolated Stripe purchase flow", () => {
-  it("simulates signed-out checkout, bound webhook activation, duplicate delivery, and return routing", async () => {
+  it("simulates account-bound one-time no-cost activation, duplicate delivery, and dashboard return", async () => {
     const repository = new InMemoryPaymentEventRepository();
     const account = { openId: "test-account-bound-before-payment", paymentState: "unpaid" as const, profile: "started" as const };
     const pending = createPendingCheckoutRecord({ name: "Synthetic Buyer", email: "synthetic@example.test" }, new Date("2026-09-03T10:00:00.000Z"), 30 * 60_000);
@@ -65,7 +65,7 @@ describe("isolated Stripe purchase flow", () => {
     expect(valid).toEqual({ statusCode: 200, responseBody: { received: true, processed: true, action: "activated", state: "active" } });
     expect(repository.getIdentityByCustomer("cus_synthetic_flow")?.openId).toBe(account.openId);
     expect(isPaidPaymentState("active")).toBe(true);
-    expect(paymentReturnDestination("active", "started")).toBe("/mira/onboarding");
+    expect(paymentReturnDestination("active", "started")).toBe("/mira/dashboard");
     expect(paymentReturnDestination("active", "complete")).toBe("/mira/dashboard");
 
     const duplicate = await webhookRequest(repository, checkoutPayload(pending.referenceId));

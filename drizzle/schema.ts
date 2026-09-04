@@ -105,10 +105,11 @@ export const miraEmailOutbox = mysqlTable(
     invitationId: varchar("invitationId", { length: 36 }).notNull().references(() => miraClientInvitations.id, { onDelete: "cascade" }),
     milestoneId: varchar("milestoneId", { length: 64 }).notNull(),
     scheduledAt: timestamp("scheduledAt").notNull(),
-    status: mysqlEnum("status", ["pending", "processing", "sent", "failed", "suppressed", "cancelled"]).default("pending").notNull(),
+    status: mysqlEnum("status", ["pending", "processing", "sent", "delivered", "failed", "suppressed", "cancelled"]).default("pending").notNull(),
     attemptCount: int("attemptCount").default(0).notNull(),
     lastErrorCategory: varchar("lastErrorCategory", { length: 64 }),
     idempotencyKey: varchar("idempotencyKey", { length: 191 }).notNull(),
+    providerMessageId: varchar("providerMessageId", { length: 191 }),
     leaseUntil: timestamp("leaseUntil"),
     claimedAt: timestamp("claimedAt"),
     sentAt: timestamp("sentAt"),
@@ -213,7 +214,7 @@ export const miraClientInvitations = mysqlTable(
     status: mysqlEnum("status", ["active", "completed", "expired", "revoked"])
       .default("active")
       .notNull(),
-    deliveryStatus: mysqlEnum("deliveryStatus", ["created", "sent", "opened", "preparation_in_progress", "completed"])
+    deliveryStatus: mysqlEnum("deliveryStatus", ["created", "queued", "sent", "delivered", "failed", "opened", "preparation_in_progress", "completed"])
       .default("created")
       .notNull(),
     deliveryProvider: varchar("deliveryProvider", { length: 32 }),

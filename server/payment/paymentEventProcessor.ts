@@ -7,12 +7,14 @@ export function paymentStateGrantsAccess(state: PaymentState | null | undefined)
 
 export type NormalizedPaymentEvent = {
   eventId: string;
+  eventCreatedAt?: Date | null;
   type: "checkout.session.completed" | "customer.subscription.updated" | "customer.subscription.deleted" | "invoice.paid" | "invoice.payment_failed";
   paymentMode: "subscription" | "payment";
   currency: string;
   priceId: string;
   paid: boolean;
   subscriptionStatus: "active" | "past_due" | "cancelled" | "incomplete" | "incomplete_expired" | "unpaid" | null;
+  checkoutSessionId?: string | null;
   clientReferenceId?: string | null;
   customerId?: string | null;
   subscriptionId?: string | null;
@@ -67,7 +69,6 @@ export type PaymentProcessResult = {
 };
 
 function validEvent(event: NormalizedPaymentEvent, config: PaymentProcessorConfig) {
-  if (event.paymentMode !== "subscription") return "wrong_payment_mode" as const;
   if (event.currency.toLowerCase() !== config.currency.toLowerCase()) return "wrong_currency" as const;
   if (event.priceId !== config.priceId) return "wrong_price" as const;
   return null;
@@ -94,15 +95,17 @@ export async function processPaymentEvent(event: NormalizedPaymentEvent, reposit
   if (event.type === "checkout.session.completed") {
     if (!event.clientReferenceId) return { accepted: false, action: "rejected", reason: "missing_reference" };
     if (!event.paid) return { accepted: false, action: "rejected", reason: "unpaid" };
-    if (event.subscriptionStatus !== "active") return { accepted: false, action: "rejected", reason: "subscription_not_active" };
+    if (event.paymentMode === "subscription" && event.subscriptionStatus !== "active") return { accepted: false, action: "rejected", reason: "subscription_not_active" };
     const pending = await repository.getPending(event.clientReferenceId);
     if (!pending) return { accepted: false, action: "rejected", reason: "unknown_reference" };
-    if (pending.status === "expired" || pending.expiresAt.getTime() <= (config.now ? config.now() : new Date()).getTime()) return { accepted: false, action: "rejected", reason: "expired_reference" };
+    const checkoutTime = event.eventCreatedAt ?? (config.now ? config.now() : new Date());
+    if (pending.status === "expired" || pending.expiresAt.getTime() <= checkoutTime.getTime()) return { accepted: false, action: "rejected", reason: "expired_reference" };
     if (pending.status !== "pending") return { accepted: false, action: "rejected", reason: "consumed_reference" };
-    if (!event.customerId || !event.subscriptionId) return { accepted: false, action: "rejected", reason: "invalid_event" };
+    const customerId = event.customerId ?? event.checkoutSessionId;
+    if (!customerId || (event.paymentMode === "subscription" && !event.subscriptionId)) return { accepted: false, action: "rejected", reason: "invalid_event" };
     const identity = await repository.consumePending(event.clientReferenceId, {
-      customerId: event.customerId,
-      subscriptionId: event.subscriptionId,
+      customerId,
+      subscriptionId: event.subscriptionId ?? "",
       priceId: event.priceId,
       currency: event.currency,
       cancelAtPeriodEnd: event.cancelAtPeriodEnd ?? false,

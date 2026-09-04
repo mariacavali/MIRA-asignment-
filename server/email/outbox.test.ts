@@ -15,29 +15,58 @@ function context(overrides: Partial<EmailContext> = {}): EmailContext {
 }
 
 describe("MIRA email outbox", () => {
-  it("schedules exactly the four milestone IDs and deduplicates invitation/milestone jobs", async () => {
+  it("uses the 4–7 day schedule and deduplicates invitation/milestone jobs", async () => {
     const repository = new InMemoryEmailOutboxRepository();
     await scheduleMiraEmailMilestones(repository, base);
     await scheduleMiraEmailMilestones(repository, base);
     const jobs = await repository.list();
-    expect(jobs).toHaveLength(2);
-    expect(jobs.map(job => job.milestoneId)).toEqual(["shoot_room_invitation", "shoot_day_reminder"]);
+    expect(jobs).toHaveLength(3);
+    expect(jobs.map(job => job.milestoneId)).toEqual(["shoot_room_invitation", "call_mira_reminder", "shoot_day_reminder"]);
     expect(jobs.every(job => !("clientEmail" in job) && !("preparationUrl" in job) && !("text" in job) && !("html" in job))).toBe(true);
   });
 
-  it("schedules guidance and the 48-hour reminder only after acceptance", async () => {
+  it("uses invitation now plus 7-day, 3-day, and 1-day milestones when more than seven days remain", async () => {
     const repository = new InMemoryEmailOutboxRepository();
-    await scheduleMiraEmailMilestones(repository, { ...base, acceptedAt: new Date("2026-10-10T10:00:00.000Z") });
+    await scheduleMiraEmailMilestones(repository, { ...base, invitationSentAt: new Date("2026-10-05T10:00:00.000Z") });
     const jobs = await repository.list();
     expect(jobs.map(job => [job.milestoneId, job.scheduledAt.toISOString()])).toEqual([
-      ["shoot_room_invitation", "2026-10-08T10:00:00.000Z"],
-      ["preparation_guidance", "2026-10-10T10:00:00.000Z"],
+      ["shoot_room_invitation", "2026-10-05T10:00:00.000Z"],
+      ["preparation_guidance", "2026-10-08T10:00:00.000Z"],
       ["call_mira_reminder", "2026-10-12T10:00:00.000Z"],
       ["shoot_day_reminder", "2026-10-14T10:00:00.000Z"],
     ]);
   });
 
-  it("suppresses completion, cancellation, invalid, and close-to-shoot jobs", async () => {
+  it("preserves the shoot's local clock time across daylight-saving changes", async () => {
+    const repository = new InMemoryEmailOutboxRepository();
+    await scheduleMiraEmailMilestones(repository, {
+      ...base,
+      scheduledAt: new Date("2027-03-31T10:00:00.000Z"),
+      invitationSentAt: new Date("2027-03-20T11:00:00.000Z"),
+    });
+    const guidance = (await repository.list()).find(job => job.milestoneId === "preparation_guidance");
+    expect(guidance?.scheduledAt.toISOString()).toBe("2027-03-24T11:00:00.000Z");
+  });
+
+  it("shortens to invitation plus one-day reminder with two to three days remaining", async () => {
+    const repository = new InMemoryEmailOutboxRepository();
+    await scheduleMiraEmailMilestones(repository, { ...base, invitationSentAt: new Date("2026-10-12T10:00:00.000Z") });
+    expect((await repository.list()).map(job => [job.milestoneId, job.scheduledAt.toISOString()])).toEqual([
+      ["shoot_room_invitation", "2026-10-12T10:00:00.000Z"],
+      ["shoot_day_reminder", "2026-10-14T10:00:00.000Z"],
+    ]);
+  });
+
+  it("queues one immediate combined message when fewer than two days remain and nothing after the shoot", async () => {
+    const repository = new InMemoryEmailOutboxRepository();
+    await scheduleMiraEmailMilestones(repository, { ...base, invitationSentAt: new Date("2026-10-14T00:00:00.000Z") });
+    expect((await repository.list()).map(job => job.milestoneId)).toEqual(["shoot_room_invitation"]);
+    const afterShoot = new InMemoryEmailOutboxRepository();
+    await scheduleMiraEmailMilestones(afterShoot, { ...base, invitationSentAt: new Date("2026-10-15T10:00:00.000Z") });
+    expect(await afterShoot.list()).toHaveLength(0);
+  });
+
+  it("suppresses completed, cancelled, or invalid schedules", async () => {
     const repository = new InMemoryEmailOutboxRepository();
     await scheduleMiraEmailMilestones(repository, { ...base, acceptedAt: new Date("2026-10-15T01:00:00.000Z"), preparationCompletedAt: new Date("2026-10-15T02:00:00.000Z"), shootCancelled: true, invitationValid: false, invitationSentAt: new Date("2026-10-15T00:00:00.000Z") });
     expect(await repository.list()).toHaveLength(0);

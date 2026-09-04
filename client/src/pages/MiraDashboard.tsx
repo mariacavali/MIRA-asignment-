@@ -32,13 +32,13 @@ export default function MiraDashboard() {
 
   const timezone = profile.data.timezone;
   return <PhotographerShell>
-    <div className="w-full">
-      <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-        <div><p className="mira-dark-kicker">Photographer dashboard</p><h1 className="mira-dark-display mt-4 text-5xl sm:text-7xl">Your shoots.</h1><p className="mt-4 text-sm text-[#bdb6a9]">One shared preparation flow, from client invitation to READY TO SHOOT.</p></div>
-        <Button onClick={() => setCreating(value => !value)} className="rounded-full bg-[#d2b98b] px-6 text-[#171613] hover:bg-[#e0c99e]"><Plus className="mr-2 size-4" /> {creating ? "Back to shoots" : "Create new shoot"}</Button>
+    <div className="w-full xl:-mx-10 xl:w-[calc(100%+5rem)]">
+      <div className="flex flex-col justify-between gap-5 border-b border-white/10 pb-7 sm:flex-row sm:items-end">
+        <div><p className="mira-dark-kicker">Photographer dashboard</p><h1 className="mira-dark-display mt-3 text-5xl sm:text-6xl">Your shoots.</h1><p className="mt-3 max-w-2xl text-sm text-[#bdb6a9]">One shared preparation flow, from client invitation to READY TO SHOOT.</p></div>
+        <Button onClick={() => setCreating(value => !value)} className="h-11 rounded-full bg-[#d2b98b] px-6 text-[#171613] hover:bg-[#e0c99e]"><Plus className="mr-2 size-4" /> {creating ? "Back to shoots" : "Create new shoot"}</Button>
       </div>
 
-      {creating ? <form className="mira-dark-panel mt-10 grid gap-5" onSubmit={event => {
+      {creating ? <form className="mira-dark-panel mt-6 grid gap-4" onSubmit={event => {
         event.preventDefault();
         create.mutate({
           title: form.title,
@@ -56,7 +56,7 @@ export default function MiraDashboard() {
           callAllowanceMinutes: form.callAllowanceMinutes,
         });
       }}>
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Shoot title"><Input required value={form.title} onChange={event => setForm({ ...form, title: event.target.value })} /></Field>
           <Field label="Shoot type"><Input value={form.shootType} onChange={event => setForm({ ...form, shootType: event.target.value })} /></Field>
           <Field label="Client name · required"><Input required value={form.clientName} onChange={event => setForm({ ...form, clientName: event.target.value })} /></Field>
@@ -67,28 +67,27 @@ export default function MiraDashboard() {
           <Field label="Duration · minutes"><Input type="number" min={1} max={1440} value={form.durationMinutes} onChange={event => setForm({ ...form, durationMinutes: event.target.value })} /></Field>
           <Field label="Call allowance · minutes"><Input type="number" min={5} max={60} value={form.callAllowanceMinutes} onChange={event => setForm({ ...form, callAllowanceMinutes: Number(event.target.value) })} /></Field>
         </div>
-        <Field label="Invitation message"><Textarea maxLength={800} value={form.invitationMessage} onChange={event => setForm({ ...form, invitationMessage: event.target.value })} placeholder="A short personal note for your client…" /></Field>
-        <Field label="Intended image use"><Textarea value={form.intendedUse} onChange={event => setForm({ ...form, intendedUse: event.target.value })} /></Field>
-        <Field label="Photographer notes"><Textarea value={form.photographerNotes} onChange={event => setForm({ ...form, photographerNotes: event.target.value })} /></Field>
+        <div className="grid gap-4 lg:grid-cols-3"><Field label="Invitation message"><Textarea className="min-h-24" maxLength={800} value={form.invitationMessage} onChange={event => setForm({ ...form, invitationMessage: event.target.value })} placeholder="A short personal note for your client…" /></Field><Field label="Intended image use"><Textarea className="min-h-24" value={form.intendedUse} onChange={event => setForm({ ...form, intendedUse: event.target.value })} /></Field><Field label="Photographer notes"><Textarea className="min-h-24" value={form.photographerNotes} onChange={event => setForm({ ...form, photographerNotes: event.target.value })} /></Field></div>
         <Button disabled={create.isPending} className="w-fit rounded-full bg-[#d2b98b] px-7 text-[#171613]">{create.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null} Create shoot</Button>
         {create.error ? <p className="text-sm text-red-300">{create.error.message}</p> : null}
       </form> : null}
 
-      <section className="mt-12 border-t border-white/10 pt-8">
-        {(shoots.data ?? []).length === 0 ? <p className="py-16 text-center text-sm text-[#9e978b]">No shoots yet. Create the first one when you are ready.</p> : <div className="grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2">
-          {(shoots.data ?? []).filter(shoot => shoot.status !== "draft").map(shoot => <button key={shoot.id} onClick={() => navigate(`/mira/shoots/${shoot.id}`)} className="group bg-[#151514] p-7 text-left hover:bg-[#1b1a18]">
+      <section className="mt-7 rounded-sm border border-[#d2b98b]/25 bg-[#121211] p-5 sm:p-6">
+        <div className="mb-5 flex items-end justify-between gap-4"><div><p className="mira-dark-kicker">Your shoots</p><p className="mt-2 text-xs text-[#9e978b]">Open an active shoot or create the next one.</p></div><span className="text-sm text-[#d2b98b]">{(shoots.data ?? []).filter(shoot => shoot.status !== "draft").length} active</span></div>
+        {(shoots.data ?? []).length === 0 ? <p className="py-10 text-center text-sm text-[#9e978b]">No shoots yet. Create the first one when you are ready.</p> : <div className="grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 xl:grid-cols-3">
+          {(shoots.data ?? []).filter(shoot => shoot.status !== "draft").map(shoot => <button key={shoot.id} onClick={() => navigate(`/mira/shoots/${shoot.id}`)} className="group bg-[#151514] p-5 text-left hover:bg-[#1b1a18]">
             <span className="text-[10px] uppercase tracking-[0.2em] text-[#b7a98f]">{shoot.status.replaceAll("_", " ")}</span>
             <span className="mira-dark-display mt-4 block text-3xl">{shoot.title}</span>
             <span className="mt-3 block text-sm text-[#a9a296]">{shoot.clientName || "Client not named"}</span>
-            <ArrowRight className="mt-7 size-4 text-[#d2b98b] transition-transform group-hover:translate-x-1" />
+            <span className="mt-5 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[#d2b98b]">Open shoot <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span>
           </button>)}
         </div>}
-        {(shoots.data ?? []).some(shoot => shoot.status === "draft") ? <details className="mt-8"><summary className="cursor-pointer text-xs uppercase tracking-[0.18em] text-[#9e978b]">Drafts</summary><div className="mt-3 grid gap-2">{(shoots.data ?? []).filter(shoot => shoot.status === "draft").map(shoot => <button key={shoot.id} onClick={() => navigate(`/mira/shoots/${shoot.id}`)} className="border-t border-white/10 py-3 text-left text-sm text-[#bdb6a9]">{shoot.title}</button>)}</div></details> : null}
+        {(shoots.data ?? []).some(shoot => shoot.status === "draft") ? <details className="mt-5"><summary className="cursor-pointer text-xs uppercase tracking-[0.18em] text-[#9e978b]">Drafts</summary><div className="mt-2 grid gap-2 sm:grid-cols-2">{(shoots.data ?? []).filter(shoot => shoot.status === "draft").map(shoot => <button key={shoot.id} onClick={() => navigate(`/mira/shoots/${shoot.id}`)} className="border-t border-white/10 py-2 text-left text-sm text-[#bdb6a9]">{shoot.title}</button>)}</div></details> : null}
       </section>
 
       <BillingSection access={access.data} portalPending={portal.isPending} portalError={portal.error?.message} onManage={() => portal.mutate({})} />
 
-      <section className="mt-16 border-t border-white/10 pt-8">
+      <section className="mt-9 border-t border-white/10 pt-7">
         <p className="mira-dark-kicker">Branding &amp; emails</p>
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
           <BrandingOption
@@ -125,11 +124,12 @@ export default function MiraDashboard() {
 
 function BillingSection({ access, portalPending, portalError, onManage }: { access: { paymentStatus: string; paymentState?: string; cancelAtPeriodEnd?: boolean; currentPeriodEnd?: Date | null } | undefined; portalPending: boolean; portalError?: string; onManage: () => void }) {
   const localTest = access?.paymentStatus === "test_active";
+  const oneTimePaid = access?.paymentStatus === "paid";
   const state = access?.paymentState ?? (localTest ? "test_active" : "unavailable");
-  const status = localTest ? "Test access" : state === "active" ? access?.cancelAtPeriodEnd ? "Cancels at the end of the billing period" : "Active" : state === "past_due" ? "Payment needs attention" : state === "cancelled" ? "Cancelled" : "Not active";
-  return <section className="mt-12 border-t border-white/10 pt-8">
+  const status = localTest ? "Test access" : oneTimePaid ? "Paid · active" : state === "active" ? access?.cancelAtPeriodEnd ? "Cancels at the end of the billing period" : "Active" : state === "past_due" ? "Payment needs attention" : state === "cancelled" ? "Cancelled" : "Not active";
+  return <section className="mt-8 border-t border-white/10 pt-6">
     <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div><p className="mira-dark-kicker">Billing</p><h2 className="mira-dark-display mt-3 text-3xl">MIRA Studio — €33.33/month</h2><p className="mt-3 text-sm text-[#9e978b]">Status: {status}</p></div>
+      <div><p className="mira-dark-kicker">Billing</p><h2 className="mira-dark-display mt-2 text-2xl">MIRA Studio · €33.33 one-time</h2><p className="mt-2 text-xs text-[#9e978b]">Status: {status}</p></div>
       {localTest ? <p className="text-xs text-[#9e978b]">Customer Portal is available for live subscriptions.</p> : state === "active" ? <Button onClick={onManage} disabled={portalPending} variant="outline" className="border-white/15 bg-transparent text-[#ded5c5]">{portalPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null} Manage subscription</Button> : null}
     </div>
     {access?.cancelAtPeriodEnd && access.currentPeriodEnd ? <p className="mt-3 text-xs text-[#b7a98f]">Your access remains active through {new Date(access.currentPeriodEnd).toLocaleDateString()}.</p> : null}
@@ -138,7 +138,7 @@ function BillingSection({ access, portalPending, portalError, onManage }: { acce
 }
 
 function BrandingOption({ eyebrow, title, description, price, action, onOpen }: { eyebrow: string; title: string; description: string; price: string; action: string; onOpen: () => void }) {
-  return <article className="border border-white/10 bg-[#151514] p-5">
+  return <article className="border border-white/10 bg-[#151514] p-4">
     <p className="text-[10px] uppercase tracking-[0.18em] text-[#9e978b]">{eyebrow}</p>
     <h2 className="mira-dark-display mt-3 text-2xl text-[#ded5c5]">{title}</h2>
     <p className="mt-3 text-sm leading-6 text-[#9e978b]">{description}</p>

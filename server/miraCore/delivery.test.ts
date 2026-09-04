@@ -59,6 +59,9 @@ describe("MIRA email delivery routing", () => {
       from: "Remote Shoot Preparation <prepare@mariacavali.com>",
       replyTo: "photographer@example.test",
     }));
+    const delivered = mocks.provider.send.mock.calls[0]?.[0];
+    expect(delivered?.html).toContain('href="https://mira.example/prepare/token"');
+    expect(delivered?.html).toContain('href="https://mira.example/prepare/token#mira-preparation"');
   });
 
   it("omits an invalid or missing photographer Reply-To without blocking the invitation", async () => {
@@ -88,6 +91,21 @@ describe("MIRA email delivery routing", () => {
     mocks.getOwnedShoot.mockResolvedValue({ ...shoot, clientEmail: "invalid" });
 
     await expect(deliverClientInvitation({ photographerUserId: 9, photographerEmail: "photographer@example.test", invitationId: "invitation-1", token: "token", shootId: 7, expiresAt: new Date("2026-10-14T10:00:00.000Z"), requestOrigin: "https://mira.example" })).rejects.toThrow("client email address is invalid");
+    expect(mocks.provider.send).not.toHaveBeenCalled();
+  });
+
+  it("fails safely without the configured public URL and never uses request origin as a fallback", async () => {
+    delete process.env.MIRA_PUBLIC_APP_BASE_URL;
+
+    await expect(deliverClientInvitation({
+      photographerUserId: 9,
+      photographerEmail: "photographer@example.test",
+      invitationId: "invitation-1",
+      token: "private-token",
+      shootId: 7,
+      expiresAt: new Date("2026-10-14T10:00:00.000Z"),
+      requestOrigin: "https://temporary-tunnel.example",
+    })).rejects.toThrow("MIRA_PUBLIC_APP_BASE_URL is not configured");
     expect(mocks.provider.send).not.toHaveBeenCalled();
   });
 });

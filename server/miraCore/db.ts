@@ -25,6 +25,7 @@ import {
 import { getDb } from "../db";
 import {
   createLocalShoot,
+  deleteLocalTextTestMessages,
   getLocalProfile,
   getLocalShoot,
   getLocalInvitation,
@@ -34,9 +35,13 @@ import {
   getLocalInvitationForShoot,
   listLocalInvitations,
   acceptLocalInvitation,
+  endLocalTextTestSession,
   isLocalFileStoreEnabled,
+  listLocalTextTestSessions,
   listLocalShoots,
   saveLocalProfile,
+  startLocalTextTestSession,
+  submitLocalTextTestTurn,
   type LocalShoot,
 } from "../localFileStore";
 import { applyShootMemoryPatch, emptyShootMemory, memoryPatchForTextTestAnswer } from "./memory";
@@ -145,6 +150,16 @@ function timeZoneOffsetMs(date: Date, timeZone: string) {
 // Invitations remain usable through the end of the day after the scheduled
 // shoot in the shoot timezone. Unscheduled shoots retain the explicit short
 // invitation window supplied by the photographer.
+// Any status past "created"/"failed" means the platform actually attempted
+// (or completed) a delivery to the client, so sending again must be an
+// explicit, deliberate resend rather than an accidental second send from a
+// double click or a retried request.
+const DELIVERY_ATTEMPTED_STATUSES = new Set(["queued", "sent", "delivered", "opened", "preparation_in_progress", "completed"]);
+
+export function invitationAlreadySentToClient(invitation: { status: string; deliveryStatus: string } | null | undefined) {
+  return Boolean(invitation && invitation.status === "active" && DELIVERY_ATTEMPTED_STATUSES.has(invitation.deliveryStatus));
+}
+
 export function calculateInvitationExpiry(scheduledAt: Date | null, timeZone: string, fallbackDays: number, durationMinutes: number | null = null) {
   if (!scheduledAt) return new Date(Date.now() + fallbackDays * 86_400_000);
   if (durationMinutes && durationMinutes > 0) return new Date(scheduledAt.getTime() + durationMinutes * 60_000 + 86_400_000);
@@ -279,7 +294,7 @@ export async function getOwnedShootState(photographerUserId: number, shootId: nu
   if (isLocalFileStoreEnabled()) {
     const shoot = await getLocalShoot(photographerUserId, shootId);
     const invitations = await listLocalInvitations(shootId);
-    return shoot ? { shoot: localShootToDomain(shoot), invitations: invitations.map(item => ({ id: item.id, status: item.status, deliveryStatus: item.deliveryStatus, expiresAt: new Date(item.expiresAt), createdAt: new Date(item.createdAt), consentAcknowledgedAt: item.consentAcknowledgedAt ? new Date(item.consentAcknowledgedAt) : null, preparationStartedAt: item.preparationStartedAt ? new Date(item.preparationStartedAt) : null, completedAt: item.completedAt ? new Date(item.completedAt) : null, preparationUrl: `/prepare/${item.token}` })) } : null;
+    return shoot ? { shoot: localShootToDomain(shoot), invitations: invitations.map(item => ({ id: item.id, status: item.status, deliveryStatus: item.deliveryStatus, deliveryProvider: item.deliveryProvider, providerMessageId: item.providerMessageId, expiresAt: new Date(item.expiresAt), createdAt: new Date(item.createdAt), sentAt: item.sentAt ? new Date(item.sentAt) : null, consentAcknowledgedAt: item.consentAcknowledgedAt ? new Date(item.consentAcknowledgedAt) : null, preparationStartedAt: item.preparationStartedAt ? new Date(item.preparationStartedAt) : null, completedAt: item.completedAt ? new Date(item.completedAt) : null, preparationUrl: `/prepare/${item.token}` })) } : null;
   }
   const db = await requireDb();
   const shoot = await getOwnedShoot(photographerUserId, shootId);
@@ -289,6 +304,7 @@ export async function getOwnedShootState(photographerUserId: number, shootId: nu
     status: miraClientInvitations.status,
     deliveryStatus: miraClientInvitations.deliveryStatus,
     deliveryProvider: miraClientInvitations.deliveryProvider,
+    providerMessageId: miraClientInvitations.providerMessageId,
     expiresAt: miraClientInvitations.expiresAt,
     sentAt: miraClientInvitations.sentAt,
     lastOpenedAt: miraClientInvitations.lastOpenedAt,
@@ -307,7 +323,7 @@ export async function getShootQaInspection(photographerUserId: number, shootId: 
   if (isLocalFileStoreEnabled()) {
     const shoot = await getOwnedShoot(photographerUserId, shootId);
     if (!shoot) return null;
-    return { profile: await getPhotographerProfile(photographerUserId), shoot, sessions: [], revisions: [], summaries: [] } as any;
+    return { profile: await getPhotographerProfile(photographerUserId), shoot, sessions: await listLocalTextTestSessions(photographerUserId, shootId) ?? [], revisions: [], summaries: [] } as any;
   }
   const db = await requireDb();
   const shoot = await getOwnedShoot(photographerUserId, shootId);
@@ -341,8 +357,8 @@ export async function createClientInvitation(params: {
     const token = randomBytes(32).toString("base64url");
     const invitation = await createLocalInvitation({
       id: randomUUID(), shootId: params.shootId, photographerUserId: params.photographerUserId,
-      token, status: "active", deliveryStatus: "created", expiresAt: params.expiresAt.toISOString(),
-      consentAcknowledgedAt: null, lastOpenedAt: null, preparationStartedAt: null, completedAt: null,
+      token, status: "active", deliveryStatus: "created", deliveryProvider: null, providerMessageId: null, expiresAt: params.expiresAt.toISOString(),
+      consentAcknowledgedAt: null, lastOpenedAt: null, preparationStartedAt: null, completedAt: null, sentAt: null,
       scheduleResponse: null,
     });
     await updateLocalShoot(params.photographerUserId, params.shootId, { status: "client_invited" });
@@ -488,12 +504,39 @@ export async function updateOwnedShootContact(params: {
     : null;
 }
 
+// Marks an invitation as queued for delivery, right before the outbound
+// Resend API call is attempted. This gives every send attempt an honest,
+// persisted "queued" state even if the process crashes or the provider call
+// itself hangs, instead of the row silently staying "created" forever.
+export async function markInvitationQueued(params: { invitationId: string; photographerUserId: number }) {
+  if (isLocalFileStoreEnabled()) {
+    await updateLocalInvitation(params.invitationId, { deliveryStatus: "queued" });
+    return;
+  }
+  const db = await requireDb();
+  await db.update(miraClientInvitations).set({
+    deliveryStatus: "queued",
+  }).where(and(
+    eq(miraClientInvitations.id, params.invitationId),
+    eq(miraClientInvitations.photographerUserId, params.photographerUserId),
+  ));
+}
+
 export async function markInvitationSent(params: {
   invitationId: string;
   photographerUserId: number;
   provider: string;
   messageId: string;
 }) {
+  if (isLocalFileStoreEnabled()) {
+    await updateLocalInvitation(params.invitationId, {
+      deliveryStatus: "sent",
+      deliveryProvider: params.provider,
+      providerMessageId: params.messageId,
+      sentAt: new Date().toISOString(),
+    });
+    return;
+  }
   const db = await requireDb();
   await db.update(miraClientInvitations).set({
     deliveryStatus: "sent",
@@ -506,8 +549,63 @@ export async function markInvitationSent(params: {
   ));
 }
 
+// Records an honest "failed" delivery status instead of silently leaving the
+// invitation looking like it was never attempted. The photographer can still
+// fall back to the copy-link action, but the audit trail reflects reality.
+export async function markInvitationFailed(params: { invitationId: string; photographerUserId: number }) {
+  if (isLocalFileStoreEnabled()) {
+    await updateLocalInvitation(params.invitationId, { deliveryStatus: "failed" });
+    return;
+  }
+  const db = await requireDb();
+  await db.update(miraClientInvitations).set({
+    deliveryStatus: "failed",
+  }).where(and(
+    eq(miraClientInvitations.id, params.invitationId),
+    eq(miraClientInvitations.photographerUserId, params.photographerUserId),
+  ));
+}
+
+// Upgrades a "sent" invitation to "delivered" from a Resend delivery-event
+// webhook, matched by the provider message id. Never regresses a status that
+// has already progressed past delivery (opened, preparing, completed), and
+// never touches an invitation the webhook payload doesn't identify.
+export async function markInvitationDeliveredByMessageId(providerMessageId: string) {
+  const db = await requireDb();
+  await db.update(miraClientInvitations).set({
+    deliveryStatus: "delivered",
+  }).where(and(
+    eq(miraClientInvitations.providerMessageId, providerMessageId),
+    eq(miraClientInvitations.deliveryStatus, "sent"),
+  ));
+}
+
+// Marks a "sent" (or already "delivered") invitation as bounced/failed from a
+// Resend webhook. Never regresses an invitation the client has already opened
+// or acted on, since a late bounce notification after real engagement is
+// almost always a stale duplicate webhook, not new information.
+export async function markInvitationBouncedByMessageId(providerMessageId: string) {
+  const db = await requireDb();
+  await db.update(miraClientInvitations).set({
+    deliveryStatus: "failed",
+  }).where(and(
+    eq(miraClientInvitations.providerMessageId, providerMessageId),
+    inArray(miraClientInvitations.deliveryStatus, ["sent", "delivered"]),
+  ));
+}
+
 export async function startTextTestSession(token: string, consentAcknowledged: boolean) {
   if (!consentAcknowledged) throw new Error("Consent acknowledgement is required");
+  if (isLocalFileStoreEnabled()) {
+    const state = await getClientInvitation(token);
+    if (!state || state.invitation.status !== "active") return null;
+    return startLocalTextTestSession({
+      token,
+      prompts: TEXT_TEST_QUESTIONS,
+      allowedSeconds: state.shoot.callAllowanceSeconds,
+      maxSessions: state.invitation.maxSessions ?? 3,
+    });
+  }
   const db = await requireDb();
   const state = await getClientInvitation(token);
   if (!state || state.invitation.status !== "active") return null;
@@ -544,6 +642,16 @@ export async function startTextTestSession(token: string, consentAcknowledged: b
 }
 
 export async function submitTextTestTurn(params: { token: string; sessionId: string; answer: string }) {
+  if (isLocalFileStoreEnabled()) {
+    const result = await submitLocalTextTestTurn({ ...params, prompts: TEXT_TEST_QUESTIONS });
+    if (!result) return null;
+    return {
+      shootId: result.shootId,
+      turnCount: result.turnCount,
+      response: result.nextPrompt ?? "Thank you. I have enough for this preparation. Your photographer will review what you shared.",
+      complete: result.complete,
+    };
+  }
   const db = await requireDb();
   const invitationCondition = await resolveInvitationCondition(params.token);
   if (!invitationCondition) return null;
@@ -632,6 +740,7 @@ export async function submitTextTestTurn(params: { token: string; sessionId: str
 }
 
 export async function endTextTestSession(params: { token: string; sessionId: string }) {
+  if (isLocalFileStoreEnabled()) return endLocalTextTestSession(params);
   const db = await requireDb();
   const invitation = await getClientInvitation(params.token);
   if (!invitation) return false;
@@ -1001,6 +1110,20 @@ export async function appendRealtimeQaEvent(params: { token: string; sessionId: 
 }
 
 export async function listRealtimeQaEventsForOwner(photographerUserId: number, shootId: number) {
+  if (isLocalFileStoreEnabled()) {
+    const sessions = await listLocalTextTestSessions(photographerUserId, shootId);
+    if (!sessions) return null;
+    const retentionMs = (Number.isFinite(ENV.miraPilotQaRetentionDays) ? Math.min(30, Math.max(1, ENV.miraPilotQaRetentionDays)) : 7) * 86_400_000;
+    const now = Date.now();
+    return sessions.flatMap(session => session.messages.map((message, index) => ({
+      id: `${session.id}:${index}`,
+      direction: message.role,
+      modality: "text_fallback" as const,
+      content: message.content,
+      createdAt: new Date(message.createdAt),
+      expiresAt: new Date(new Date(message.createdAt).getTime() + retentionMs),
+    }))).filter(event => event.expiresAt.getTime() > now).sort((left, right) => left.createdAt.getTime() - right.createdAt.getTime());
+  }
   const db = await requireDb();
   if (!await getOwnedShoot(photographerUserId, shootId)) return null;
   await db.delete(miraCallQaEvents).where(lt(miraCallQaEvents.expiresAt, new Date()));
@@ -1009,6 +1132,7 @@ export async function listRealtimeQaEventsForOwner(photographerUserId: number, s
 }
 
 export async function deleteRealtimeQaEventsForOwner(photographerUserId: number, shootId: number) {
+  if (isLocalFileStoreEnabled()) return deleteLocalTextTestMessages(photographerUserId, shootId);
   const db = await requireDb();
   if (!await getOwnedShoot(photographerUserId, shootId)) return false;
   await db.delete(miraCallQaEvents).where(eq(miraCallQaEvents.shootId, shootId));

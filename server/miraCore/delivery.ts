@@ -11,8 +11,8 @@ import {
   markPhotographerNotified,
 } from "./db";
 
-function publicUrl(path: string, requestOrigin?: string) {
-  const value = ENV.publicAppBaseUrl || requestOrigin || "";
+function publicUrl(path: string) {
+  const value = process.env.MIRA_PUBLIC_APP_BASE_URL ?? ENV.publicAppBaseUrl;
   if (!value) throw new Error("MIRA_PUBLIC_APP_BASE_URL is not configured");
   return buildPublicUrl(value, path);
 }
@@ -32,7 +32,8 @@ export async function deliverClientInvitation(params: {
   if (!isValidEmailAddress(shoot.clientEmail)) throw new Error("The client email address is invalid");
   const profile = await getPhotographerProfile(params.photographerUserId);
   const photographerName = profile?.businessName || profile?.displayName || "Your photographer";
-  const preparationUrl = publicUrl(`/prepare/${params.token}`, params.requestOrigin);
+  const preparationUrl = publicUrl(`/prepare/${params.token}`);
+  const talkToMiraUrl = `${preparationUrl}#mira-preparation`;
   const content = clientShootRoomInvitationEmail({
     clientFirstName: shoot.clientName?.trim().split(/\s+/)[0] ?? null,
     photographerName,
@@ -42,6 +43,8 @@ export async function deliverClientInvitation(params: {
     location: shoot.location,
     accessUntil: params.expiresAt,
     preparationUrl,
+    talkToMiraUrl,
+    sentAt: new Date(),
   });
   const { provider, from } = requireEmailConfiguration();
   const replyTo = isValidEmailAddress(params.photographerEmail) ? params.photographerEmail : null;
@@ -58,7 +61,7 @@ export async function deliverClientInvitation(params: {
     provider: delivery.provider,
     messageId: delivery.messageId,
   });
-  return { preparationUrl, provider: delivery.provider, deliveryStatus: "sent" as const, replyToWarning: replyTo ? null : "Photographer Reply-To is missing or invalid; invitation was sent without it." };
+  return { preparationUrl, provider: delivery.provider, providerMessageId: delivery.messageId, deliveryStatus: "sent" as const, replyToWarning: replyTo ? null : "Photographer Reply-To is missing or invalid; invitation was sent without it." };
 }
 
 export async function notifyPhotographerOfCompletion(params: {
@@ -72,7 +75,7 @@ export async function notifyPhotographerOfCompletion(params: {
     return false;
   }
   const { provider, from } = requireEmailConfiguration();
-  const shootUrl = publicUrl(`/mira/shoots/${context.shoot.id}`, params.requestOrigin);
+  const shootUrl = publicUrl(`/mira/shoots/${context.shoot.id}`);
   const content = preparationCompletedEmail({
     clientName: context.shoot.clientName,
     shootTitle: context.shoot.title,

@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check, LockKeyhole } from "lucide-react";
 
 export default function MiraLanding() {
   return (
@@ -21,7 +21,7 @@ export default function MiraLanding() {
           <p className="text-base leading-7 text-[#c9c3b7] max-w-2xl mb-10">
             MIRA prepares your client for the remote shoot, so you can arrive with shared direction, fewer loose ends and more space for the photographs that matter.
           </p>
-          <a href="/mira/checkout" className="inline-flex h-11 items-center rounded-full bg-[#d2b98b] px-8 text-sm font-medium text-[#171613] hover:bg-[#e0c99e]">
+          <a href="/mira/signup" className="inline-flex h-11 items-center rounded-full bg-[#d2b98b] px-8 text-sm font-medium text-[#171613] hover:bg-[#e0c99e]">
             Prepare your next shoot <ArrowRight className="ml-2 size-4" />
           </a>
         </section>
@@ -93,20 +93,39 @@ export default function MiraLanding() {
 
         {/* 5. FINAL PURCHASE SECTION */}
         <section id="final-purchase" className="border-t border-white/10 pt-20">
-          <p className="mira-dark-kicker mb-8">One simple plan</p>
-          <h2 className="mira-dark-display text-4xl sm:text-5xl mb-8">MIRA for photographers</h2>
-          <p className="text-base leading-7 text-[#c9c3b7] max-w-3xl mb-6">
-            A private preparation experience for your remote-shoot clients. Your client receives clear guidance before the session. You receive the essential practical and creative direction in one place. The result is a better-prepared client and more space for a better shoot.
-          </p>
-          <div className="mt-12 mb-10">
-            <p className="text-5xl sm:text-6xl font-bold text-[#d2b98b] mb-2">€33.33/month</p>
+          <div className="mira-dark-panel grid gap-12 border-[#d2b98b]/25 p-8 md:p-12 lg:grid-cols-[1fr_0.72fr] lg:gap-16">
+            <div>
+              <p className="mira-dark-kicker mb-7">MIRA for photographers</p>
+              <h2 className="mira-dark-display text-4xl leading-[1.12] sm:text-5xl">Prepare every client before the shoot begins.</h2>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-[#c9c3b7]">
+                Create private preparation rooms, collect creative direction and references, and arrive at every shoot with greater clarity.
+              </p>
+              <ul className="mt-9 grid gap-4 border-t border-white/10 pt-8 text-sm leading-6 text-[#d7d0c4]">
+                {[
+                  "Private preparation rooms for your clients",
+                  "AI-assisted creative preparation",
+                  "Clearer shoot direction before the session",
+                ].map(benefit => (
+                  <li key={benefit} className="flex items-start gap-3">
+                    <Check className="mt-0.5 size-4 shrink-0 text-[#d2b98b]" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex flex-col justify-center border-t border-white/10 pt-10 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
+              <p className="text-4xl font-semibold tracking-[-0.03em] text-[#d2b98b] sm:text-5xl">€33.33<span className="text-lg font-normal tracking-normal text-[#b7a98f]"> one-time</span></p>
+              <p className="mt-3 text-sm text-[#b7a98f]">One payment. No recurring charges.</p>
+              <a href="/mira/signup" className="mt-9 inline-flex h-13 w-full items-center justify-center rounded-full bg-[#d2b98b] px-8 text-sm font-semibold tracking-[0.08em] text-[#171613] transition-colors hover:bg-[#e0c99e]">
+                BUY MIRA <ArrowRight className="ml-2 size-4" />
+              </a>
+              <p className="mt-4 flex items-center justify-center gap-2 text-xs text-[#9e978b]">
+                <LockKeyhole className="size-3.5" /> Secure checkout powered by Stripe
+              </p>
+              <a href="/mira/login" className="mt-7 text-center text-sm text-[#c9c3b7] underline decoration-white/25 underline-offset-4 hover:text-[#f1eadc]">Already have MIRA? Log in</a>
+            </div>
           </div>
-          <a href="/mira/checkout" className="inline-flex h-12 items-center rounded-full bg-[#d2b98b] px-10 text-base font-medium text-[#171613] hover:bg-[#e0c99e] mb-8">
-            Buy MIRA <ArrowRight className="ml-2 size-5" />
-          </a>
-          <p className="text-sm text-[#b7a98f]">
-            <a href="/mira/login" className="underline hover:text-[#f1eadc]">Already have an account? Photographer login</a>
-          </p>
         </section>
       </div>
     </main>

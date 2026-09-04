@@ -28,12 +28,24 @@ export default function MiraShootRoom() {
   const [consent, setConsent] = useState(false);
   const [callError, setCallError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [conversationMode, setConversationMode] = useState<"voice" | "text">("voice");
   const callStateRef = useRef<"idle" | "calling" | "ended">("idle");
+  const miraPreparationRef = useRef<HTMLElement>(null);
+  const focusMiraPreparation = typeof window !== "undefined" && window.location.hash === "#mira-preparation";
   const acknowledge = trpc.miraCore.acknowledgeInvitation.useMutation({ onSuccess: () => setAccepted(true) });
   
   useEffect(() => {
     if (invitation.data?.accepted) setAccepted(true);
   }, [invitation.data?.accepted]);
+
+  useEffect(() => {
+    if (!accepted || !focusMiraPreparation) return;
+    const frame = window.requestAnimationFrame(() => {
+      miraPreparationRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      miraPreparationRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [accepted, focusMiraPreparation]);
 
   if (invitation.isLoading) {
     return (
@@ -68,18 +80,27 @@ export default function MiraShootRoom() {
   return (
     <RoomShell>
       {/* Welcome section with Call MIRA button */}
-      <ClientShootRoomWelcome
-        photographer={invitation.data.photographer}
-        consent={consent}
-        onConsentChange={setConsent}
-        onCallMira={() => {
-          if (!consent) return;
-          setIsConnecting(true);
-          callStateRef.current = "calling";
-        }}
-        isLoading={isConnecting}
-        error={callError}
-      />
+      <section id="mira-preparation" ref={miraPreparationRef} tabIndex={-1} aria-label="MIRA preparation">
+        <ClientShootRoomWelcome
+          photographer={invitation.data.photographer}
+          consent={consent}
+          onConsentChange={setConsent}
+          onCallMira={() => {
+            if (!consent) return;
+            setConversationMode("voice");
+            setIsConnecting(true);
+            callStateRef.current = "calling";
+          }}
+          onTextMira={() => {
+            if (!consent) return;
+            setConversationMode("text");
+            setIsConnecting(true);
+            callStateRef.current = "calling";
+          }}
+          isLoading={isConnecting}
+          error={callError}
+        />
+      </section>
 
       {/* Section 1: Your Shoot Details */}
       <section className="mira-dark-panel mb-20 lg:mb-32">
@@ -115,6 +136,7 @@ export default function MiraShootRoom() {
           <MiraClientCall
             token={credential}
             consent={consent}
+            initialMode={conversationMode}
             onSessionStart={() => {
               setCallError(null);
             }}

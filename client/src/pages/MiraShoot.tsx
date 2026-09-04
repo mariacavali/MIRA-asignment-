@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, Check, Copy, ImagePlus, Link2, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Copy, ImagePlus, Link2, Loader2, RefreshCw, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "wouter";
 import { EmailSequencePreview } from "@/components/mira/EmailSequencePreview";
@@ -44,11 +44,14 @@ export default function MiraShoot() {
     setDeliveryMessage("Private client link created.");
     void state.refetch();
   }});
-  const sendInvitation = trpc.miraCore.sendInvitation.useMutation({ onSuccess: result => {
-    setLink(result.preparationUrl);
-    setDeliveryMessage(result.deliveryError || `Invitation sent. If your client cannot find it within a few minutes, ask them to check Spam or Promotions.${result.replyToWarning ? ` ${result.replyToWarning}` : ""}`);
-    void state.refetch();
-  }});
+  const sendInvitation = trpc.miraCore.sendInvitation.useMutation({
+    onSuccess: result => {
+      setLink(result.preparationUrl);
+      setDeliveryMessage(result.deliveryError || `Invitation sent. If your client cannot find it within a few minutes, ask them to check Spam or Promotions.${result.replyToWarning ? ` ${result.replyToWarning}` : ""}`);
+      void state.refetch();
+    },
+    onError: error => setDeliveryMessage(error.message || "The invitation could not be sent."),
+  });
   useEffect(() => {
     if (!state.data || state.data.invitations.length > 0 || link || invitation.isPending) return;
     invitation.mutate({ shootId, expiresInDays: 7 });
@@ -57,13 +60,15 @@ export default function MiraShoot() {
   if (loading || state.isLoading) return <PhotographerShell><Loader2 className="size-5 animate-spin" /></PhotographerShell>;
   if (!state.data) return <PhotographerShell><p>Shoot not found.</p></PhotographerShell>;
   const { shoot, invitations } = state.data;
+  const latestInvitation = invitations[0];
+  const invitationAlreadySent = Boolean(latestInvitation && ["queued", "sent", "delivered", "opened", "preparation_in_progress", "completed"].includes(latestInvitation.deliveryStatus));
   const latestRevision = inspection.data?.revisions?.[inspection.data.revisions.length - 1];
   const scheduleValue = latestRevision?.snapshotJson?.shootContext?.scheduleConfirmation?.value;
   const scheduleResponse = Array.isArray(scheduleValue) ? scheduleValue : null;
-  return <PhotographerShell><div className="w-full max-w-5xl">
+  return <PhotographerShell><div className="w-full xl:-mx-10 xl:w-[calc(100%+5rem)]">
     <button onClick={() => navigate("/mira")} className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#b7a98f]"><ArrowLeft className="size-3.5" /> Dashboard</button>
-    <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_0.6fr]">
-      <section><p className="mira-dark-kicker">{shoot.status.replaceAll("_", " ")}</p><h1 className="mira-dark-display mt-5 text-6xl">{shoot.title}</h1><dl className="mt-10 grid gap-6 border-t border-white/10 pt-8 sm:grid-cols-2">
+    <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.62fr)]">
+      <section><p className="mira-dark-kicker">{shoot.status.replaceAll("_", " ")}</p><h1 className="mira-dark-display mt-3 text-5xl">{shoot.title}</h1><dl className="mt-6 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
         <Detail label="Client" value={shoot.clientName || "Not named"} />
         <Detail label="Source" value={shoot.sourceMode === "mira_saas" ? "MIRA photographer dashboard" : "Maria Cavali Photography"} />
         <Detail label="Location" value={shoot.location || "Not set"} />
@@ -82,8 +87,8 @@ export default function MiraShoot() {
       ) : shoot.roomState === "preparation_active" ? (
         <Button onClick={() => markReady.mutate({ shootId })} disabled={markReady.isPending} className="mt-6 w-fit rounded-full bg-[#d2b98b] text-[#171613]"><Check className="mr-2 size-4" /> Mark Ready to Shoot</Button>
       ) : null}</section>
-      <aside className="mira-dark-panel self-start"><p className="mira-dark-kicker">Client invitation</p><h2 className="mira-dark-display mt-4 text-3xl">Invite your client.</h2><p className="mt-4 text-sm leading-6 text-[#bdb6a9]">Save the details first, then create one private link for your client.</p>
-        <form className="mt-7 grid gap-4" onSubmit={event => {
+      <aside className="mira-dark-panel self-start p-6"><p className="mira-dark-kicker">Client invitation</p><h2 className="mira-dark-display mt-3 text-3xl">Invite your client.</h2><p className="mt-3 text-sm leading-6 text-[#bdb6a9]">Save the details, then create one private link.</p>
+        <form className="mt-5 grid gap-3" onSubmit={event => {
           event.preventDefault();
           updateContact.mutate({
             shootId,
@@ -97,27 +102,41 @@ export default function MiraShoot() {
           <ContactField label="Client email"><Input type="email" value={contact.clientEmail} onChange={event => setContact({ ...contact, clientEmail: event.target.value })} /></ContactField>
           <ContactField label="Client phone · optional"><Input type="tel" value={contact.clientPhone} onChange={event => setContact({ ...contact, clientPhone: event.target.value })} /></ContactField>
           <ContactField label="Invitation message"><Textarea maxLength={800} value={contact.invitationMessage} onChange={event => setContact({ ...contact, invitationMessage: event.target.value })} /></ContactField>
-          <Button type="submit" variant="outline" disabled={updateContact.isPending} className="w-fit border-white/15 bg-transparent text-[#ded5c5]">Save client details</Button>
+          <Button type="submit" variant="outline" disabled={updateContact.isPending} className="w-full border-white/15 bg-transparent text-[#ded5c5]">Save client details</Button>
         </form>
-        <Button variant="ghost" disabled={invitation.isPending || updateContact.isPending} onClick={async () => { await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null }); invitation.mutate({ shootId, expiresInDays: 7 }); }} className="mt-7 w-full text-[#d2b98b]"><Link2 className="mr-2 size-4" /> Create or regenerate private link</Button>
-          <section className="mira-dark-panel mt-10">
+        <Button variant="ghost" disabled={invitation.isPending || updateContact.isPending} onClick={async () => { await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null }); invitation.mutate({ shootId, expiresInDays: 7 }); }} className="mt-2 w-full text-[#d2b98b]"><Link2 className="mr-2 size-4" /> Create or regenerate private link</Button>
+        <Button
+          variant="outline"
+          disabled={sendInvitation.isPending || updateContact.isPending || !contact.clientEmail.trim()}
+          onClick={async () => {
+            await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null });
+            sendInvitation.mutate({ shootId, expiresInDays: 7, force: invitationAlreadySent });
+          }}
+          className="mt-2 w-full border-[#d2b98b]/40 bg-transparent text-[#d2b98b]"
+        >
+          {sendInvitation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : invitationAlreadySent ? <RefreshCw className="mr-2 size-4" /> : <Send className="mr-2 size-4" />}
+          {invitationAlreadySent ? "Resend invitation" : "Send invitation"}
+        </Button>
+        {!contact.clientEmail.trim() ? <p className="mt-2 text-xs text-[#9e978b]">Add a client email to send the invitation by email.</p> : null}
+          <section className="mt-6 border-t border-white/10 pt-5">
             <p className="mira-dark-kicker">Client communications</p>
             <h2 className="mira-dark-display mt-3 text-3xl">Preparation email sequence</h2>
             <p className="mt-3 text-xs leading-5 text-[#9e978b]">A local preview of the messages prepared for this client. Nothing is sent from this preview.</p>
             <EmailSequencePreview scheduledAt={shoot.scheduledAt} timezone={shoot.timezone} clientEmail={shoot.clientEmail} />
           </section>
-        {deliveryMessage ? <p className="mt-4 text-xs leading-5 text-[#bdb6a9]">{deliveryMessage}</p> : null}
-        {link ? <div className="mt-5 border border-[#d2b98b]/30 bg-black/20 p-4"><p className="text-sm text-[#ded5c5]">Invitation ready for {shoot.clientName || "your client"}.</p><input aria-label="Private invitation link" readOnly value={link} className="mt-3 h-10 w-full border border-white/10 bg-black/20 px-3 text-xs text-[#bdb6a9] outline-none" /><div className="mt-3 grid gap-2"><Button variant="ghost" onClick={() => window.location.assign(link)} className="justify-start text-[#d2b98b]"><Link2 className="mr-2 size-3.5" /> Open client view</Button><Button variant="ghost" onClick={() => { void navigator.clipboard.writeText(link); setDeliveryMessage("Invitation link copied."); }} className="justify-start text-[#d2b98b]"><Copy className="mr-2 size-3.5" /> Copy invitation link</Button></div></div> : null}
-        <div className="mt-7 space-y-3">{invitations.map(item => <div key={item.id} className="flex items-center justify-between border-t border-white/10 pt-3 text-xs"><span className="uppercase tracking-[0.14em] text-[#9e978b]">{item.deliveryStatus.replaceAll("_", " ")}</span>{item.consentAcknowledgedAt ? <span className="flex items-center gap-1 text-[#d2b98b]"><Check className="size-3" /> Consent acknowledged</span> : null}</div>)}</div>
+        {deliveryMessage ? <p className="mt-3 text-xs leading-5 text-[#bdb6a9]">{deliveryMessage}</p> : null}
+        {link ? <div className="mt-4 border border-[#d2b98b]/30 bg-black/20 p-4"><p className="text-sm text-[#ded5c5]">Invitation ready for {shoot.clientName || "your client"}.</p><div className="mt-3 grid gap-2 sm:grid-cols-2"><Button variant="ghost" onClick={() => window.location.assign(link)} className="justify-start text-[#d2b98b]"><Link2 className="mr-2 size-3.5" /> Open client view</Button><Button variant="ghost" onClick={() => { void navigator.clipboard.writeText(link); setDeliveryMessage("Invitation link copied."); }} className="justify-start text-[#d2b98b]"><Copy className="mr-2 size-3.5" /> Copy invitation link</Button></div></div> : null}
+        <div className="mt-4 space-y-2">{invitations.map(item => <div key={item.id} className="flex items-center justify-between border-t border-white/10 pt-2 text-xs"><span className="uppercase tracking-[0.14em] text-[#9e978b]">{item.deliveryStatus.replaceAll("_", " ")}</span>{item.consentAcknowledgedAt ? <span className="flex items-center gap-1 text-[#d2b98b]"><Check className="size-3" /> Consent acknowledged</span> : null}</div>)}</div>
       </aside>
     </div>
-    <section className="mira-dark-panel mt-10"><div className="flex items-start justify-between gap-5"><div><p className="mira-dark-kicker">Conversation record</p><h2 className="mira-dark-display mt-3 text-3xl">Preparation conversation</h2><p className="mt-3 max-w-2xl text-xs leading-5 text-[#9e978b]">Visible only to the authenticated photographer. Short-lived conversation notes support review and remain separate from ShootMemory.</p></div><Button variant="outline" disabled={!qaEvents.data?.length || deleteQaEvents.isPending} onClick={() => deleteQaEvents.mutate({ shootId })} className="border-white/15 bg-transparent text-[#ded5c5]">Delete conversation notes</Button></div><div className="mt-6 space-y-3">{qaEvents.data?.length ? qaEvents.data.map(event => <article key={event.id} className="border-t border-white/10 pt-3"><p className="text-[10px] uppercase tracking-[0.16em] text-[#b7a98f]">{event.direction} · {event.modality.replaceAll("_", " ")}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#ded5c5]">{event.content}</p><p className="mt-2 text-[10px] text-[#777168]">Automatically expires {event.expiresAt.toLocaleString()}</p></article>) : <p className="text-sm text-[#9e978b]">No retained conversation notes.</p>}</div></section>
-    <section className="mira-dark-panel mt-10"><p className="mira-dark-kicker">Visual input</p><h2 className="mira-dark-display mt-3 text-3xl">Shoot references</h2><p className="mt-3 max-w-2xl text-xs leading-5 text-[#9e978b]">Upload screenshots or imagery as observed evidence. A visible colour or motif is not treated as the client’s preference unless they explicitly say so.</p><form className="mt-6 grid max-w-xl gap-3" onSubmit={async event => { event.preventDefault(); if (!referenceFile) return; uploadReference.mutate({ shootId, reference: { originalName: referenceFile.name, mimeType: referenceFile.type as "image/jpeg" | "image/png" | "image/webp", base64: await fileToBase64(referenceFile), clientDescription: referenceDescription.trim() || null, evidenceKind: "observed" } }); }}><input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => setReferenceFile(event.target.files?.[0] ?? null)} className="text-xs text-[#c5bfb3]" /><Textarea maxLength={800} value={referenceDescription} onChange={event => setReferenceDescription(event.target.value)} placeholder="Context for this reference" /><Button type="submit" variant="outline" disabled={!referenceFile || uploadReference.isPending} className="w-fit border-white/15 bg-transparent text-[#ded5c5]"><ImagePlus className="mr-2 size-4" />Add reference</Button></form><div className="mt-6 space-y-3">{inspection.data?.visualReferences.map((reference: any) => <article key={reference.id} className="border-t border-white/10 pt-4"><p className="text-xs text-[#ded5c5]">{reference.originalName} · {reference.uploaderRole} · {reference.evidenceKind.replaceAll("_", " ")} · {reference.status}</p>{reference.clientDescription ? <p className="mt-2 text-xs text-[#9e978b]">{reference.clientDescription}</p> : null}{reference.analysisJson ? <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap text-xs leading-5 text-[#bdb6a9]">{JSON.stringify(reference.analysisJson, null, 2)}</pre> : <Button variant="ghost" disabled={analyzeReference.isPending} onClick={() => analyzeReference.mutate({ shootId, assetId: reference.id })} className="mt-2 text-[#d2b98b]">Analyze visual evidence</Button>}</article>)}</div></section>
-    <section className="mira-dark-panel mt-10"><p className="mira-dark-kicker">Preparation overview</p><h2 className="mira-dark-display mt-3 text-3xl">Shoot preparation</h2><p className="mt-3 text-xs leading-5 text-[#9e978b]">Owner-scoped context, room sessions, chronological ShootMemory revisions, confirmation records, and visual provenance.</p><pre className="mt-5 max-h-[42rem] overflow-auto whitespace-pre-wrap text-xs leading-6 text-[#c9c3b7]">{JSON.stringify(inspection.data ?? {}, null, 2)}</pre></section>
-    <section className="mira-dark-panel mt-10"><p className="mira-dark-kicker">Creative direction</p><h2 className="mira-dark-display mt-3 text-3xl">Confirmed Creative DNA</h2>{creativeDna.data?.length ? creativeDna.data.map(record => <article key={record.id} className="mt-6 border-t border-white/10 pt-5"><p className="text-xs uppercase tracking-[0.14em] text-[#b7a98f]">Confirmed direction · {record.status.replaceAll("_", " ")}</p>{record.creativeDnaJson ? <pre className="mt-4 max-h-[36rem] overflow-auto whitespace-pre-wrap text-xs leading-6 text-[#c9c3b7]">{JSON.stringify(record.creativeDnaJson, null, 2)}</pre> : <p className="mt-3 text-sm text-[#9e978b]">Creative DNA is not available yet.</p>}</article>) : <p className="mt-5 text-sm text-[#9e978b]">No confirmed Creative DNA for this shoot.</p>}</section>
+    <section className="mira-dark-panel mt-6"><div className="flex items-start justify-between gap-5"><div><p className="mira-dark-kicker">Conversation record</p><h2 className="mira-dark-display mt-2 text-3xl">Preparation conversation</h2><p className="mt-2 max-w-2xl text-xs leading-5 text-[#9e978b]">Private preparation notes for this shoot.</p></div><Button variant="outline" disabled={!qaEvents.data?.length || deleteQaEvents.isPending} onClick={() => deleteQaEvents.mutate({ shootId })} className="border-white/15 bg-transparent text-[#ded5c5]">Delete conversation notes</Button></div><div className="mt-5 space-y-3">{qaEvents.data?.length ? qaEvents.data.map(event => <article key={event.id} className="border-t border-white/10 pt-3"><p className="text-[10px] uppercase tracking-[0.16em] text-[#b7a98f]">{event.direction} · {event.modality.replaceAll("_", " ")}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#ded5c5]">{event.content}</p><p className="mt-2 text-[10px] text-[#777168]">Automatically expires {event.expiresAt.toLocaleString()}</p></article>) : <p className="text-sm text-[#9e978b]">No retained conversation notes.</p>}</div></section>
+    <section className="mira-dark-panel mt-6"><p className="mira-dark-kicker">Visual input</p><h2 className="mira-dark-display mt-2 text-3xl">Shoot references</h2><p className="mt-2 max-w-2xl text-xs leading-5 text-[#9e978b]">Upload screenshots or imagery that help clarify the shoot.</p><form className="mt-5 grid max-w-2xl gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end" onSubmit={async event => { event.preventDefault(); if (!referenceFile) return; uploadReference.mutate({ shootId, reference: { originalName: referenceFile.name, mimeType: referenceFile.type as "image/jpeg" | "image/png" | "image/webp", base64: await fileToBase64(referenceFile), clientDescription: referenceDescription.trim() || null, evidenceKind: "observed" } }); }}><input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => setReferenceFile(event.target.files?.[0] ?? null)} className="text-xs text-[#c5bfb3]" /><Textarea className="min-h-20" maxLength={800} value={referenceDescription} onChange={event => setReferenceDescription(event.target.value)} placeholder="Context for this reference" /><Button type="submit" variant="outline" disabled={!referenceFile || uploadReference.isPending} className="w-fit border-white/15 bg-transparent text-[#ded5c5]"><ImagePlus className="mr-2 size-4" />Add reference</Button></form><div className="mt-5 space-y-3">{inspection.data?.visualReferences.map((reference: any) => <article key={reference.id} className="border-t border-white/10 pt-3"><p className="text-xs text-[#ded5c5]">{reference.originalName} · {reference.uploaderRole === "client" ? "Client upload" : "Photographer upload"}</p>{reference.clientDescription ? <p className="mt-2 text-xs text-[#9e978b]">{reference.clientDescription}</p> : null}{reference.analysisJson ? <p className="mt-2 text-xs text-[#d2b98b]">Visual analysis ready.</p> : <Button variant="ghost" disabled={analyzeReference.isPending} onClick={() => analyzeReference.mutate({ shootId, assetId: reference.id })} className="mt-2 text-[#d2b98b]">Analyze visual evidence</Button>}</article>)}</div></section>
+    <section className="mira-dark-panel mt-6"><p className="mira-dark-kicker">Preparation overview</p><h2 className="mira-dark-display mt-2 text-3xl">Shoot preparation</h2><p className="mt-2 text-xs leading-5 text-[#9e978b]">A compact view of the preparation already collected for this shoot.</p><div className="mt-5 grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-4"><SummaryStat label="Conversations" value={inspection.data?.sessions?.length ?? 0} /><SummaryStat label="Updates" value={inspection.data?.revisions?.length ?? 0} /><SummaryStat label="Summaries" value={inspection.data?.summaries?.length ?? 0} /><SummaryStat label="References" value={inspection.data?.visualReferences?.length ?? 0} /></div></section>
+    <section className="mira-dark-panel mt-6"><p className="mira-dark-kicker">Creative direction</p><h2 className="mira-dark-display mt-2 text-3xl">Confirmed Creative DNA</h2>{creativeDna.data?.length ? creativeDna.data.map(record => <article key={record.id} className="mt-5 border-t border-white/10 pt-4"><p className="text-xs uppercase tracking-[0.14em] text-[#b7a98f]">Confirmed direction · {record.status.replaceAll("_", " ")}</p><p className="mt-3 text-sm text-[#ded5c5]">{record.creativeDnaJson ? "Confirmed creative direction is ready for this shoot." : "Creative DNA is not available yet."}</p></article>) : <p className="mt-4 text-sm text-[#9e978b]">No confirmed Creative DNA for this shoot.</p>}</section>
   </div></PhotographerShell>;
 }
 
 function Detail({ label, value }: { label: string; value: string }) { return <div><dt className="text-[10px] uppercase tracking-[0.2em] text-[#8f887d]">{label}</dt><dd className="mt-2 text-sm text-[#ded5c5]">{value}</dd></div>; }
+function SummaryStat({ label, value }: { label: string; value: number }) { return <div className="bg-[#151514] p-4"><p className="text-2xl text-[#d2b98b]">{value}</p><p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#8f887d]">{label}</p></div>; }
 function ContactField({ label, children }: { label: string; children: React.ReactNode }) { return <label className="grid gap-2 text-[10px] uppercase tracking-[0.16em] text-[#9e978b]">{label}{children}</label>; }
 function fileToBase64(file: File) { return new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(",")[1] ?? ""); reader.onerror = () => reject(reader.error); reader.readAsDataURL(file); }); }

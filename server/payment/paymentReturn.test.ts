@@ -42,7 +42,7 @@ describe("payment return flow", () => {
     expect(isPaidPaymentState(state, localTestAccess.paymentStatus)).toBe(true);
     expect(isBlockedPaymentState(state)).toBe(false);
     expect(paymentReturnDestination(state, "complete", localTestAccess.paymentStatus)).toBe("/mira/dashboard");
-    expect(paymentReturnDestination(state, "started", localTestAccess.paymentStatus)).toBe("/mira/onboarding");
+    expect(paymentReturnDestination(state, "started", localTestAccess.paymentStatus)).toBe("/mira/dashboard");
   });
 
   it("resolves an unpaid local account as not paid and not blocked", () => {
@@ -65,9 +65,19 @@ describe("payment return flow", () => {
 
   it("does not use return query payment values or activate payment in the page", () => {
     const source = readFileSync(new URL("../../client/src/pages/MiraPaymentSuccess.tsx", import.meta.url), "utf8");
-    expect(source).not.toMatch(/session_id|payment_status|searchParams|activateLocalPlan/);
+    const routes = readFileSync(new URL("../../client/src/App.tsx", import.meta.url), "utf8");
+    expect(source).not.toMatch(/session_id|payment_status|searchParams|activateLocalPlan|MIRADEMO|amount_total/);
     expect(source).toContain("getPhotographerAccess");
-    expect(source).toContain("/mira/login");
+    expect(source).toContain("Confirming your payment…");
+    expect(source).toContain("This page cannot activate access by itself.");
+    expect(source).toContain("Continue to your dashboard");
+    expect(source).toContain("We could not verify your payment yet.");
+    expect(source).toContain("No access was granted.");
+    expect(source).not.toContain("/mira/login");
+    expect(source).toContain("/for-photographers");
     expect(source).toContain("/mira/checkout");
+    expect(routes).toContain('<Route path={"/mira/payment-success"} component={MiraPaymentSuccess} />');
+    expect(routes).toContain('<Route path={"/mira/onboarding"} component={MiraPhotographerOnboarding} />');
+    expect(routes).toContain('<Route path={"/mira/dashboard"} component={MiraDashboard} />');
   });
 });

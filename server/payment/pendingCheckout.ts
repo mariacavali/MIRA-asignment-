@@ -13,7 +13,8 @@ export async function createPendingCheckout(input: { name: string; email: string
   if (ENV.paymentMode !== "stripe") throw new Error("Stripe payment mode is not enabled");
   if (!ENV.stripePaymentLinkUrl) throw new Error("Stripe Payment Link is not configured");
   if (ENV.miraLocalFileStore) {
-    const record = await createLocalPendingCheckout(input);
+    const record = await createLocalPendingCheckout(input, photographerUserId);
+    if (!record) throw new Error("The authenticated photographer account was not found");
     return { referenceId: record.referenceId, redirectUrl: buildStripePaymentLinkUrl(ENV.stripePaymentLinkUrl, record.referenceId), sessionOpenId: null };
   }
   if (!ENV.stripePriceId) throw new Error("Stripe price is not configured");
