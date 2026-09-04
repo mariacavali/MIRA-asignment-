@@ -46,6 +46,7 @@ import {
   buildShootCreativeDnaSource,
   generateShootCreativeDnaForConfirmedMemory,
   getShootCreativeDnaForOwner,
+  normalizeShootMemorySnapshot,
 } from "./creativeDnaAdapter";
 
 function fakeTable(rows: Record<string, unknown>[]) {
@@ -100,11 +101,11 @@ function createFakeDb(tables: {
   };
 }
 
-function seedDb() {
+function seedDb(snapshotJson: unknown = emptyShootMemory()) {
   return createFakeDb({
     shoots: [{ id: 42, photographerUserId: 9, title: "Voice QA" }],
     summaries: [{ id: "summary-1", shootId: 42, photographerUserId: 9, confirmedAt: new Date(), memoryVersion: 3, summaryText: "Confirmed summary" }],
-    revisions: [{ id: 1, shootId: 42, version: 3, snapshotJson: { identity: {}, brand: {}, expression: {}, shootContext: {} } }],
+    revisions: [{ id: 1, shootId: 42, version: 3, snapshotJson }],
     profiles: [{ userId: 9, displayName: "John", photographyStyle: "editorial portraiture", areasOfExpertise: [] }],
     creativeDna: [],
   });
@@ -263,5 +264,68 @@ describe("generateShootCreativeDnaForConfirmedMemory (demo fallback + wiring)", 
       expect(rows).toHaveLength(1);
       expect((rows[0] as any).status).toBe("complete");
     });
+  });
+});
+
+describe("normalizeShootMemorySnapshot (MariaDB JSON-column string/object boundary)", () => {
+  it("preserves an already-parsed object unchanged", () => {
+    const memory = emptyShootMemory();
+    expect(normalizeShootMemorySnapshot(memory)).toEqual(memory);
+  });
+
+  it("safely parses a valid JSON string into the same object the driver would otherwise have already parsed", () => {
+    const memory = emptyShootMemory();
+    expect(normalizeShootMemorySnapshot(JSON.stringify(memory))).toEqual(memory);
+  });
+
+  it("rejects a malformed JSON string instead of throwing an unhandled TypeError from dereferencing it", () => {
+    expect(() => normalizeShootMemorySnapshot("{not valid json")).toThrow("Confirmed ShootMemory revision is not valid JSON");
+  });
+
+  it("rejects well-formed JSON that does not match the ShootMemory shape, rather than inventing missing client data", () => {
+    expect(() => normalizeShootMemorySnapshot(JSON.stringify({ identity: {} }))).toThrow("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+  });
+
+  it("rejects null and non-object primitives the same way as malformed data", () => {
+    expect(() => normalizeShootMemorySnapshot(null)).toThrow("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+    expect(() => normalizeShootMemorySnapshot(42)).toThrow("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+  });
+
+  it("buildShootCreativeDnaSource produces the identical source whether memory arrives as an object or as the equivalent JSON string", () => {
+    const memory = emptyShootMemory();
+    const fromObject = buildShootCreativeDnaSource({ shoot: shoot as any, photographer: photographer as any, memory, summaryText: "Confirmed summary" });
+    const fromString = buildShootCreativeDnaSource({ shoot: shoot as any, photographer: photographer as any, memory: JSON.stringify(memory), summaryText: "Confirmed summary" });
+    expect(fromString).toEqual(fromObject);
+  });
+});
+
+describe("generateShootCreativeDnaForConfirmedMemory: MariaDB string-form snapshotJson regression", () => {
+  beforeEach(() => {
+    dbMocks.getDb.mockReset();
+    synthesizeMocks.synthesizeMiraV4CreativeDna.mockReset();
+    referencesMocks.listShootVisualReferencesForClient.mockReset().mockResolvedValue([]);
+    localFileStoreMocks.isLocalFileStoreEnabled.mockReturnValue(false);
+    envMocks.env.embeddingApiKey = "";
+  });
+
+  it("reaches the same deterministic demo fallback when the driver returns snapshotJson as a raw JSON string", async () => {
+    dbMocks.getDb.mockResolvedValue(seedDb(JSON.stringify(emptyShootMemory())));
+    const result = await generateShootCreativeDnaForConfirmedMemory({ shootId: 42, photographerUserId: 9 });
+    expect(result?.status).toBe("complete");
+    expect(result?.model).toBe("demo-local");
+    expect(synthesizeMocks.synthesizeMiraV4CreativeDna).not.toHaveBeenCalled();
+  });
+
+  it("still reaches the demo fallback with an already-parsed object, unchanged from before this fix (no regression)", async () => {
+    dbMocks.getDb.mockResolvedValue(seedDb(emptyShootMemory()));
+    const result = await generateShootCreativeDnaForConfirmedMemory({ shootId: 42, photographerUserId: 9 });
+    expect(result?.status).toBe("complete");
+    expect(result?.model).toBe("demo-local");
+  });
+
+  it("fails closed with a retryable error - never silently invents client data - when the stored snapshot is malformed JSON", async () => {
+    dbMocks.getDb.mockResolvedValue(seedDb("{not valid json"));
+    await expect(generateShootCreativeDnaForConfirmedMemory({ shootId: 42, photographerUserId: 9 }))
+      .rejects.toThrow("Confirmed ShootMemory revision is not valid JSON");
   });
 });

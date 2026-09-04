@@ -10,6 +10,7 @@ import {
   MIRA_V4_CREATIVE_DNA_PROMPT_VERSION,
   MIRA_V4_CREATIVE_DNA_SCHEMA_VERSION,
 } from "../../shared/miraV4CreativeDna";
+import { shootMemorySchema, type ShootMemory } from "../../shared/miraCore";
 import { ENV } from "../_core/env";
 import { getDb } from "../db";
 import { isLocalFileStoreEnabled } from "../localFileStore";
@@ -61,14 +62,45 @@ function memoryValue(value: unknown) {
   return Array.isArray(raw) ? raw.join(", ") : raw;
 }
 
+// Defensive normalization boundary: some MariaDB driver/connection
+// configurations return a JSON column's value as a raw string rather than an
+// already-parsed object, even though Drizzle's `.$type<ShootMemory>()`
+// declares it as always-parsed at the type level. Dereferencing a raw string
+// as an object (e.g. `memory.identity.business`) throws before Creative DNA
+// persistence and moodboard compilation, so every caller must go through
+// this normalizer instead of trusting the declared column type. A string is
+// parsed and then, like any other shape, validated against the same
+// authoritative ShootMemory schema the rest of the app already uses
+// (`shared/miraCore.ts`) - malformed or non-conforming data is rejected with
+// a clear error rather than silently treated as an empty/invented memory.
+export function normalizeShootMemorySnapshot(value: unknown): ShootMemory {
+  let candidate: unknown = value;
+  if (typeof value === "string") {
+    try {
+      candidate = JSON.parse(value);
+    } catch {
+      throw new Error("Confirmed ShootMemory revision is not valid JSON");
+    }
+  }
+  const parsed = shootMemorySchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new Error("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+  }
+  return parsed.data;
+}
+
 export function buildShootCreativeDnaSource(params: {
   shoot: typeof miraShoots.$inferSelect;
   photographer: typeof miraPhotographerProfiles.$inferSelect | null;
-  memory: (typeof miraShootMemoryRevisions.$inferSelect)["snapshotJson"];
+  // Declared `unknown`, not the column's nominal ShootMemory type, precisely
+  // because the raw driver value cannot be trusted to already be an object -
+  // see normalizeShootMemorySnapshot above.
+  memory: unknown;
   summaryText: string;
   visualReferences?: ShootVisualReferenceForCreativeDna[];
 }): MiraV4CreativeDnaSource {
-  const { shoot, photographer, memory } = params;
+  const { shoot, photographer } = params;
+  const memory = normalizeShootMemorySnapshot(params.memory);
   return {
     journey: {
       building: memoryValue(memory.identity.business) ?? memoryValue(memory.identity.profession),
