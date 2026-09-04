@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MIRA Stakeholder Dashboard — Specification (No Live Data)</title>
+<style>
+  :root {
+    --bg: #f7f5f1;
+    --surface: #ffffff;
+    --border: #e4ded2;
+    --ink: #1f1b16;
+    --ink-secondary: #55503f;
+    --ink-muted: #8a8371;
+    --accent: #a9773e;
+    --accent-soft: #f1e6d5;
+    --status-pending-bg: #efe6d6;
+    --status-pending-fg: #6f5a30;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16140f;
+      --surface: #201c15;
+      --border: #35301f;
+      --ink: #f1eadc;
+      --ink-secondary: #c8bfa8;
+      --ink-muted: #8f886f;
+      --accent: #d8ac6f;
+      --accent-soft: #332715;
+      --status-pending-bg: #332715;
+      --status-pending-fg: #e0bd85;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial, sans-serif;
+    padding: 32px 20px 64px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  header { margin-bottom: 8px; }
+  h1 { font-size: 1.5rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .subtitle { color: var(--ink-secondary); font-size: 0.9rem; max-width: 680px; line-height: 1.5; margin: 0 0 4px; }
+  .banner {
+    margin: 20px 0 28px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--status-pending-bg);
+    color: var(--status-pending-fg);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .banner strong { font-weight: 700; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card .label {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .card .value {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    letter-spacing: -0.02em;
+  }
+  .card .value .unit { font-size: 0.95rem; font-weight: 500; margin-left: 4px; color: var(--ink-muted); }
+  .card .why { font-size: 0.83rem; color: var(--ink-secondary); line-height: 1.5; }
+  .card .source {
+    margin-top: auto;
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+  .status-pill {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--status-pending-bg);
+    color: var(--status-pending-fg);
+    width: fit-content;
+  }
+  footer { margin-top: 36px; font-size: 0.78rem; color: var(--ink-muted); line-height: 1.6; max-width: 760px; }
+  footer a { color: var(--accent); }
+  table.nav {
+    margin-top: 8px;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    width: 100%;
+  }
+  table.nav th, table.nav td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-secondary);
+  }
+  table.nav th { color: var(--ink-muted); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>MIRA — Stakeholder Dashboard (Specification)</h1>
+      <p class="subtitle">The seven metrics MIRA is designed to report once real usage exists. This page is the honest "agreed alternative" to a PowerBI/.pbix artifact for this submission — no PowerBI workspace or .pbix file exists, and no live/production data exists to populate one.</p>
+    </header>
+
+    <div class="banner">
+      <strong>No fabricated numbers.</strong> Every card below shows a real, computable metric definition and its exact source table/column in the implemented schema (<code>drizzle/schema.ts</code>) — not an example value. Values read "No production data yet" because no production deployment or live user base exists. See <code>capstone/dashboard/dashboard_documentation.md</code> for full calculation logic and rationale.
+    </div>
+
+    <section class="grid" aria-label="Stakeholder metrics">
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Shoots created</span>
+        <span class="value">— <span class="unit">shoots / period</span></span>
+        <p class="why">Top-of-funnel usage signal — the first number that must be non-zero for anything else to mean anything.</p>
+        <span class="source">mira_shoots.createdAt</span>
+      </article>
+
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Invitations sent</span>
+        <span class="value">— <span class="unit">invitations</span></span>
+        <p class="why">Distinguishes "a shoot was set up" from "a client was actually invited to prepare."</p>
+        <span class="source">mira_client_invitations.sentAt</span>
+      </article>
+
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Invitation delivery rate</span>
+        <span class="value">— <span class="unit">%</span></span>
+        <p class="why">Share of sent invitations confirmed <em>delivered</em> by the email provider, not just accepted for sending.</p>
+        <span class="source">mira_client_invitations.deliveryStatus</span>
+      </article>
+
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Preparation completion rate</span>
+        <span class="value">— <span class="unit">%</span></span>
+        <p class="why">Share of invited clients who actually complete Discovery — the signal a static checklist can never produce.</p>
+        <span class="source">mira_client_invitations.completedAt</span>
+      </article>
+
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Readiness rate</span>
+        <span class="value">— <span class="unit">%</span></span>
+        <p class="why">Share of shoots that reach a real, gated <code>ready_to_shoot</code> state before the shoot date — the metric closest to the product's core promise.</p>
+        <span class="source">mira_shoots.status</span>
+      </article>
+
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Average preparation time</span>
+        <span class="value">— <span class="unit">hours</span></span>
+        <p class="why">Elapsed time from invitation sent to preparation completed — operational pacing signal for both photographer and product.</p>
+        <span class="source">mira_client_invitations.sentAt / .completedAt</span>
+      </article>
+
+      <article class="card">
+        <span class="status-pill">No data</span>
+        <span class="label">Payment → active-account rate</span>
+        <span class="value">— <span class="unit">%</span></span>
+        <p class="why">The commercial funnel's core conversion signal. Exactly one verified reference event exists (a €0.00 test transaction) — not a rate.</p>
+        <span class="source">mira_pending_checkouts.status</span>
+      </article>
+    </section>
+
+    <footer>
+      <strong>How to navigate this page:</strong> open this file directly in any browser (double-click, or drag into a browser window) — it is fully static, no server or build step required.
+      <table class="nav">
+        <tr><th>Section</th><th>Where</th></tr>
+        <tr><td>Full metric rationale, exact calculation SQL, and caveats</td><td><code>capstone/dashboard/dashboard_documentation.md</code></td></tr>
+        <tr><td>What must be true before real numbers can appear</td><td><code>capstone/dashboard/dashboard_documentation.md</code> §"Pending dependencies"</td></tr>
+        <tr><td>Underlying schema these metrics query</td><td><code>drizzle/schema.ts</code></td></tr>
+      </table>
+      <p>This page will be updated to bind real values once a production deployment with real usage exists — see the "Pending dependencies" section referenced above.</p>
+    </footer>
+  </div>
+</body>
+</html>

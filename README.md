@@ -27,7 +27,7 @@ These documents provide factual system information for an independent audit and 
 
 The product application uses React and Vite in `client/`, Express and tRPC in `server/`, shared TypeScript contracts in `shared/`, and Drizzle migrations for MySQL/TiDB in `drizzle/`. Model, image, storage, authentication, and optional provider integrations are server-side boundaries.
 
-n8n is an optional automation boundary, not the application source of truth. The importable synthetic photographer/model-client lifecycle POC is documented in [`capstone/round2/n8n/`](capstone/round2/n8n/); it does not authenticate users, store payment instruments, send email, or replace MIRA persistence.
+n8n is an optional automation boundary, not the application source of truth. Two real, importable, inactive-by-default n8n workflow exports exist at [`workflows/`](workflows/) for MIRA's client email-milestone scheduling — documented in [`capstone/automation/n8n_automation_poc.md`](capstone/automation/n8n_automation_poc.md) and [`docs/n8n-email-sequence-setup.md`](docs/n8n-email-sequence-setup.md); neither authenticates users, stores payment instruments, sends email itself, or replaces MIRA persistence.
 
 ## Run locally
 
