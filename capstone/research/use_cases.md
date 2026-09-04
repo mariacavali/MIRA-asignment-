@@ -4,6 +4,8 @@
 
 **Source evidence used:** `server/miraCore/router.ts`, `server/miraCore/creativeDnaAdapter.ts`, `server/miraCore/moodboardAdapter.ts`, `server/miraCore/visualReferences.ts`, `client/src/pages/MiraShoot.tsx`, `client/src/pages/MiraShootRoom.tsx`, `docs/stripe-integration.md`.
 
+**Selected use case for Round 1 focus: Use case 1 — Solo photographer.** All live-verification work this round (Stripe, Resend, the demo Shoot Room flow — see `docs/ROUND1_VERIFICATION.md`) was exercised against exactly this shape: one photographer, one client, one shoot. Use cases 2 and 3 remain illustrative extensions of the same implemented flow, not separately verified.
+
 ## Use case 1 — Solo photographer
 
 **Shape:** One photographer, no assistants, books and manages every shoot personally, has limited time between paid sessions to chase client preparation.

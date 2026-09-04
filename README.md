@@ -34,7 +34,7 @@ n8n is an optional automation boundary, not the application source of truth. Two
 Requirements: Node.js and pnpm. **This is a TypeScript/Node.js project, not Python — there is no `requirements.txt`; [`package.json`](package.json) (locked by [`pnpm-lock.yaml`](pnpm-lock.yaml)) is the equivalent dependency manifest.**
 
 1. Install dependencies with `pnpm install`.
-2. Create a local `.env` using the blank variable template in [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md). Never commit local credentials.
+2. Create a local `.env` using the blank variable template in [`.env.example`](.env.example) (or the fuller reference at [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md)). Every line in `.env.example` is a bare variable name or a non-secret default — never a real value. Never commit local credentials.
 3. Configure the required database and platform services for your environment.
 4. Apply database migrations with `pnpm db:push`.
 5. Start development with `pnpm dev`.

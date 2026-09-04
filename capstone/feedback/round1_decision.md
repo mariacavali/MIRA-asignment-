@@ -40,27 +40,27 @@ Round 2 does not change the industry or use case (decision remains **KEEP**, unc
 
 ## Teaching staff feedback
 
-**Not yet received as of this document.** Recorded honestly rather than filled in with invented commentary — see `capstone/round2/README.md`'s status discipline, which governs this document equally.
+**Status: PENDING.** Not yet received as of this document. Recorded honestly rather than filled in with invented commentary — see `capstone/round2/README.md`'s status discipline, which governs this document equally.
 
-- `[PLACEHOLDER]` — no dated instructor comment exists yet to summarize.
-- `[PLACEHOLDER]`
-- `[PLACEHOLDER]`
+- `PENDING` — no dated instructor comment exists yet to summarize.
+- `PENDING`
+- `PENDING`
 
 | Date | Reviewer | Feedback | Response/action |
 |---|---|---|---|
-| `[TBD]` | `[TBD]` | `[PLACEHOLDER — no feedback received yet]` | `[TBD]` |
+| `PENDING` | `PENDING` | `PENDING — no feedback received yet` | `PENDING` |
 
 ## Class / peer feedback
 
-**Not yet received as of this document.**
+**Status: PENDING.** Not yet received as of this document.
 
-- `[PLACEHOLDER]` — no dated peer comment exists yet to summarize.
-- `[PLACEHOLDER]`
-- `[PLACEHOLDER]`
+- `PENDING` — no dated peer comment exists yet to summarize.
+- `PENDING`
+- `PENDING`
 
 | Date | Reviewer | Feedback | Response/action |
 |---|---|---|---|
-| `[TBD]` | `[TBD]` | `[PLACEHOLDER — no feedback received yet]` | `[TBD]` |
+| `PENDING` | `PENDING` | `PENDING — no feedback received yet` | `PENDING` |
 
 ---
 
