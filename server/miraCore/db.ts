@@ -844,11 +844,19 @@ export async function startOrResumeRealtimeSession(token: string) {
       lastConnectedAt: now,
       reconnectUntil,
     });
+    // Same MariaDB Invalid Date boundary already fixed for lastOpenedAt in
+    // getClientInvitation's markOpened branch above (isValidDate): the
+    // driver can return these nullable timestamp columns as Date objects
+    // with a NaN time value instead of null, which `?? now` alone does not
+    // catch, and re-persisting one throws "Invalid time value" before
+    // buildRealtimeSessionConfig or the OpenAI request ever runs. state's
+    // lastOpenedAt is already normalized this way (it went through
+    // getClientInvitation(token, true) above), so only these two need it.
     await tx.update(miraClientInvitations).set({
-      consentAcknowledgedAt: state.invitation.consentAcknowledgedAt ?? now,
+      consentAcknowledgedAt: isValidDate(state.invitation.consentAcknowledgedAt) ? state.invitation.consentAcknowledgedAt : now,
       lastOpenedAt: state.invitation.lastOpenedAt ?? now,
       deliveryStatus: "preparation_in_progress",
-      preparationStartedAt: state.invitation.preparationStartedAt ?? now,
+      preparationStartedAt: isValidDate(state.invitation.preparationStartedAt) ? state.invitation.preparationStartedAt : now,
     }).where(eq(miraClientInvitations.id, state.invitation.id));
     await tx.update(miraShoots).set({
       status: state.shoot.status === "preparation_ready" ? "preparation_ready" : "conversation_in_progress",
