@@ -49,7 +49,7 @@ import { evaluateDiscoveryGate } from "./memory";
 import { ENV } from "../_core/env";
 import { buildShootPreparationBrief, type ShootPreparationBrief } from "./preparationBrief";
 import { parseInvitationAccessToken, verifyInvitationAccessSignature } from "./invitationAccessLink";
-import { mapCompletedMoodboardImages } from "./moodboardAdapter";
+import { mapCompletedMoodboardImages, normalizeCreativeDnaInput } from "./moodboardAdapter";
 
 const TEXT_TEST_QUESTIONS = [
   "To begin, what do you do—and what is this shoot meant to help you communicate?",
@@ -1275,12 +1275,28 @@ export async function getShootRoomStatusForClient(shootId: number) {
         eq(miraShootCreativeDna.shootId, shootId),
         eq(miraShootCreativeDna.status, "complete"),
       )).orderBy(desc(miraShootCreativeDna.confirmedMemoryVersion)).limit(1);
-    const creativeDna = creativeDnaRows[0]?.creativeDnaJson;
-    if (creativeDna) {
-      preparationBrief = buildShootPreparationBrief({
-        creativeDna,
-        shoot: { location: shoot.location, scheduledAt: shoot.scheduledAt, timezone: shoot.timezone },
-      });
+    const rawCreativeDna = creativeDnaRows[0]?.creativeDnaJson;
+    if (rawCreativeDna) {
+      // Same MariaDB JSON-column string/object boundary already fixed for
+      // moodboard compilation (moodboardAdapter.ts) and Creative DNA
+      // synthesis (creativeDnaAdapter.ts) - the driver can return this
+      // column as a raw string, which a truthy check alone does not catch.
+      // Normalizing (and, for a genuinely malformed record, failing without
+      // fabricating brief content) keeps this the same honest boundary as
+      // those two call sites, reusing the same validator rather than a new
+      // one. A normalization failure here must never take down the rest of
+      // the client's room status (moodboard, room state) - it only means no
+      // preparation brief is shown, the same as the already-existing
+      // "creativeDna is missing" case.
+      try {
+        const creativeDna = normalizeCreativeDnaInput(rawCreativeDna);
+        preparationBrief = buildShootPreparationBrief({
+          creativeDna,
+          shoot: { location: shoot.location, scheduledAt: shoot.scheduledAt, timezone: shoot.timezone },
+        });
+      } catch (error) {
+        console.warn("MIRA preparation brief unavailable - persisted Creative DNA failed normalization", error instanceof Error ? error.message : "unknown error");
+      }
     }
   }
 
