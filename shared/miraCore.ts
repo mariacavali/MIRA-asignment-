@@ -35,7 +35,17 @@ const memoryValueSchema = z
     ]),
     kind: z.enum(["explicit", "interpreted"]),
     confidence: z.enum(["high", "medium", "low"]),
-    sourceEventIds: z.array(z.string().uuid()).min(1).max(20),
+    // Every current writer (server/miraCore/db.ts's persistRealtimeMemoryTool,
+    // recordShootScheduleResponse, and the text-test flow via
+    // memoryPatchForTextTestAnswer) happens to generate these with
+    // crypto.randomUUID(), but nothing guarantees that: the parameter type
+    // (`sourceEventId: string`) and the storage column
+    // (`mira_call_events.id`, a plain varchar(36) with no format
+    // constraint) never enforce UUID shape. Confirmed live data contains
+    // legitimate, non-empty internal string identifiers that are not
+    // UUID-formatted, so this only bounds length/emptiness - it never
+    // requires, invents, or reformats a UUID.
+    sourceEventIds: z.array(z.string().trim().min(1).max(128)).min(1).max(20),
     clientConfirmed: z.boolean(),
     updatedAt: z.string().datetime(),
   })

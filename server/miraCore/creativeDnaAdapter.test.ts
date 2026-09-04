@@ -299,6 +299,63 @@ describe("normalizeShootMemorySnapshot (MariaDB JSON-column string/object bounda
   });
 });
 
+describe("sourceEventIds accepts real internal identifiers, not only UUIDs", () => {
+  function memoryWithSourceEventIds(sourceEventIds: string[]) {
+    const memory = emptyShootMemory();
+    return {
+      ...memory,
+      identity: {
+        ...memory.identity,
+        profession: {
+          value: "Portrait photographer client",
+          kind: "explicit" as const,
+          confidence: "high" as const,
+          sourceEventIds,
+          clientConfirmed: true,
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    };
+  }
+
+  it("accepts a UUID event ID, unchanged from before this fix", () => {
+    const memory = memoryWithSourceEventIds(["8d6d2f8f-755b-1efb-bb12-65a59500dea9"]);
+    expect(normalizeShootMemorySnapshot(memory)).toEqual(memory);
+  });
+
+  it("accepts a real non-UUID internal event ID exactly as generated - never invents, hashes, or reformats it", () => {
+    const memory = memoryWithSourceEventIds(["mira:call:session-42:turn-7"]);
+    expect(normalizeShootMemorySnapshot(memory)?.identity.profession?.sourceEventIds).toEqual(["mira:call:session-42:turn-7"]);
+  });
+
+  it("accepts a mix of UUID and non-UUID event IDs in the same array", () => {
+    const memory = memoryWithSourceEventIds(["8d6d2f8f-755b-1efb-bb12-65a59500dea9", "text-test:answer-3"]);
+    expect(normalizeShootMemorySnapshot(memory)?.identity.profession?.sourceEventIds).toEqual(["8d6d2f8f-755b-1efb-bb12-65a59500dea9", "text-test:answer-3"]);
+  });
+
+  it("still rejects an empty event ID string - non-empty is preserved, not just UUID format", () => {
+    const memory = memoryWithSourceEventIds([""]);
+    expect(() => normalizeShootMemorySnapshot(memory)).toThrow("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+  });
+
+  it("still rejects an empty sourceEventIds array - existing strictness on the rest of the schema is unchanged", () => {
+    const memory = memoryWithSourceEventIds([]);
+    expect(() => normalizeShootMemorySnapshot(memory)).toThrow("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+  });
+
+  it("still rejects a memory-value object with a missing required field (e.g. clientConfirmed), proving other validation is untouched", () => {
+    const memory = memoryWithSourceEventIds(["mira:call:session-42:turn-7"]);
+    const { clientConfirmed: _omit, ...withoutClientConfirmed } = memory.identity.profession as any;
+    const broken = { ...memory, identity: { ...memory.identity, profession: withoutClientConfirmed } };
+    expect(() => normalizeShootMemorySnapshot(broken)).toThrow("Confirmed ShootMemory revision does not match the expected ShootMemory shape");
+  });
+
+  it("accepts a non-UUID event ID whether the snapshot arrives as an object or as the equivalent JSON string", () => {
+    const memory = memoryWithSourceEventIds(["mira:call:session-42:turn-7"]);
+    expect(normalizeShootMemorySnapshot(JSON.stringify(memory))).toEqual(memory);
+  });
+});
+
 describe("generateShootCreativeDnaForConfirmedMemory: MariaDB string-form snapshotJson regression", () => {
   beforeEach(() => {
     dbMocks.getDb.mockReset();
