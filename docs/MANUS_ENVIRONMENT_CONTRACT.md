@@ -69,6 +69,10 @@ Safe to leave unset in production; each has a workable default or gates an unrel
 
 `VITE_FRONTEND_FORGE_API_KEY` is intentionally the one secret-shaped value exposed to the browser bundle (the `VITE_` prefix is Vite's own client-exposure convention) — this is pre-existing platform infrastructure unrelated to MIRA's own work, confirmed to be the only `VITE_`-prefixed credential referenced anywhere in client code. No MIRA-specific secret (Stripe, Resend, OpenAI, invitation-link, email-worker) is ever read via `import.meta.env` — confirmed by direct search of `client/src`.
 
+### Isolated-preview storage fallback (not for real commercial production)
+
+`MIRA_ALLOW_LOCAL_STORAGE_IN_PRODUCTION` (`server/_core/env.ts`) is an explicit, off-by-default opt-in for an isolated preview/demo deployment that runs with `NODE_ENV=production` but has no Forge storage (`BUILT_IN_FORGE_API_URL`/`BUILT_IN_FORGE_API_KEY`) configured. Forge is always preferred whenever both Forge variables are set, regardless of this flag. When Forge is absent, `NODE_ENV=production`, and this flag is unset or anything other than the literal string `true`, both the storage proxy (`server/_core/storageProxy.ts`) and `storageGetSignedUrl`/`storagePut` (`server/storage.ts`) continue to fail closed exactly as before. Setting it to exactly `true` only widens the existing local-disk fallback (`LOCAL_STORAGE_ROOT` in `server/storage.ts`) to also apply under production, so an isolated preview that already wrote assets to that path (uploaded references, demo moodboard placeholders) can serve them. It does not change Forge-configured behavior, does not touch the database, and is not a substitute for real commercial production storage (Forge/S3) — a genuine production deployment should configure Forge instead of setting this flag.
+
 ## 8. Must never be `true` / set in production
 
 | Variable | Dangerous value | What actually happens if set anyway |

@@ -7,6 +7,13 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  // Explicit, off-by-default opt-in for isolated previews/demo deployments that
+  // run with NODE_ENV=production but have no Forge storage configured. Forge
+  // is always preferred when both Forge vars are set; this only widens the
+  // existing local-disk fallback (see server/storage.ts, server/_core/storageProxy.ts)
+  // to also apply under production when explicitly enabled. Not a substitute
+  // for real commercial production storage.
+  allowLocalStorageInProduction: process.env.MIRA_ALLOW_LOCAL_STORAGE_IN_PRODUCTION === "true",
   embeddingApiKey: process.env.OPENAI_API_KEY ?? "",
   embeddingApiBaseUrl: process.env.OPENAI_EMBEDDING_BASE_URL ?? "https://api.openai.com",
   embeddingModel: process.env.OPENAI_EMBEDDING_MODEL ?? "text-embedding-3-small",
