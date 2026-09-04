@@ -306,6 +306,31 @@ describe("shoot moodboard adapter (Creative DNA -> existing V4 moodboard engine)
       expect(mapCompletedMoodboardImages("complete", undefined)).toEqual([]);
       expect(mapCompletedMoodboardImages("complete", null)).toEqual([]);
     });
+
+    // MariaDB JSON-column string/object boundary - the driver can return
+    // referencesJson as a raw string instead of an already-parsed array.
+    it("produces the identical five mapped scenes, in order, when referencesJson is the driver's raw JSON string form", () => {
+      const fromObject = mapCompletedMoodboardImages("complete", fiveReferences);
+      const fromString = mapCompletedMoodboardImages("complete", JSON.stringify(fiveReferences));
+      expect(fromString).toEqual(fromObject);
+      expect(fromString.map(image => image.id)).toEqual(["scene_1", "scene_2", "scene_3", "scene_4", "scene_5"]);
+    });
+
+    it("passes through extra persisted fields (shotNumber, prompt) without them affecting the mapped output", () => {
+      const withExtraFields = fiveReferences.map((reference, index) => ({ ...reference, shotNumber: index + 1, prompt: `Prompt ${index + 1}` }));
+      const images = mapCompletedMoodboardImages("complete", JSON.stringify(withExtraFields));
+      expect(images).toEqual(fiveReferences.map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url })));
+    });
+
+    it("returns [] safely, without crashing, for a raw string that is not valid JSON", () => {
+      expect(mapCompletedMoodboardImages("complete", "{not valid json")).toEqual([]);
+    });
+
+    it("returns [] safely, without crashing or inventing images, for valid JSON that is not an array of scene references", () => {
+      expect(mapCompletedMoodboardImages("complete", JSON.stringify({ id: "not_an_array" }))).toEqual([]);
+      expect(mapCompletedMoodboardImages("complete", JSON.stringify(["just", "strings"]))).toEqual([]);
+      expect(mapCompletedMoodboardImages("complete", JSON.stringify([{ direction: "Missing id" }]))).toEqual([]);
+    });
   });
 });
 

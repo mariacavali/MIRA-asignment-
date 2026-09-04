@@ -96,10 +96,10 @@ function demoLocalCreativeDna() {
   return buildDemoMiraV4CreativeDna(source);
 }
 
-function seedDb(creativeDnaJson: unknown, memoryRevisions: Record<string, unknown>[] = []) {
+function seedDb(creativeDnaJson: unknown, memoryRevisions: Record<string, unknown>[] = [], moodboardReferencesJson: unknown = fiveSceneReferences()) {
   return createFakeDb({
     shoots: [{ id: 42, roomState: "preparation_active", status: "conversation_in_progress", location: "Home studio", scheduledAt: new Date("2026-09-04T12:00:00.000Z"), timezone: "Europe/Amsterdam", durationMinutes: 60 }],
-    moodboard: [{ shootId: 42, confirmedMemoryVersion: 3, status: "complete", referencesJson: fiveSceneReferences() }],
+    moodboard: [{ shootId: 42, confirmedMemoryVersion: 3, status: "complete", referencesJson: moodboardReferencesJson }],
     creativeDna: [{ shootId: 42, confirmedMemoryVersion: 3, status: "complete", creativeDnaJson }],
     revisions: memoryRevisions,
   });
@@ -242,6 +242,37 @@ describe("getShootRoomStatusForClient: schedule response survives the MariaDB JS
     expect(status.scheduleResponse).toBeNull();
     expect(status.moodboardReady).toBe(true);
     expect(status.images).toHaveLength(5);
+    expect(status.preparationBrief).not.toBeNull();
+  });
+});
+
+// Regression coverage for the confirmed third client Shoot Room rendering
+// blocker: mapCompletedMoodboardImages (server/miraCore/moodboardAdapter.ts)
+// returned [] unless mira_shoot_moodboard.referencesJson was already an
+// array. When the MariaDB driver returns that JSON column as a raw string,
+// none of the five persisted, completed scenes reached the client.
+describe("getShootRoomStatusForClient: moodboard scenes survive the MariaDB JSON-column string/object boundary", () => {
+  beforeEach(() => {
+    dbMocks.getDb.mockReset();
+    localFileStoreMocks.isLocalFileStoreEnabled.mockReturnValue(false);
+  });
+
+  it("returns preparationBrief and all five completed, ordered moodboard scenes together when referencesJson is the driver's raw JSON string", async () => {
+    const db = seedDb(demoLocalCreativeDna(), [], JSON.stringify(fiveSceneReferences()));
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.moodboardReady).toBe(true);
+    expect(status.images).toHaveLength(5);
+    expect(status.images.map(image => image.id)).toEqual(["scene_1", "scene_2", "scene_3", "scene_4", "scene_5"]);
+    expect(status.preparationBrief).not.toBeNull();
+  });
+
+  it("fails safely on a malformed persisted referencesJson - moodboardReady is false and images is empty, but preparationBrief still returns", async () => {
+    const db = seedDb(demoLocalCreativeDna(), [], "{not valid json");
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.moodboardReady).toBe(false);
+    expect(status.images).toEqual([]);
     expect(status.preparationBrief).not.toBeNull();
   });
 });

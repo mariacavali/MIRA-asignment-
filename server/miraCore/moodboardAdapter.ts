@@ -1,5 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
+import { z } from "zod";
 import { miraShootMoodboard } from "../../drizzle/schema";
 import { ENV } from "../_core/env";
 import { createLocalPlaceholderImage } from "../_core/imageGeneration";
@@ -185,6 +186,22 @@ export async function generateShootMoodboardForCreativeDna(params: {
 
 export type ShootMoodboardImage = { id: string; direction: string; url: string };
 
+// Same MariaDB JSON-column string/object boundary as normalizeCreativeDnaInput
+// above, applied to mira_shoot_moodboard.referencesJson: the driver can
+// return this column as a raw string instead of an already-parsed array, so
+// an Array.isArray check alone silently discarded five valid, persisted
+// scenes. There is no existing shared schema for this shape (unlike Creative
+// DNA/ShootMemory), so this is the smallest local parse-and-validate
+// boundary - only the fields mapCompletedMoodboardImages actually reads are
+// required; other persisted fields (shotNumber, prompt, status, errorCode)
+// are passed through untouched. Malformed JSON or a structure that doesn't
+// match is treated the same as "no moodboard yet": an empty array, never a
+// thrown error or an invented image.
+const moodboardReferenceSchema = z
+  .object({ id: z.string(), direction: z.string(), url: z.string().nullable().optional() })
+  .passthrough();
+const moodboardReferencesSchema = z.array(moodboardReferenceSchema);
+
 // Shared by both visibility surfaces - the client Shoot Room
 // (getShootRoomStatusForClient in db.ts) and the photographer dashboard
 // (getShootMoodboardForOwner below) - so "what counts as a displayable
@@ -192,10 +209,20 @@ export type ShootMoodboardImage = { id: string; direction: string; url: string }
 // partial image: only a "complete" moodboard with a real, rendered url
 // counts, for either audience.
 export function mapCompletedMoodboardImages(status: string, referencesJson: unknown): ShootMoodboardImage[] {
-  if (status !== "complete" || !Array.isArray(referencesJson)) return [];
-  return (referencesJson as Array<{ id: string; direction: string; url?: string | null }>)
-    .filter((reference): reference is { id: string; direction: string; url: string } => Boolean(reference?.url))
-    .map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url }));
+  if (status !== "complete") return [];
+  let candidate: unknown = referencesJson;
+  if (typeof candidate === "string") {
+    try {
+      candidate = JSON.parse(candidate);
+    } catch {
+      return [];
+    }
+  }
+  const parsed = moodboardReferencesSchema.safeParse(candidate);
+  if (!parsed.success) return [];
+  return parsed.data
+    .filter((reference): reference is { id: string; direction: string; url: string } => Boolean(reference.url))
+    .map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url as string }));
 }
 
 // Photographer-dashboard read of the latest moodboard for a shoot they own.
