@@ -56,6 +56,17 @@ MIRA sits **inside** the photographer's existing workflow (their Stripe purchase
 - **No customer adoption or usage data exists.** There is no production deployment, no live user base, and no retention/engagement data in this repository. All adoption claims in this document set are explicitly out of scope and are not made.
 - **Any scored or ranked assessment in this document set (see `opportunities_risks.md`) is the author's own analytical judgment**, produced by reasoning about the implemented product against the sector context above. It is not a market statistic, survey result, or third-party analyst report, and should not be read as one.
 
+## 4a. Public data sources (identified, not yet analyzed)
+
+The rest of this document is grounded in the implemented codebase and the supplied research pack, not in external public datasets. Per the brief's request for "public data (Kaggle, Hugging Face, etc.) relevant to your sector/size," two real, currently-available public datasets were identified as directly relevant to this sector/company-size context:
+
+| Dataset | Platform | Relevance |
+|---|---|---|
+| [Freelance Contracts Dataset (1.3M entries)](https://www.kaggle.com/datasets/asaniczka/freelance-contracts-dataset-1-3-million-entries) | Kaggle | Freelance/independent-contractor market structure — directly relevant to MIRA's "independent photographer" segment (`capstone/round2/use-case-definition.md`, "Company"). |
+| [Small Business Data](https://www.kaggle.com/datasets/anneezeh/small-business-data) | Kaggle | Small-business operating characteristics — relevant to the "small studio" use case (`capstone/research/use_cases.md`, Use case 2). |
+
+**Honest status: identified, not downloaded, not analyzed.** No figure, statistic, or claim anywhere in this document set is drawn from either dataset — doing so without actually running the analysis would be inventing a result. This section exists so the gap is explicit rather than silently absent, and to name the concrete next step (download + analyze against the freelance/small-studio segmentation already used in `use_cases.md`) rather than leave "public data" unaddressed entirely. Portrait/face-image datasets on Hugging Face (e.g. computer-vision training sets for face segmentation or generation) were also reviewed and deliberately **not** cited here — they are training data for a different technical purpose (facial recognition/generation models) than MIRA's own image-generation approach (a general-purpose text-to-image API, not a fine-tuned face model — see `capstone/round2/eu-ai-act-assessment.md` §1, which confirms MIRA performs no biometric processing), and citing them would misrepresent what they're for.
+
 ## 5. Summary positioning statement
 
 > MIRA's addressable opportunity is not "better remote photography" (Clos[1] and Shutter[2] already solve capture) or "better studio administration" (CRMs already solve that). It is the specific, currently-unverified gap between "invitation sent" and "camera rolls": confirming the client is genuinely prepared, and giving the photographer a creative plan they have reviewed and can trust, before the shoot begins.

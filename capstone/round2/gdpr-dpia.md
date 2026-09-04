@@ -54,6 +54,18 @@
 
 **Gap:** no Data Processing Agreement status, processor region/sub-processor list, or Standard Contractual Clauses assessment (for any non-EU processor) is documented anywhere in this repository. This is a legal/contracting task outside what this codebase can demonstrate.
 
+## 5a. Third-party international transfers
+
+**OpenAI and Stripe are both US-headquartered processors.** Under GDPR Chapter V, transferring EU personal data to a processor outside the EU/EEA requires a valid transfer mechanism — typically Standard Contractual Clauses (SCCs), an adequacy decision, or (for some processors) participation in the EU-US Data Privacy Framework. **This repository cannot confirm which mechanism applies**, because that depends on the processor's own current certification/contractual status with Maria's account, not on anything in the codebase.
+
+| Processor | Data that would cross the transfer boundary | What needs confirming (not confirmable from code) |
+|---|---|---|
+| OpenAI (US) | Conversation content, shoot brief, uploaded reference image, generated Creative DNA/moodboard content | Whether OpenAI's current Data Processing Addendum and SCCs/DPF status cover this specific use, and whether that status is current at time of real deployment |
+| Stripe (US, with EU entities) | Photographer's own payment details (not the client's) | Stripe's standard terms typically address this, but this has not been independently reviewed for this project |
+| Resend | Client email address, invitation content | Processor region/transfer mechanism not confirmed |
+
+**This is the single most concrete "must close before a real pilot" compliance item in this document** — unlike the retention gaps in §3 (which are an engineering task this codebase can close directly), a transfer-mechanism confirmation is a due-diligence task (reading and confirming each processor's current DPA/SCC terms) that must happen before any real client's data is sent to any of these processors, and cannot be resolved by writing more code.
+
 ## 6. Risks identified
 
 | Risk | Severity (author's judgment) | Mitigation status |
@@ -63,6 +75,7 @@
 | No client-facing data-access or portability feature | Medium | Not mitigated |
 | Real (non-demo) OpenAI processing of real client data has never been exercised, so real-world data-handling behavior (e.g. provider-side retention) is unverified | Medium-High | Requires provider-level data-processing terms review before first real use |
 | No documented processor agreements/sub-processor list | Medium | Requires legal/contracting work, not an engineering fix |
+| International transfer mechanism (EU→US) not confirmed for OpenAI/Stripe/Resend | **High — highest-priority compliance gap in this document** | Requires reading and confirming each processor's current DPA/SCC/DPF status before real deployment (§5a) — not resolvable in code |
 
 ## 7. Conclusion
 

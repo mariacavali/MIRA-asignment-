@@ -2,7 +2,7 @@
 
 ## Status
 
-**No PowerBI/.pbix workspace exists.** In its place, a real, static HTML dashboard artifact now exists at [`dashboard.html`](dashboard.html) — the agreed alternative for this submission. **No live/production data exists to populate it**, so every metric card in that artifact honestly reads "No production data yet" rather than an example or placeholder number. This document is the specification behind it: what each metric measures and where its data already lives in the implemented schema.
+**No PowerBI/.pbix workspace exists.** This coding environment has no PowerBI Desktop (a Windows/macOS desktop application, not something a CLI/server environment can run or produce a `.pbix` file from). In its place, a real, static HTML dashboard artifact now exists at [`dashboard.html`](dashboard.html) — the agreed alternative for this submission, built with the same 7 metrics a PowerBI report would show, in the same layout logic (metric, value, source), so the structure carries over directly if a real PowerBI report is built later. **No live/production data exists to populate it**, so every metric card in that artifact honestly reads "No production data yet" rather than an example or placeholder number. This document is the specification behind it: what each metric measures and where its data already lives in the implemented schema.
 
 | Item | Status |
 |---|---|

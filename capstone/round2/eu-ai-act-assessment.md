@@ -30,6 +30,25 @@ MIRA Core's client-facing AI touchpoints: (1) the Discovery conversation (voice 
 | Generated creative content marked as AI-produced when shown to the photographer | **Not yet assessed.** The photographer dashboard's moodboard/Creative DNA view has not been reviewed for equivalent labeling in this assessment pass. | Not yet closed — see "Gaps" below |
 | Human oversight over AI output before it reaches a consequential outcome | **Implemented, structurally.** No AI output autonomously finalizes anything — the photographer reviews the Creative DNA/moodboard on their own dashboard before the shoot, and "Ready to Shoot" only activates after generation succeeds, never automatically substituting for photographer review of the content itself (`shouldActivateShootPreparation`, `shared/miraCore.ts`). This is a genuine structural mitigation, not a policy promise. | `server/miraCore/creativeDnaAdapter.ts`, `server/miraCore/moodboardAdapter.ts`, `shared/miraCore.ts` |
 
+## Conformity summary
+
+Because MIRA is classified **not high-risk** (Step 2 above), the formal conformity-assessment procedure, CE marking, and EU database registration obligations that apply to Annex III high-risk systems **do not apply**. The applicable obligation is the lighter-weight Article 50 transparency duty (Step 3), which this document already assesses as partially implemented (consent notice: yes; per-asset content labeling: not yet). There is no conformity assessment to summarize beyond this classification itself — stating this explicitly is the summary, not a placeholder for one.
+
+**If this classification ever changes** (e.g. MIRA later adds a feature that scores or ranks people, or is repurposed into a regulated Annex III domain), this conclusion must be re-run from Step 2, not assumed to still hold.
+
+## Technical documentation outline (voluntary — not a high-risk Annex IV requirement)
+
+Annex IV's detailed technical-documentation requirements apply only to high-risk systems, which MIRA is not. As good practice ahead of any real deployment, a lightweight equivalent outline is given here rather than skipped entirely:
+
+1. **System description** — purpose (verified client readiness + photographer-approved creative plan), intended users (independent photographers and small studios), and explicit non-purpose (no biometric identification, no consequential decision about a person — `capstone/round2/use-case-definition.md`).
+2. **AI components and providers** — OpenAI (`gpt-5-mini` for Creative DNA text synthesis, `gpt-image-2` for moodboard images), both direct API calls, not fine-tuned models (`server/miraV4/creativeDna.ts`, `server/miraCore/openAiMoodboardImage.ts`).
+3. **Data used** — client conversation content, up to five client-uploaded reference images, photographer brief — see `capstone/round2/gdpr-dpia.md` §1 for the full inventory.
+4. **Human oversight design** — photographer review gate before any output reaches "Ready to Shoot" (`shouldActivateShootPreparation`).
+5. **Known limitations** — real (non-demo) generation quality is unverified (`capstone/round2/roi-and-risk-assessment.md`); voice conversation is unverified; Calendar confirmation is currently broken (`capstone/round2/mvp-verification.md`).
+6. **Risk management measures** — the demo-local fallback (no paid call without an explicit key) already limits accidental real-model exposure during development; the consent gate limits processing to affirmatively-consenting clients.
+
+This outline is a starting point for a real technical file, not a substitute for one — it has not been reviewed by counsel or a qualified AI-governance professional.
+
 ## Gaps to close before broader rollout
 
 1. **Explicit per-asset "AI-generated" labeling** on moodboard images and Creative DNA text shown in both the client Shoot Room and the photographer dashboard, not just the pre-conversation consent notice. Consent covers the conversation; it does not, on its own, satisfy the separate content-labeling expectation in Article 50(2)/(4).

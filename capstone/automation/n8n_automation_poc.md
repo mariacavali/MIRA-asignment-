@@ -49,3 +49,7 @@ The core problem this capstone targets is repeated, manual client preparation wo
 ## Relationship to the separate, unrelated early PoC
 
 This is not the same thing as the *earlier*, pre-application n8n prototype described in `capstone/round2/poc-documentation.md` (client input → OpenAI → JavaScript parsing → Google Sheets → Google Docs), which predates the current MIRA application entirely and is documented purely as historical context. This document covers the current, real, importable n8n automation artifact that exists in this repository today.
+
+## Honest gap: no video recording
+
+Round 2's brief asks for a 2–5 minute demo recording of the POC alongside its documentation. **No recording exists in this repository or was produced as part of this work** — this coding environment has no screen-recording capability. The reproducible steps in "How to import and inspect" above are the honest substitute: importing either workflow and triggering it per those steps produces the same execution this recording would show. Producing the actual recording is a real, outstanding task for whoever has access to a local n8n instance and screen-recording software.
