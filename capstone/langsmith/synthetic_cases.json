@@ -1,0 +1,93 @@
+{
+  "note": "All content in this file is synthetic test fixture data written for this Round 1 monitoring sample. No real client, real photographer, real business, or real personal data is used anywhere in this file.",
+  "cases": [
+    {
+      "id": "founder-personal-brand",
+      "label": "Founder personal-brand shoot",
+      "photographerBrief": {
+        "displayName": "Studio North",
+        "businessName": "Studio North Editorial",
+        "photographyStyle": "warm documentary portraiture",
+        "areasOfExpertise": ["personal branding", "founder portraits"],
+        "title": "Founder personal-brand session",
+        "shootType": "personal brand",
+        "intendedUse": "website hero image and LinkedIn presence",
+        "location": "founder's home office, natural light",
+        "durationMinutes": 45,
+        "photographerNotes": "Keep direction calm and credible, avoid corporate stock-photo energy. Founder is camera-shy and wants to look approachable, not performative."
+      },
+      "clientAnswers": [
+        { "path": "identity.business", "value": "Early-stage climate-tech startup, three years in" },
+        { "path": "identity.role", "value": "Founder and CEO" },
+        { "path": "brand.audience", "value": "Investors and potential enterprise customers evaluating credibility" },
+        { "path": "brand.desiredPerception", "value": "Approachable expertise, not corporate stock-photo energy" },
+        { "path": "expression.desiredFeeling", "value": "Calm and quietly confident, not performative" },
+        { "path": "visualWorld.light", "value": "Soft natural window light" },
+        { "path": "visualWorld.wardrobe", "value": "Simple, no logos, muted tones" },
+        { "path": "shootContext.location", "value": "Home office with a plain wall and one window" },
+        { "path": "shootContext.constraints", "value": "Only 45 minutes available, camera-shy, dislikes posed smiling shots" }
+      ],
+      "summaryText": "The founder wants a calm, credible personal-brand session for their startup's website and LinkedIn presence - approachable expertise rather than corporate stock-photo energy, shot in natural light in their home office within a 45-minute window.",
+      "expectedBriefFacts": ["personal brand", "website", "LinkedIn", "natural light", "home office", "camera-shy"],
+      "expectedClientFacts": ["climate-tech", "founder", "investor", "approachable", "calm", "45 minute"]
+    },
+    {
+      "id": "remote-editorial-portrait",
+      "label": "Remote editorial portrait",
+      "photographerBrief": {
+        "displayName": "Lumen Editorial",
+        "businessName": "Lumen Editorial Studio",
+        "photographyStyle": "cinematic editorial portraiture, remote-directed",
+        "areasOfExpertise": ["remote editorial sessions", "self-shot direction"],
+        "title": "Remote editorial portrait session",
+        "shootType": "editorial portrait",
+        "intendedUse": "magazine contributor page and press kit",
+        "location": "client's own apartment, self-shot with remote direction",
+        "durationMinutes": 60,
+        "photographerNotes": "This is a remote, self-shot session - the client operates the camera on a tripod under live remote direction. Keep instructions simple and confidence-building."
+      },
+      "clientAnswers": [
+        { "path": "identity.profession", "value": "Independent journalist and essayist" },
+        { "path": "brand.intendedUses", "value": "Magazine contributor page and press kit" },
+        { "path": "expression.wantsToBeSeenAs", "value": "Serious but warm, not stiff or corporate" },
+        { "path": "visualWorld.light", "value": "Moody window light, late afternoon" },
+        { "path": "visualWorld.composition", "value": "Tight editorial framing, not full-body" },
+        { "path": "visualWorld.avoid", "value": "No forced smiling, no bright flat lighting" },
+        { "path": "shootContext.location", "value": "Client's own apartment, self-shot with a tripod" },
+        { "path": "shootContext.deliverables", "value": "Three to five final frames for a magazine contributor page" }
+      ],
+      "summaryText": "An independent journalist needs a remote, self-shot editorial portrait session for a magazine contributor page and press kit - moody late-afternoon window light, tight editorial framing, serious but warm, shot on a tripod in their own apartment under live remote direction.",
+      "expectedBriefFacts": ["editorial portrait", "magazine", "press kit", "remote", "self-shot", "tripod"],
+      "expectedClientFacts": ["journalist", "moody", "late afternoon", "tight", "serious", "warm"]
+    },
+    {
+      "id": "creative-business-product-campaign",
+      "label": "Product / creative-business campaign",
+      "photographerBrief": {
+        "displayName": "Kest & Co",
+        "businessName": "Kest & Co Creative",
+        "photographyStyle": "considered still-life and product storytelling",
+        "areasOfExpertise": ["product campaigns", "small creative-business branding"],
+        "title": "Product and studio campaign for a ceramics label",
+        "shootType": "product campaign",
+        "intendedUse": "e-commerce site relaunch and seasonal campaign",
+        "location": "small ceramics studio",
+        "durationMinutes": 120,
+        "photographerNotes": "Balance clean product shots with a few in-studio process and lifestyle frames. The brand wants texture and handmade warmth, not sterile catalog styling."
+      },
+      "clientAnswers": [
+        { "path": "identity.business", "value": "Small independent ceramics label, handmade tableware" },
+        { "path": "brand.offer", "value": "Handmade stoneware tableware sold direct-to-consumer online" },
+        { "path": "brand.businessGoals", "value": "Relaunching the e-commerce site for the autumn season" },
+        { "path": "visualWorld.materials", "value": "Raw stoneware, linen, unglazed clay textures" },
+        { "path": "visualWorld.colours", "value": "Warm neutrals, clay tones, muted sage" },
+        { "path": "visualWorld.environments", "value": "The studio itself, work-in-progress pieces visible" },
+        { "path": "shootContext.deliverables", "value": "Product shots for the site plus a handful of process and lifestyle images for social" },
+        { "path": "shootContext.constraints", "value": "Half-day shoot, small studio space, natural light only after 10am" }
+      ],
+      "summaryText": "A small independent ceramics label needs a product and studio campaign for their autumn e-commerce relaunch - warm neutral, clay-toned styling with raw stoneware and linen textures, mixing clean product shots with a few in-studio process and lifestyle frames, shot in natural light in their own studio within a half day.",
+      "expectedBriefFacts": ["product campaign", "e-commerce", "seasonal", "studio", "handmade warmth"],
+      "expectedClientFacts": ["ceramics", "stoneware", "autumn", "clay", "half-day"]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-09-04T11:52:21.203Z",
+  "datasetSize": 3,
+  "model": "gpt-5-mini",
+  "run": {
+    "status": "not_run",
+    "missingEnvironmentVariables": [
+      "OPENAI_API_KEY",
+      "LANGCHAIN_API_KEY (or LANGSMITH_API_KEY)",
+      "LANGCHAIN_TRACING_V2=\"true\" (or LANGSMITH_TRACING_V2=\"true\")"
+    ],
+    "langsmithProject": null
+  },
+  "cases": [
+    {
+      "id": "founder-personal-brand",
+      "label": "Founder personal-brand shoot",
+      "status": "not_run",
+      "error": null,
+      "latencyMs": null,
+      "model": null,
+      "tokenUsage": null,
+      "estimatedCostUsd": {
+        "estimatedUsd": null,
+        "note": "Not available - this case was not run."
+      },
+      "briefUsage": null,
+      "clientPreferenceUsage": null,
+      "creativeDnaCompleteness": null,
+      "unsupportedPersonalDetails": null,
+      "langsmith": null
+    },
+    {
+      "id": "remote-editorial-portrait",
+      "label": "Remote editorial portrait",
+      "status": "not_run",
+      "error": null,
+      "latencyMs": null,
+      "model": null,
+      "tokenUsage": null,
+      "estimatedCostUsd": {
+        "estimatedUsd": null,
+        "note": "Not available - this case was not run."
+      },
+      "briefUsage": null,
+      "clientPreferenceUsage": null,
+      "creativeDnaCompleteness": null,
+      "unsupportedPersonalDetails": null,
+      "langsmith": null
+    },
+    {
+      "id": "creative-business-product-campaign",
+      "label": "Product / creative-business campaign",
+      "status": "not_run",
+      "error": null,
+      "latencyMs": null,
+      "model": null,
+      "tokenUsage": null,
+      "estimatedCostUsd": {
+        "estimatedUsd": null,
+        "note": "Not available - this case was not run."
+      },
+      "briefUsage": null,
+      "clientPreferenceUsage": null,
+      "creativeDnaCompleteness": null,
+      "unsupportedPersonalDetails": null,
+      "langsmith": null
+    }
+  ]
+}
