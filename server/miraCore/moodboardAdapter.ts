@@ -8,7 +8,7 @@ import { isLocalFileStoreEnabled } from "../localFileStore";
 import { generateMoodboardImageViaOpenAI } from "./openAiMoodboardImage";
 import { compileCampaignPlanAndPrompt } from "../miraV4/campaignCompiler";
 import { buildFinalMoodboardPrompts, type MiraV4SelectedVisualReference } from "../miraV4/moodboard";
-import type { MiraV4CreativeDna } from "../../shared/miraV4CreativeDna";
+import { miraV4CreativeDnaSchema, type MiraV4CreativeDna } from "../../shared/miraV4CreativeDna";
 
 async function requireDb() {
   const db = await getDb();
@@ -18,6 +18,36 @@ async function requireDb() {
 
 function isImageProviderNotConfigured(error: unknown) {
   return error instanceof Error && /OPENAI_API_KEY is not configured/.test(error.message);
+}
+
+// Defensive normalization boundary, mirroring normalizeShootMemorySnapshot in
+// creativeDnaAdapter.ts: some MariaDB driver/connection configurations
+// return a JSON column's value as a raw string rather than an already-parsed
+// object, even though Drizzle's `.$type<MiraV4CreativeDna>()` declares
+// mira_shoot_creative_dna.creativeDnaJson as always-parsed at the type
+// level. Passing a raw string straight into compileCampaignPlanAndPrompt
+// throws a root-level ZodError ("expected object", path []) before any
+// moodboard prompt can be built, so every caller must go through this
+// normalizer first. A string is parsed and then validated against the same
+// authoritative, strict Creative DNA schema the rest of the app already
+// uses (miraV4CreativeDnaSchema) - malformed JSON, primitives, arrays, and
+// non-conforming objects are all rejected with a clear error rather than
+// silently compiled anyway. The persisted content and the schema itself are
+// never changed here.
+export function normalizeCreativeDnaInput(value: unknown): MiraV4CreativeDna {
+  let candidate: unknown = value;
+  if (typeof value === "string") {
+    try {
+      candidate = JSON.parse(value);
+    } catch {
+      throw new Error("Persisted Creative DNA is not valid JSON");
+    }
+  }
+  const parsed = miraV4CreativeDnaSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new Error("Persisted Creative DNA does not match the expected Creative DNA shape");
+  }
+  return parsed.data;
 }
 
 // Distinct from MIRA_V4_VISUAL_PROMPT_VERSION (moodboard.ts's own versioning
@@ -60,7 +90,10 @@ export async function generateShootMoodboardForCreativeDna(params: {
   shootId: number;
   photographerUserId: number;
   confirmedMemoryVersion: number;
-  creativeDna: MiraV4CreativeDna;
+  // Declared `unknown`, not the column's nominal MiraV4CreativeDna type,
+  // precisely because the raw driver value cannot be trusted to already be
+  // an object - see normalizeCreativeDnaInput above.
+  creativeDna: unknown;
 }) {
   const db = await requireDb();
   const existing = await db.select().from(miraShootMoodboard).where(and(
@@ -69,16 +102,17 @@ export async function generateShootMoodboardForCreativeDna(params: {
   )).limit(1);
   if (existing[0]?.status === "complete") return existing[0];
 
-  const { campaignPlan, compositeImagePrompt } = compileCampaignPlanAndPrompt(params.creativeDna);
+  const creativeDna = normalizeCreativeDnaInput(params.creativeDna);
+  const { campaignPlan, compositeImagePrompt } = compileCampaignPlanAndPrompt(creativeDna);
   const selected = buildAutoSelectedDirection(compositeImagePrompt, campaignPlan.title);
   const refinement = {
     preserve: "the confirmed campaign world, palette, lighting, and continuity rules",
     avoid: "generic stock styling or any change of direction from the confirmed Creative DNA",
     note: null,
   };
-  const prompts = buildFinalMoodboardPrompts({ creativeDna: params.creativeDna, campaignPlan, compositeImagePrompt, selected, refinement });
+  const prompts = buildFinalMoodboardPrompts({ creativeDna, campaignPlan, compositeImagePrompt, selected, refinement });
   const sourceFingerprint = createHash("sha256")
-    .update(JSON.stringify({ creativeDna: params.creativeDna, promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION }))
+    .update(JSON.stringify({ creativeDna, promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION }))
     .digest("hex");
   const campaignPlanJson = campaignPlan as unknown as Record<string, unknown>;
   const references = prompts.map(prompt => ({ id: prompt.id, direction: prompt.direction, shotNumber: prompt.shotNumber, prompt: prompt.prompt }));
