@@ -27,6 +27,34 @@ Every claim in this package is one of exactly four statuses, used consistently:
 | [`final-presentation-outline.md`](final-presentation-outline.md) | A content outline for presenting this package honestly — no new deck was built |
 | [`evidence/`](evidence/) | An index to the canonical evidence files this package cites, rather than duplicated copies of them |
 
+## Required exact filenames (official Ironhack Round 2 submission page)
+
+The official submission page discovers documents by exact filename. Each row below is a short index file that points to the full canonical content above (no content is duplicated or rewritten) — except `presentation.pdf`, which is a byte-identical copy of the Round 1 deck.
+
+| Required filename | Points to |
+|---|---|
+| [`use_case_definition.md`](use_case_definition.md) | [`use-case-definition.md`](use-case-definition.md) |
+| [`poc_documentation.md`](poc_documentation.md) | [`poc-documentation.md`](poc-documentation.md) + n8n workflow exports (`../automation/n8n_automation_poc.md`, `../../workflows/mira-client-email-sequence.json`, `../../workflows/mira-email-outbox-trigger.json`) |
+| [`roi_risk_assessment.md`](roi_risk_assessment.md) | [`roi-and-risk-assessment.md`](roi-and-risk-assessment.md) |
+| [`eu_ai_act_compliance.md`](eu_ai_act_compliance.md) | [`eu-ai-act-assessment.md`](eu-ai-act-assessment.md) |
+| [`gdpr_documentation.md`](gdpr_documentation.md) | [`gdpr-dpia.md`](gdpr-dpia.md) |
+| [`strategic_plan.md`](strategic_plan.md) | [`strategic-deployment-plan.md`](strategic-deployment-plan.md) |
+| [`presentation.pdf`](presentation.pdf) | Byte-identical copy of [`../presentation/MIRA_Ironhack_Presentation_Final.pdf`](../presentation/MIRA_Ironhack_Presentation_Final.pdf) (Round 1 deck; sha1 `e862bd3fdcb955862c485297b1cce57fc5f60c91`) |
+| [`mvp_documentation.md`](mvp_documentation.md) | [`mvp-verification.md`](mvp-verification.md) |
+
+Demo video (required evidence, not a discoverable-name document): [`evidence/MIRA_Ironhack_Demo_Final.mp4`](evidence/MIRA_Ironhack_Demo_Final.mp4) — see `evidence/README.md` for exactly what it is and is not evidence of.
+
+**Limitations that apply across this entire package, restated here for visibility:**
+
+- Real LangSmith traces: **pending** — the MIRA-specific monitoring sample is built and ready but has not been run against real credentials.
+- The demo video is a presentation recording — **not verified live n8n execution**, and not confirmed as a live-app screen-recording.
+- Voice conversation and real (non-demo) AI image generation: **pending** — never exercised live in this project.
+- Teaching staff / class feedback: **pending** — not yet received.
+
+## Round 1 materials
+
+Round 1's full document set remains present in this repository and is linked throughout this package rather than copied: `capstone/research/`, `capstone/dashboard/`, `capstone/automation/`, `capstone/monitoring/`, `capstone/planning/`, `capstone/feedback/`, `capstone/presentation/` (source of `presentation.pdf` above), `capstone/evidence/`, `capstone/langsmith/`. See `docs/ROUND1_VERIFICATION.md` for the Round 1 live-verification checkpoint and `capstone/ROUND1_SUBMISSION_CHECKLIST.md` for the Round 1 submission checklist.
+
 ## The single most important fact in this package
 
 The working MVP flow is now **live-verified end to end in demo mode** — five demo references in, Creative DNA and a five-scene demo moodboard out, Ready to Shoot reached — on an isolated preview (`docs/ROUND1_VERIFICATION.md`, commit `6cf6b97c6dee65adc048d306b1131e691250f10a`). This is real progress from Round 1's "code-verified only" visual-pipeline status. **It does not mean real generation quality, real cost, or a real pilot exist** — those remain the explicit, named gaps this package is honest about, and `strategic-deployment-plan.md` sequences closing them.
