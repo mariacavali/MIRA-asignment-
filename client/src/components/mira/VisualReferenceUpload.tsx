@@ -65,14 +65,22 @@ export function VisualReferenceUpload({ token }: { token: string }) {
     },
   });
 
-  const canSubmit = !!file && !!purpose && description.trim().length > 0 && !upload.isPending;
+  const MAX_CLIENT_VISUAL_REFERENCES = 5;
+  const referenceCount = references.data?.length ?? 0;
+  const atReferenceLimit = referenceCount >= MAX_CLIENT_VISUAL_REFERENCES;
+  const canSubmit = !!file && !!purpose && description.trim().length > 0 && !upload.isPending && !atReferenceLimit;
 
   return (
     <div>
-      <p className="mira-dark-kicker">Optional visual references</p>
+      <p className="mira-dark-kicker">Optional visual references · {referenceCount} of {MAX_CLIENT_VISUAL_REFERENCES} used</p>
       <p className="mt-3 text-sm leading-6 text-[#c5bfb3]">
-        If you would like, share a few images before your conversation—an existing moodboard, a portrait, your location or visual references you love. You can also explain what MIRA should notice.
+        If you would like, share up to {MAX_CLIENT_VISUAL_REFERENCES} images before your conversation—an existing moodboard, a portrait, your location or visual references you love. You can also explain what MIRA should notice.
       </p>
+      {atReferenceLimit && (
+        <p className="mt-3 text-xs leading-5 text-[#b7a98f]">
+          You've shared {MAX_CLIENT_VISUAL_REFERENCES} references, the most MIRA can use for this shoot. Remove one below to add a different one.
+        </p>
+      )}
 
       {status.data?.creativeDirectionConfirmed && (
         <p className="mt-4 rounded border border-white/10 bg-white/[0.03] p-3 text-xs leading-5 text-[#c5bfb3]">
@@ -154,9 +162,10 @@ export function VisualReferenceUpload({ token }: { token: string }) {
       >
         <p className="text-xs uppercase tracking-[0.16em] text-[#b7a98f]">Visual references · optional</p>
         <input
-          className="mt-4 block w-full text-xs text-[#c5bfb3]"
+          className="mt-4 block w-full text-xs text-[#c5bfb3] disabled:opacity-50"
           type="file"
           accept="image/jpeg,image/png,image/webp"
+          disabled={atReferenceLimit}
           onChange={event => { setFile(event.target.files?.[0] ?? null); setMessage(null); }}
         />
 

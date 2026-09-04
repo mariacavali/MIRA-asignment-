@@ -1,8 +1,13 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { miraShootMoodboard } from "../../drizzle/schema";
+import { ENV } from "../_core/env";
+import { createLocalPlaceholderImage } from "../_core/imageGeneration";
 import { getDb } from "../db";
+import { isLocalFileStoreEnabled } from "../localFileStore";
 import { generateMoodboardImageViaOpenAI } from "./openAiMoodboardImage";
-import { compileMiraV4VisualSource, MIRA_V4_VISUAL_PROMPT_VERSION } from "../miraV4/moodboard";
+import { compileCampaignPlanAndPrompt } from "../miraV4/campaignCompiler";
+import { buildFinalMoodboardPrompts, type MiraV4SelectedVisualReference } from "../miraV4/moodboard";
 import type { MiraV4CreativeDna } from "../../shared/miraV4CreativeDna";
 
 async function requireDb() {
@@ -15,20 +20,41 @@ function isImageProviderNotConfigured(error: unknown) {
   return error instanceof Error && /OPENAI_API_KEY is not configured/.test(error.message);
 }
 
+// Distinct from MIRA_V4_VISUAL_PROMPT_VERSION (moodboard.ts's own versioning
+// for the five-exploration-direction round) - this identifies the shoot
+// pipeline's own strategy of skipping the interactive select/refine round
+// and going straight to one coherent five-scene campaign deliverable.
+export const MIRA_CORE_MOODBOARD_PROMPT_VERSION = "shoot-coherent-v1";
+
+// The Shoot Room has no UI for the V4 pipeline's interactive select/refine
+// round (a deliberate, documented scope choice - see the module doc below),
+// so this synthesizes the one input buildFinalMoodboardPrompts actually
+// reads from its "selected" and "refinement" parameters: a short direction
+// label (from the campaign's own confirmed title) and default continuity
+// rules. No exploration image, human choice, or refinement text is
+// fabricated - the campaign plan itself, compiled deterministically from the
+// confirmed Creative DNA, is the sole authority for what gets built.
+function buildAutoSelectedDirection(compositeImagePrompt: string, campaignTitle: string): MiraV4SelectedVisualReference {
+  return { id: "auto_selected_primary_direction", url: "", direction: campaignTitle, prompt: compositeImagePrompt };
+}
+
 /**
- * Wires the existing V4/V5 moodboard entry point (compileMiraV4VisualSource ->
- * the five-scene campaign grammar) to a confirmed shoot's Creative DNA. This
- * intentionally reuses the "initial visual exploration" stage of the existing
- * V4 pipeline rather than its interactive select/refine rounds, since the
- * MIRA Core client room has no UI for that human-in-the-loop selection step.
- * That is a deliberate, documented scope choice, not a shortcut around a bug.
+ * Wires the existing V4 moodboard compiler's *coherent five-scene* campaign
+ * deliverable (buildFinalMoodboardPrompts) to a confirmed shoot's Creative
+ * DNA, producing one moodboard direction with five continuity-linked images
+ * rather than five unrelated exploration directions.
  *
  * The deterministic part (compiling the campaign plan and the five scene
- * prompts) never calls an external provider and cannot fail once Creative DNA
- * is schema-valid. Actual pixel rendering calls OpenAI's Images API directly
- * (OPENAI_API_KEY) and is tracked separately via renderStatus so a
+ * prompts) never calls an external provider and cannot fail once Creative
+ * DNA is schema-valid. Actual pixel rendering calls OpenAI's Images API
+ * directly (OPENAI_API_KEY) and is tracked separately via renderStatus so a
  * missing/unavailable image provider never blocks the shoot from reaching
- * Preparation, and is never silently fabricated.
+ * Preparation. When no OPENAI_API_KEY is configured, this renders five real,
+ * deterministically-generated local placeholder images instead of silently
+ * producing nothing - reusing the exact same local placeholder renderer the
+ * V4/Level2Create pipeline already uses for its own local development mode -
+ * so the moodboard gallery always has something real and persisted to show
+ * without ever calling a paid image API.
  */
 export async function generateShootMoodboardForCreativeDna(params: {
   shootId: number;
@@ -43,44 +69,59 @@ export async function generateShootMoodboardForCreativeDna(params: {
   )).limit(1);
   if (existing[0]?.status === "complete") return existing[0];
 
-  const source = compileMiraV4VisualSource(params.creativeDna);
-  const campaignPlanJson = source.campaignPlan as unknown as Record<string, unknown>;
+  const { campaignPlan, compositeImagePrompt } = compileCampaignPlanAndPrompt(params.creativeDna);
+  const selected = buildAutoSelectedDirection(compositeImagePrompt, campaignPlan.title);
+  const refinement = {
+    preserve: "the confirmed campaign world, palette, lighting, and continuity rules",
+    avoid: "generic stock styling or any change of direction from the confirmed Creative DNA",
+    note: null,
+  };
+  const prompts = buildFinalMoodboardPrompts({ creativeDna: params.creativeDna, campaignPlan, compositeImagePrompt, selected, refinement });
+  const sourceFingerprint = createHash("sha256")
+    .update(JSON.stringify({ creativeDna: params.creativeDna, promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION }))
+    .digest("hex");
+  const campaignPlanJson = campaignPlan as unknown as Record<string, unknown>;
+  const references = prompts.map(prompt => ({ id: prompt.id, direction: prompt.direction, shotNumber: prompt.shotNumber, prompt: prompt.prompt }));
 
   if (!existing[0]) {
     await db.insert(miraShootMoodboard).values({
       shootId: params.shootId,
       photographerUserId: params.photographerUserId,
       confirmedMemoryVersion: params.confirmedMemoryVersion,
-      promptVersion: MIRA_V4_VISUAL_PROMPT_VERSION,
-      sourceFingerprint: source.sourceFingerprint,
+      promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION,
+      sourceFingerprint,
       status: "in_progress",
       renderStatus: "pending",
       campaignPlanJson,
-      referencesJson: source.references,
+      referencesJson: references,
     });
   } else {
     await db.update(miraShootMoodboard).set({
       status: "in_progress",
       renderStatus: "pending",
-      promptVersion: MIRA_V4_VISUAL_PROMPT_VERSION,
-      sourceFingerprint: source.sourceFingerprint,
+      promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION,
+      sourceFingerprint,
       campaignPlanJson,
-      referencesJson: source.references,
+      referencesJson: references,
       errorCode: null,
     }).where(eq(miraShootMoodboard.id, existing[0].id));
   }
 
-  // The compiled campaign plan + prompts are the real, deterministic artifact.
-  // This is what gates Preparation - it never requires an external provider.
+  // The compiled campaign plan + five scene prompts are the real,
+  // deterministic artifact. This is what gates Preparation - it never
+  // requires an external provider.
   await db.update(miraShootMoodboard).set({ status: "complete" }).where(and(
     eq(miraShootMoodboard.shootId, params.shootId),
     eq(miraShootMoodboard.confirmedMemoryVersion, params.confirmedMemoryVersion),
   ));
 
+  const usingDemoImages = !ENV.embeddingApiKey;
   try {
-    const rendered = await Promise.all(source.references.map(async reference => {
-      const image = await generateMoodboardImageViaOpenAI({ prompt: reference.prompt, quality: "medium" });
-      return { ...reference, url: image.url ?? null };
+    const rendered = await Promise.all(prompts.map(async prompt => {
+      const image = usingDemoImages
+        ? await createLocalPlaceholderImage({ prompt: prompt.prompt, quality: "medium" })
+        : await generateMoodboardImageViaOpenAI({ prompt: prompt.prompt, quality: "medium" });
+      return { id: prompt.id, direction: prompt.direction, shotNumber: prompt.shotNumber, prompt: prompt.prompt, url: image.url ?? null };
     }));
     const allRendered = rendered.every(reference => Boolean(reference.url));
     await db.update(miraShootMoodboard).set({
@@ -106,4 +147,33 @@ export async function generateShootMoodboardForCreativeDna(params: {
     eq(miraShootMoodboard.confirmedMemoryVersion, params.confirmedMemoryVersion),
   )).limit(1);
   return result[0] ?? null;
+}
+
+export type ShootMoodboardImage = { id: string; direction: string; url: string };
+
+// Shared by both visibility surfaces - the client Shoot Room
+// (getShootRoomStatusForClient in db.ts) and the photographer dashboard
+// (getShootMoodboardForOwner below) - so "what counts as a displayable
+// moodboard image" is defined exactly once. Never renders a placeholder or
+// partial image: only a "complete" moodboard with a real, rendered url
+// counts, for either audience.
+export function mapCompletedMoodboardImages(status: string, referencesJson: unknown): ShootMoodboardImage[] {
+  if (status !== "complete" || !Array.isArray(referencesJson)) return [];
+  return (referencesJson as Array<{ id: string; direction: string; url?: string | null }>)
+    .filter((reference): reference is { id: string; direction: string; url: string } => Boolean(reference?.url))
+    .map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url }));
+}
+
+// Photographer-dashboard read of the latest moodboard for a shoot they own.
+// Mirrors getShootCreativeDnaForOwner's ownership-scoped, read-only shape.
+export async function getShootMoodboardForOwner(photographerUserId: number, shootId: number): Promise<{ status: string; renderStatus: string; images: ShootMoodboardImage[] } | null> {
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await requireDb();
+  const rows = await db.select().from(miraShootMoodboard).where(and(
+    eq(miraShootMoodboard.photographerUserId, photographerUserId),
+    eq(miraShootMoodboard.shootId, shootId),
+  )).orderBy(desc(miraShootMoodboard.confirmedMemoryVersion)).limit(1);
+  const row = rows[0];
+  if (!row) return null;
+  return { status: row.status, renderStatus: row.renderStatus, images: mapCompletedMoodboardImages(row.status, row.referencesJson) };
 }

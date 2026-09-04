@@ -49,6 +49,7 @@ import { evaluateDiscoveryGate } from "./memory";
 import { ENV } from "../_core/env";
 import { buildShootPreparationBrief, type ShootPreparationBrief } from "./preparationBrief";
 import { parseInvitationAccessToken, verifyInvitationAccessSignature } from "./invitationAccessLink";
+import { mapCompletedMoodboardImages } from "./moodboardAdapter";
 
 const TEXT_TEST_QUESTIONS = [
   "To begin, what do you do—and what is this shoot meant to help you communicate?",
@@ -1263,11 +1264,7 @@ export async function getShootRoomStatusForClient(shootId: number) {
   }).from(miraShootMoodboard).where(eq(miraShootMoodboard.shootId, shootId))
     .orderBy(desc(miraShootMoodboard.confirmedMemoryVersion)).limit(1);
   const moodboard = moodboardRows[0];
-  const images = moodboard?.status === "complete" && Array.isArray(moodboard.referencesJson)
-    ? (moodboard.referencesJson as Array<{ id: string; direction: string; url?: string | null }>)
-        .filter((reference): reference is { id: string; direction: string; url: string } => Boolean(reference.url))
-        .map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url }))
-    : [];
+  const images = mapCompletedMoodboardImages(moodboard?.status ?? "pending", moodboard?.referencesJson);
   const creativeDirectionConfirmed = roomState === "preparation_active" || roomState === "discovery_confirmed";
   const preparationReady = roomState === "preparation_active";
 
