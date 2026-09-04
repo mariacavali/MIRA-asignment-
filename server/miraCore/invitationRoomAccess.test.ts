@@ -18,7 +18,7 @@ function invitationRow(overrides: Record<string, unknown> = {}) {
       tokenHash: (overrides.tokenHash as string) ?? "a".repeat(64),
       status: (overrides.status as string) ?? "active",
       expiresAt: (overrides.expiresAt as Date) ?? new Date("2026-10-17T00:00:00.000Z"),
-      lastOpenedAt: null,
+      lastOpenedAt: overrides.lastOpenedAt !== undefined ? (overrides.lastOpenedAt as Date | null) : null,
       deliveryStatus: "sent",
       completedAt: null,
     },
@@ -126,5 +126,93 @@ describe("MIRA client room credential resolution", () => {
     const state = await getClientInvitation("raw-token-value");
     expect(state?.invitation.status).toBe("active");
     expect(state!.invitation.expiresAt.getTime()).toBeGreaterThan(Date.now());
+  });
+});
+
+// Regression coverage for the confirmed openInvitation live failure: the
+// markOpened branch of getClientInvitation reused `row.invitation.lastOpenedAt
+// ?? new Date()`. MariaDB/Drizzle can map the nullable lastOpenedAt column to
+// a JS Date whose time value is NaN ("Invalid Date") instead of null - `??`
+// does not catch that (an Invalid Date is not nullish) - so the update
+// re-persisted the same Invalid Date, and the driver threw
+// "Invalid time value" while serializing it.
+function chainWithUpdate(selectResult: unknown[], onUpdate: (values: Record<string, unknown>) => void) {
+  const selectChain = {
+    from: () => selectChain,
+    innerJoin: () => selectChain,
+    leftJoin: () => selectChain,
+    where: () => selectChain,
+    limit: () => Promise.resolve(selectResult),
+  };
+  return {
+    select: () => selectChain,
+    update: () => ({
+      set: (values: Record<string, unknown>) => {
+        onUpdate(values);
+        return { where: () => Promise.resolve() };
+      },
+    }),
+  };
+}
+
+describe("MIRA client room open (markOpened) - MariaDB Invalid Date boundary on lastOpenedAt", () => {
+  beforeEach(() => {
+    dbMocks.getDb.mockReset();
+  });
+
+  it("uses the current valid Date when lastOpenedAt is null (never opened before)", async () => {
+    const updates: Record<string, unknown>[] = [];
+    dbMocks.getDb.mockResolvedValue(chainWithUpdate([invitationRow({ lastOpenedAt: null })], values => updates.push(values)));
+    const before = Date.now();
+    const state = await getClientInvitation("raw-token-value", true);
+    const after = Date.now();
+    expect(state?.invitation.lastOpenedAt).toBeInstanceOf(Date);
+    expect(state!.invitation.lastOpenedAt!.getTime()).toBeGreaterThanOrEqual(before);
+    expect(state!.invitation.lastOpenedAt!.getTime()).toBeLessThanOrEqual(after);
+    expect(updates).toHaveLength(1);
+    expect(updates[0].lastOpenedAt).toBe(state!.invitation.lastOpenedAt);
+  });
+
+  it("uses the current valid Date, without throwing, when the driver returns lastOpenedAt as an Invalid Date - the confirmed live failure mode", async () => {
+    const updates: Record<string, unknown>[] = [];
+    dbMocks.getDb.mockResolvedValue(chainWithUpdate([invitationRow({ lastOpenedAt: new Date(NaN) })], values => updates.push(values)));
+    const state = await getClientInvitation("raw-token-value", true);
+    expect(state?.invitation.lastOpenedAt).toBeInstanceOf(Date);
+    expect(Number.isFinite(state!.invitation.lastOpenedAt!.getTime())).toBe(true);
+    expect(Number.isFinite((updates[0].lastOpenedAt as Date).getTime())).toBe(true);
+  });
+
+  it("preserves an existing valid lastOpenedAt across a later open, instead of overwriting it", async () => {
+    const firstOpened = new Date("2026-09-01T09:00:00.000Z");
+    const updates: Record<string, unknown>[] = [];
+    dbMocks.getDb.mockResolvedValue(chainWithUpdate([invitationRow({ lastOpenedAt: firstOpened })], values => updates.push(values)));
+    const state = await getClientInvitation("raw-token-value", true);
+    expect(state?.invitation.lastOpenedAt).toEqual(firstOpened);
+    expect(updates[0].lastOpenedAt).toEqual(firstOpened);
+  });
+
+  it("opens an active invitation successfully - no thrown error for the MariaDB Invalid Date boundary", async () => {
+    dbMocks.getDb.mockResolvedValue(chainWithUpdate([invitationRow({ lastOpenedAt: new Date(NaN) })], () => {}));
+    await expect(getClientInvitation("raw-token-value", true)).resolves.not.toBeNull();
+  });
+
+  it("never attempts to mark an inactive (revoked) invitation opened - existing behavior is unchanged", async () => {
+    const updates: Record<string, unknown>[] = [];
+    dbMocks.getDb.mockResolvedValue(chainWithUpdate([invitationRow({ status: "revoked", lastOpenedAt: new Date(NaN) })], values => updates.push(values)));
+    const state = await getClientInvitation("raw-token-value", true);
+    expect(state?.invitation.status).toBe("revoked");
+    expect(updates).toHaveLength(0);
+  });
+
+  it("never attempts to mark an inactive (expired) invitation opened - existing behavior is unchanged", async () => {
+    const updates: Record<string, unknown>[] = [];
+    const longAgoShoot = new Date(Date.now() - 30 * 3_600_000);
+    dbMocks.getDb.mockResolvedValue(chainWithUpdate(
+      [invitationRow({ scheduledAt: longAgoShoot, durationMinutes: 30, lastOpenedAt: new Date(NaN) })],
+      values => updates.push(values),
+    ));
+    const state = await getClientInvitation("raw-token-value", true);
+    expect(state?.invitation.status).toBe("expired");
+    expect(updates).toHaveLength(0);
   });
 });

@@ -76,7 +76,7 @@ function createFakeMoodboardDb() {
 const dbMocks = vi.hoisted(() => ({ getDb: vi.fn() }));
 vi.mock("../db", () => ({ getDb: dbMocks.getDb }));
 
-import { generateShootMoodboardForCreativeDna, getShootMoodboardForOwner, mapCompletedMoodboardImages } from "./moodboardAdapter";
+import { generateShootMoodboardForCreativeDna, getShootMoodboardForOwner, mapCompletedMoodboardImages, normalizeCreativeDnaInput } from "./moodboardAdapter";
 
 // Reuses the same validated Creative DNA shape as the existing V4 moodboard
 // test suite (server/miraV4/moodboard.test.ts), since the real V4 campaign
@@ -224,6 +224,41 @@ describe("shoot moodboard adapter (Creative DNA -> existing V4 moodboard engine)
     expect(imageMocks.createLocalPlaceholderImage).not.toHaveBeenCalled();
   });
 
+  describe("MariaDB JSON-column string/object boundary for persisted Creative DNA", () => {
+    it("reaches a complete five-scene demo moodboard when creativeDna arrives as an already-parsed object", async () => {
+      imageMocks.createLocalPlaceholderImage.mockResolvedValue({ url: "/manus-storage/generated/local-placeholder-demo.svg" });
+      const result = await generateShootMoodboardForCreativeDna({ shootId: 3, photographerUserId: 132, confirmedMemoryVersion: 32, creativeDna });
+      expect(result?.status).toBe("complete");
+      expect((result?.referencesJson as unknown[]).length).toBe(5);
+      expect(imageMocks.createLocalPlaceholderImage).toHaveBeenCalledTimes(5);
+    });
+
+    it("reaches the identical complete five-scene demo moodboard when creativeDna arrives as the equivalent raw JSON string (the confirmed live-driver shape)", async () => {
+      imageMocks.createLocalPlaceholderImage.mockResolvedValue({ url: "/manus-storage/generated/local-placeholder-demo.svg" });
+      const result = await generateShootMoodboardForCreativeDna({ shootId: 3, photographerUserId: 132, confirmedMemoryVersion: 32, creativeDna: JSON.stringify(creativeDna) });
+      expect(result?.status).toBe("complete");
+      expect(result?.renderStatus).toBe("complete");
+      const references = result?.referencesJson as Array<{ shotNumber: number; url: string | null }>;
+      expect(references).toHaveLength(5);
+      expect(references.map(reference => reference.shotNumber)).toEqual([1, 2, 3, 4, 5]);
+      expect(imageMocks.createLocalPlaceholderImage).toHaveBeenCalledTimes(5);
+      expect(imageMocks.generateMoodboardImageViaOpenAI).not.toHaveBeenCalled();
+    });
+
+    it("fails safely (never fabricates a moodboard) on malformed JSON, primitives, arrays, and non-conforming objects", async () => {
+      await expect(generateShootMoodboardForCreativeDna({ shootId: 3, photographerUserId: 132, confirmedMemoryVersion: 32, creativeDna: "{not valid json" }))
+        .rejects.toThrow("Persisted Creative DNA is not valid JSON");
+      await expect(generateShootMoodboardForCreativeDna({ shootId: 4, photographerUserId: 132, confirmedMemoryVersion: 32, creativeDna: 42 }))
+        .rejects.toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+      await expect(generateShootMoodboardForCreativeDna({ shootId: 5, photographerUserId: 132, confirmedMemoryVersion: 32, creativeDna: [creativeDna] }))
+        .rejects.toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+      await expect(generateShootMoodboardForCreativeDna({ shootId: 6, photographerUserId: 132, confirmedMemoryVersion: 32, creativeDna: { schemaVersion: "1.0" } }))
+        .rejects.toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+      expect(imageMocks.createLocalPlaceholderImage).not.toHaveBeenCalled();
+      expect(imageMocks.generateMoodboardImageViaOpenAI).not.toHaveBeenCalled();
+    });
+  });
+
   describe("getShootMoodboardForOwner (photographer dashboard visibility)", () => {
     it("returns the completed images only to the owning photographer", async () => {
       imageMocks.createLocalPlaceholderImage.mockResolvedValue({ url: "/manus-storage/generated/local-placeholder-demo.svg" });
@@ -271,5 +306,58 @@ describe("shoot moodboard adapter (Creative DNA -> existing V4 moodboard engine)
       expect(mapCompletedMoodboardImages("complete", undefined)).toEqual([]);
       expect(mapCompletedMoodboardImages("complete", null)).toEqual([]);
     });
+
+    // MariaDB JSON-column string/object boundary - the driver can return
+    // referencesJson as a raw string instead of an already-parsed array.
+    it("produces the identical five mapped scenes, in order, when referencesJson is the driver's raw JSON string form", () => {
+      const fromObject = mapCompletedMoodboardImages("complete", fiveReferences);
+      const fromString = mapCompletedMoodboardImages("complete", JSON.stringify(fiveReferences));
+      expect(fromString).toEqual(fromObject);
+      expect(fromString.map(image => image.id)).toEqual(["scene_1", "scene_2", "scene_3", "scene_4", "scene_5"]);
+    });
+
+    it("passes through extra persisted fields (shotNumber, prompt) without them affecting the mapped output", () => {
+      const withExtraFields = fiveReferences.map((reference, index) => ({ ...reference, shotNumber: index + 1, prompt: `Prompt ${index + 1}` }));
+      const images = mapCompletedMoodboardImages("complete", JSON.stringify(withExtraFields));
+      expect(images).toEqual(fiveReferences.map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url })));
+    });
+
+    it("returns [] safely, without crashing, for a raw string that is not valid JSON", () => {
+      expect(mapCompletedMoodboardImages("complete", "{not valid json")).toEqual([]);
+    });
+
+    it("returns [] safely, without crashing or inventing images, for valid JSON that is not an array of scene references", () => {
+      expect(mapCompletedMoodboardImages("complete", JSON.stringify({ id: "not_an_array" }))).toEqual([]);
+      expect(mapCompletedMoodboardImages("complete", JSON.stringify(["just", "strings"]))).toEqual([]);
+      expect(mapCompletedMoodboardImages("complete", JSON.stringify([{ direction: "Missing id" }]))).toEqual([]);
+    });
+  });
+});
+
+describe("normalizeCreativeDnaInput (MariaDB JSON-column string/object boundary, pure)", () => {
+  it("preserves an already-parsed, valid Creative DNA object unchanged", () => {
+    expect(normalizeCreativeDnaInput(creativeDna)).toEqual(creativeDna);
+  });
+
+  it("safely parses a valid JSON-string representation into the same object", () => {
+    expect(normalizeCreativeDnaInput(JSON.stringify(creativeDna))).toEqual(creativeDna);
+  });
+
+  it("rejects a malformed JSON string instead of letting compileCampaignPlanAndPrompt throw a raw ZodError", () => {
+    expect(() => normalizeCreativeDnaInput("{not valid json")).toThrow("Persisted Creative DNA is not valid JSON");
+  });
+
+  it("rejects primitives", () => {
+    expect(() => normalizeCreativeDnaInput(42)).toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+    expect(() => normalizeCreativeDnaInput(null)).toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+    expect(() => normalizeCreativeDnaInput(true)).toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+  });
+
+  it("rejects arrays, even an array containing one otherwise-valid Creative DNA object", () => {
+    expect(() => normalizeCreativeDnaInput([creativeDna])).toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
+  });
+
+  it("rejects a well-formed but invalid/incomplete Creative DNA object, never inventing the missing fields", () => {
+    expect(() => normalizeCreativeDnaInput({ schemaVersion: "1.0" })).toThrow("Persisted Creative DNA does not match the expected Creative DNA shape");
   });
 });

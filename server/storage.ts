@@ -16,7 +16,12 @@ function localStoragePath(key: string) {
 }
 
 function canUseLocalStorage() {
-  return !ENV.isProduction && !ENV.forgeApiUrl && !ENV.forgeApiKey;
+  // Forge is always preferred when configured. Outside production this is
+  // unchanged; under production, local disk is only used when the explicit,
+  // off-by-default MIRA_ALLOW_LOCAL_STORAGE_IN_PRODUCTION opt-in is set (see
+  // server/_core/env.ts) - an isolated-preview fallback, not a change to
+  // normal production behavior.
+  return (!ENV.isProduction || ENV.allowLocalStorageInProduction) && !ENV.forgeApiUrl && !ENV.forgeApiKey;
 }
 
 function getForgeConfig() {

@@ -49,7 +49,8 @@ import { evaluateDiscoveryGate } from "./memory";
 import { ENV } from "../_core/env";
 import { buildShootPreparationBrief, type ShootPreparationBrief } from "./preparationBrief";
 import { parseInvitationAccessToken, verifyInvitationAccessSignature } from "./invitationAccessLink";
-import { mapCompletedMoodboardImages } from "./moodboardAdapter";
+import { mapCompletedMoodboardImages, normalizeCreativeDnaInput } from "./moodboardAdapter";
+import { normalizeShootMemorySnapshot } from "./creativeDnaAdapter";
 
 const TEXT_TEST_QUESTIONS = [
   "To begin, what do you do—and what is this shoot meant to help you communicate?",
@@ -392,6 +393,16 @@ export async function createClientInvitation(params: {
   return { invitationId, token, expiresAt: params.expiresAt };
 }
 
+// MariaDB/Drizzle can map a nullable timestamp column to a JS Date object
+// whose internal time value is NaN ("Invalid Date") instead of null. That
+// value is not nullish, so `?? new Date()` alone does not catch it, and
+// serializing an Invalid Date back to the database throws
+// "Invalid time value". Used only to decide whether an existing
+// lastOpenedAt is safe to reuse - never to hide other database errors.
+function isValidDate(value: unknown): value is Date {
+  return value instanceof Date && Number.isFinite(value.getTime());
+}
+
 export async function getClientInvitation(token: string, markOpened = false) {
   if (isLocalFileStoreEnabled()) {
     const state = await getLocalInvitation(token, markOpened);
@@ -436,7 +447,7 @@ export async function getClientInvitation(token: string, markOpened = false) {
   if (!row) return null;
   finalizeInvitationRoomRow(row);
   if (markOpened && row.invitation.status === "active") {
-    const openedAt = row.invitation.lastOpenedAt ?? new Date();
+    const openedAt = isValidDate(row.invitation.lastOpenedAt) ? row.invitation.lastOpenedAt : new Date();
     await db.update(miraClientInvitations).set({
       lastOpenedAt: openedAt,
       ...(row.invitation.deliveryStatus === "created" || row.invitation.deliveryStatus === "sent"
@@ -833,11 +844,19 @@ export async function startOrResumeRealtimeSession(token: string) {
       lastConnectedAt: now,
       reconnectUntil,
     });
+    // Same MariaDB Invalid Date boundary already fixed for lastOpenedAt in
+    // getClientInvitation's markOpened branch above (isValidDate): the
+    // driver can return these nullable timestamp columns as Date objects
+    // with a NaN time value instead of null, which `?? now` alone does not
+    // catch, and re-persisting one throws "Invalid time value" before
+    // buildRealtimeSessionConfig or the OpenAI request ever runs. state's
+    // lastOpenedAt is already normalized this way (it went through
+    // getClientInvitation(token, true) above), so only these two need it.
     await tx.update(miraClientInvitations).set({
-      consentAcknowledgedAt: state.invitation.consentAcknowledgedAt ?? now,
+      consentAcknowledgedAt: isValidDate(state.invitation.consentAcknowledgedAt) ? state.invitation.consentAcknowledgedAt : now,
       lastOpenedAt: state.invitation.lastOpenedAt ?? now,
       deliveryStatus: "preparation_in_progress",
-      preparationStartedAt: state.invitation.preparationStartedAt ?? now,
+      preparationStartedAt: isValidDate(state.invitation.preparationStartedAt) ? state.invitation.preparationStartedAt : now,
     }).where(eq(miraClientInvitations.id, state.invitation.id));
     await tx.update(miraShoots).set({
       status: state.shoot.status === "preparation_ready" ? "preparation_ready" : "conversation_in_progress",
@@ -1275,20 +1294,48 @@ export async function getShootRoomStatusForClient(shootId: number) {
         eq(miraShootCreativeDna.shootId, shootId),
         eq(miraShootCreativeDna.status, "complete"),
       )).orderBy(desc(miraShootCreativeDna.confirmedMemoryVersion)).limit(1);
-    const creativeDna = creativeDnaRows[0]?.creativeDnaJson;
-    if (creativeDna) {
-      preparationBrief = buildShootPreparationBrief({
-        creativeDna,
-        shoot: { location: shoot.location, scheduledAt: shoot.scheduledAt, timezone: shoot.timezone },
-      });
+    const rawCreativeDna = creativeDnaRows[0]?.creativeDnaJson;
+    if (rawCreativeDna) {
+      // Same MariaDB JSON-column string/object boundary already fixed for
+      // moodboard compilation (moodboardAdapter.ts) and Creative DNA
+      // synthesis (creativeDnaAdapter.ts) - the driver can return this
+      // column as a raw string, which a truthy check alone does not catch.
+      // Normalizing (and, for a genuinely malformed record, failing without
+      // fabricating brief content) keeps this the same honest boundary as
+      // those two call sites, reusing the same validator rather than a new
+      // one. A normalization failure here must never take down the rest of
+      // the client's room status (moodboard, room state) - it only means no
+      // preparation brief is shown, the same as the already-existing
+      // "creativeDna is missing" case.
+      try {
+        const creativeDna = normalizeCreativeDnaInput(rawCreativeDna);
+        preparationBrief = buildShootPreparationBrief({
+          creativeDna,
+          shoot: { location: shoot.location, scheduledAt: shoot.scheduledAt, timezone: shoot.timezone },
+        });
+      } catch (error) {
+        console.warn("MIRA preparation brief unavailable - persisted Creative DNA failed normalization", error instanceof Error ? error.message : "unknown error");
+      }
     }
   }
 
-  const latestMemory = await getLatestShootMemory(shootId);
-  const scheduleValue = latestMemory.shootContext.scheduleConfirmation?.value;
-  const scheduleResponse = Array.isArray(scheduleValue) && (scheduleValue[0] === "confirmed" || scheduleValue[0] === "change_requested")
-    ? { response: scheduleValue[0] as "confirmed" | "change_requested", note: scheduleValue[1] ?? null }
-    : null;
+  // Same MariaDB JSON-column string/object boundary already fixed for the
+  // Creative DNA read above: getLatestShootMemory can return snapshotJson as
+  // a raw string, which makes shootContext undefined. Normalizing here (and
+  // failing safely, without inventing a confirmation, on a genuinely
+  // malformed record) keeps a schedule-confirmation lookup from crashing the
+  // rest of the client's room status (moodboard, room state, preparation
+  // brief), the same way the Creative DNA boundary above does.
+  let scheduleResponse: { response: "confirmed" | "change_requested"; note: string | null } | null = null;
+  try {
+    const latestMemory = normalizeShootMemorySnapshot(await getLatestShootMemory(shootId));
+    const scheduleValue = latestMemory.shootContext.scheduleConfirmation?.value;
+    scheduleResponse = Array.isArray(scheduleValue) && (scheduleValue[0] === "confirmed" || scheduleValue[0] === "change_requested")
+      ? { response: scheduleValue[0] as "confirmed" | "change_requested", note: scheduleValue[1] ?? null }
+      : null;
+  } catch (error) {
+    console.warn("MIRA schedule response unavailable - persisted shoot memory failed normalization", error instanceof Error ? error.message : "unknown error");
+  }
 
   return {
     roomState,

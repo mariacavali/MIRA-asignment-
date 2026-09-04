@@ -13,7 +13,10 @@ export function registerStorageProxy(app: Express) {
     }
 
     if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
-      if (ENV.isProduction) {
+      // Fails closed in production unless the explicit, off-by-default
+      // MIRA_ALLOW_LOCAL_STORAGE_IN_PRODUCTION opt-in is set (server/_core/env.ts)
+      // - an isolated-preview fallback only, never a substitute for Forge.
+      if (ENV.isProduction && !ENV.allowLocalStorageInProduction) {
         res.status(500).send("Storage proxy not configured");
         return;
       }

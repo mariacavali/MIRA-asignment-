@@ -27,6 +27,7 @@ describe("MIRA transactional email templates", () => {
 
   it("renders all four client emails with escaped content and the private room CTA", () => {
     const preparationUrl = "https://mira.example/prepare/private-room";
+    const talkToMiraUrl = `${preparationUrl}#mira-preparation`;
     const invitation = clientShootRoomInvitationEmail({
       clientFirstName: "<Jamie>",
       photographerName: "North & Light",
@@ -36,6 +37,7 @@ describe("MIRA transactional email templates", () => {
       location: "Studio, Amsterdam",
       accessUntil: "2026-10-16T10:00:00.000Z",
       preparationUrl,
+      talkToMiraUrl,
     });
     const guidance = preparationGuidanceEmail({ clientFirstName: "Jamie", preparationUrl });
     const reminder = callMiraReminderEmail({ clientFirstName: "Jamie", photographerName: "North & Light", preparationUrl });
@@ -47,7 +49,14 @@ describe("MIRA transactional email templates", () => {
     expect(invitation.text).toContain("Save this email so you can return to your private Shoot Room");
     expect(invitation.html).toContain("&lt;Jamie&gt;");
     expect(invitation.html).not.toContain("<Jamie>");
-    for (const email of [invitation, guidance, reminder, day]) {
+    expect(invitation.text).toContain(talkToMiraUrl);
+    expect(invitation.html).toContain(`href="${preparationUrl}"`);
+    expect(invitation.html).toContain(`href="${talkToMiraUrl}"`);
+    expect(invitation.html).toContain("background:#efe6d4");
+    expect(invitation.html).toContain("background:#191816");
+    expect(invitation.html).toContain("background:#d5bc89");
+    expect(invitation.html).toContain("YOU’RE INVITED TO PREPARE FOR YOUR SHOOT");
+    for (const email of [guidance, reminder, day]) {
       expect(email.text).toContain(preparationUrl);
       expect(email.html).toContain(`href="${preparationUrl}"`);
       expect(email.text).toContain("TALK TO MIRA");
