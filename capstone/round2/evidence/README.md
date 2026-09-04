@@ -10,18 +10,20 @@
 | MIRA-specific LangSmith monitoring sample, dataset, and actual run output | `capstone/langsmith/mira_monitoring_sample.ts`, `capstone/langsmith/synthetic_cases.json`, `capstone/langsmith/results.json`, `capstone/langsmith/README.md` |
 | Existing Ironhack LangSmith course evidence (separate from MIRA) | `capstone/monitoring/langsmith_monitoring.md` |
 | Round 1 submission checklist | `capstone/ROUND1_SUBMISSION_CHECKLIST.md` |
-| Round 1 presentation deck and its own known-discrepancy notes | `capstone/presentation/` |
+| Round 1 presentation deck, its newer PDF export, and both decks' own known-discrepancy notes | `capstone/presentation/` |
+| Video file supplied by the user | [`MIRA_Ironhack_Demo_Final.mp4`](MIRA_Ironhack_Demo_Final.mp4) (this folder) — see "What this video is" below |
 
 No new screenshot was captured for this Round 2 package — no new live run was performed beyond what is already recorded in the files above. If a new screenshot or run is captured later, add it here with the same token-safety discipline already applied throughout this repository (no browser address bar, no invitation token, no client email address, no credentials, no private identifiers, no storage keys or signed URLs).
 
-## User-owned items not yet in this repository
+## What this video is — and, importantly, what it is not evidence of
 
-These exist locally on the user's machine but are not committed here — either because they are large binaries (this project's convention is to reference, not duplicate, large files) or because they have known accuracy issues still pending correction:
+[`MIRA_Ironhack_Demo_Final.mp4`](MIRA_Ironhack_Demo_Final.mp4) was supplied by the user (copied from their local Downloads folder; checksum-verified identical to the source). **Its content has not been reviewed frame-by-frame in this session** — this environment can scan the file's embedded text/metadata (done: no secrets, tokens, private URLs, or personal data found) but cannot watch or transcribe video. Its filename, before renaming, matched a presentation PDF exactly (`MIRA_Ironhack_Presentation_Workflow_Calendar_Evidence.pdf.mp4`), which suggests it may be a Canva slide-deck video export rather than a screen-recording of the live application — **this has not been confirmed either way**.
+
+**This file must not be treated as proof of any feature marked pending or blocked elsewhere in this repository.** In particular, it is not evidence that voice conversation works, that real (non-demo) image generation has been exercised, or that Google Calendar integration exists — none of those claims can be verified from an unreviewed video file, and each remains exactly as documented elsewhere (`capstone/round2/mvp-verification.md`, `docs/ROUND1_VERIFICATION.md`): voice pending, real generation unverified, no Google Calendar feature in this codebase. The **required** 2–5 minute screen-recording of the live app (signup → shoot → invitation → Shoot Room → preparation) remains a separate, still-missing item unless this file is confirmed by the user to actually be that recording.
+
+## Other user-owned items not yet in this repository
 
 | Item | Status |
 |---|---|
-| 2–5 minute screen-recording of the live MIRA app (signup → shoot → invitation → Shoot Room → preparation) | **Missing.** Not producible in this coding environment (no screen-recording capability). See `capstone/automation/n8n_automation_poc.md`, "Honest gap: no video recording." |
-| A ~69MB local file, `MIRA_Ironhack_Presentation_Workflow_Calendar_Evidence.pdf.mp4` | **Exists locally, not verified as the item above.** Its filename matches a presentation PDF exactly, suggesting a Canva slide-deck video export rather than an app screen-recording — unconfirmed either way. |
-| An updated Canva presentation draft (multiple slide versions reviewed during this project) | **Exists locally, not submission-ready.** Contains at least one serious unresolved accuracy issue — a slide showing polished editorial photography captioned as MIRA's own generated output, when MIRA's actual verified output is a demo-local placeholder image — plus a repeated, unverified "Google Calendar VERIFIED" claim with no corresponding feature anywhere in this codebase. Deliberately not committed to this repository until corrected, so no inaccurate presentation ships as part of the submission. |
-| Final Canva export (PDF/PPTX) once the above is corrected | **Pending user action.** Export from Canva (File → Download) once accuracy issues are resolved, then add here. |
+| Confirmation of what `MIRA_Ironhack_Demo_Final.mp4` actually shows | **Pending user confirmation** — see above. |
 | A photographer questionnaire run via n8n | **Unconfirmed.** Not documented anywhere in this repository; no artifact (workflow export, responses) has been supplied. Every existing document in this repository states willingness-to-pay/photographer feedback as unvalidated — this should only be added if real artifacts exist to document, not asserted from a slide claim alone. |
