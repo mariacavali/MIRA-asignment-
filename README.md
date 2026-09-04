@@ -59,7 +59,7 @@ This is the real click-path through the implemented MIRA Core flow once the app 
 6. **Confirm Discovery** — this triggers Creative DNA and moodboard generation. Without a configured `OPENAI_API_KEY`, this produces clearly-labeled demo/placeholder output (no external API is called); with a real key and a real database, it produces real generated output.
 7. **Review the result** back on the photographer's dashboard (`getShootMoodboard`) and in the client's Shoot Room (`MoodboardGallery`).
 
-For the exact, currently-verified status of each of these steps (live-verified / code-verified / pending), see `capstone/automation/automation_poc.md` and `capstone/validation/staged_validation_evidence.md` rather than assuming every step above has been exercised live.
+For the exact, currently-verified status of each of these steps (live-verified / code-verified / pending), see `capstone/automation/automation_poc.md` and `capstone/evidence/staged_validation_evidence.md` rather than assuming every step above has been exercised live. Steps 1–2 and the invitation/Shoot Room link in step 5 are live-verified (branch `fix/mira-stable-resend-email`, commit `8d6d2f8f755b1efbb1265a59500dea995a44c8d2`, preview `https://pc-6fh5ovldu7pa.manus.host`); steps 6–7 (Creative DNA/moodboard generation) are code-verified only (branch `codex/mira-visual-stage3`, commit `90baaff9b9930bc82f0e6e93129d97ee350ce641`) and have not been run live.
 
 ## Key deliverables
 
@@ -108,9 +108,20 @@ The Round 1 business/research submission documents live in [`capstone/`](capston
 - [Cost & timeline template](capstone/planning/cost_timeline.md) — assumptions-based; all real figures are placeholders pending approval
 - [Round 1 decision](capstone/feedback/round1_decision.md) — current recommendation: **KEEP**
 - [Presentation](capstone/presentation/README.md) — includes the supplied deck, [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](capstone/presentation/MIRA_Ironhack_Presentation_Validated_Stages.pptx)
-- [Staged validation evidence](capstone/validation/staged_validation_evidence.md) — per-stage git branch/commit references and test results
+- [Staged validation evidence](capstone/evidence/staged_validation_evidence.md) — per-stage git branch/commit references and test results
 
 These documents make no claims about deployment status, customer adoption, or willingness to pay beyond what is explicitly verified elsewhere in this repository; unverified items are marked as such throughout.
+
+### Verified checkpoints referenced by the Round 1 evidence
+
+| Layer | Branch | Commit | Status |
+|---|---|---|---|
+| Stripe payments | `fix/mira-final-ux-runtime` | `e2e99e1f47c5d749d6ca91281e24c00a51f10931` | Live-verified |
+| Resend email delivery | `fix/mira-stable-resend-email` | `8d6d2f8f755b1efbb1265a59500dea995a44c8d2` | Live-verified — preview `https://pc-6fh5ovldu7pa.manus.host` |
+| Visual preparation pipeline | `codex/mira-visual-stage3` | `90baaff9b9930bc82f0e6e93129d97ee350ce641` | Code-verified; live deployment pending |
+| Combined Resend + visual checkpoint | `fix/mira-resend-visual-integration` | `b1e44b8bca5dd195f632356a49bdad92fd099abc` | Code-verified combination only — does not itself add live verification to the visual pipeline |
+
+Full detail, including exact test counts and what remains pending for each row, is in [`capstone/evidence/staged_validation_evidence.md`](capstone/evidence/staged_validation_evidence.md).
 
 ## Security
 

@@ -18,7 +18,7 @@
 
 6. **Monitoring approach** — the existing Ironhack LangSmith evaluation evidence, and the plan (not yet built) for a MIRA-specific trace. See `../monitoring/langsmith_monitoring.md`.
 
-7. **Risks and open questions** — willingness to pay is unvalidated; real image/voice/email delivery quality is unverified. State this directly rather than glossing over it. See `../research/opportunities_risks.md`.
+7. **Risks and open questions** — willingness to pay is unvalidated; real moodboard-image and voice quality remain unverified. Email delivery is now live-verified (see `../evidence/staged_validation_evidence.md`), but that is one delivered invitation, not a volume or quality signal. State this directly rather than glossing over it. See `../research/opportunities_risks.md`.
 
 8. **Recommendation** — KEEP, with explicit conditions for Round 2. See `../feedback/round1_decision.md`.
 
@@ -39,5 +39,5 @@ Everything else reviewed in the deck (Stripe: live-verified with the same commit
 
 - [x] ~~Build the actual slide deck / presentation artifact~~ — supplied deck included (see Status above).
 - [ ] Decide presentation format (live demo vs. recorded vs. static deck) — depends on whether a stable staging environment is available at presentation time.
-- [ ] If a live demo is planned, confirm in advance which stages can actually be demonstrated (Stripe checkout and the private Shoot Room UI are the most demonstrable today; real email delivery and real moodboard generation are not, per `../automation/automation_poc.md`).
-- [ ] Cross-check the deck's slide content against `../validation/staged_validation_evidence.md` before presenting, since this outline was not used to author the supplied deck and has not been diffed slide-by-slide against it.
+- [ ] If a live demo is planned, confirm in advance which stages can actually be demonstrated (Stripe checkout, real Resend email delivery, and the private Shoot Room link are now live-verified and demonstrable; real moodboard generation is not, per `../automation/automation_poc.md`).
+- [ ] Cross-check the deck's slide content against `../evidence/staged_validation_evidence.md` before presenting, since this outline was not used to author the supplied deck and has not been diffed slide-by-slide against it.
