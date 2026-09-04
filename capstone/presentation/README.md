@@ -4,6 +4,13 @@
 
 **The validated-stages slide deck is included:** [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](MIRA_Ironhack_Presentation_Validated_Stages.pptx) (22 slides). Slide 7 was updated and verified as part of this submission's own accuracy pass — its Creative Pipeline status now reads "LIVE-VERIFIED · Five demo references → Creative DNA → five-scene demo moodboard," reflecting the demo-local moodboard that actually rendered live (see `docs/ROUND1_VERIFICATION.md`); no other slide content, slide count, or design was changed. This README remains as a content-traceability outline: every point below links to the document in this repository that grounds it, so the deck's claims can be checked against real evidence.
 
+**A second, newer deck export is also included:** [`MIRA_Ironhack_Presentation_Final.pdf`](MIRA_Ironhack_Presentation_Final.pdf) (15 pages). **This file is included as supplied and has two unresolved accuracy issues that should be corrected before this deck is presented or graded as final:**
+
+1. **Page 10** labels "Google Calendar" as "VERIFIED" (date, location, one-day reminder). No Google Calendar integration exists anywhere in this codebase — this contradicts the documented, live-tested finding that MIRA's own shoot-schedule confirmation is **currently blocked**, not verified (`docs/ROUND1_VERIFICATION.md`).
+2. **Page 13** capitions polished editorial/stock photography as "five connected editorial scenes — not generic AI images" produced by MIRA. MIRA's actual, live-verified moodboard output is a demo-local placeholder image (a labeled gradient graphic), not the photography shown — no real (non-demo) image generation has ever been run in this project (`capstone/round2/mvp-verification.md`).
+
+Everything else in this file (Stripe, Resend, the demo moodboard's "five-scene demo moodboard" label, the honestly-caveated 4.2/5 evaluation score) is consistent with documented evidence.
+
 ## Suggested outline
 
 1. **What MIRA is** — one-line positioning: verified client readiness plus a photographer-approved creative plan for remote photography sessions. See `../research/sector_research.md` §2, §5.

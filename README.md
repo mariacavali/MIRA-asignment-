@@ -107,7 +107,7 @@ The Round 1 business/research submission documents live in [`capstone/`](capston
 - [LangSmith monitoring](capstone/monitoring/langsmith_monitoring.md) — existing Ironhack evaluation evidence, clearly labeled as a separate course experiment, plus a now-built (not yet run for real) [MIRA-specific monitoring sample](capstone/langsmith/README.md)
 - [Cost & timeline](capstone/planning/cost_timeline.md) — an explicitly-labeled illustrative worked example (assumptions table, resulting estimate, rough timeline) alongside the detailed placeholder-based template; no figure is presented as a confirmed real price
 - [Round 1 decision](capstone/feedback/round1_decision.md) — current recommendation: **KEEP**, including what Round 2 deepens and the first MVP scope idea
-- [Presentation](capstone/presentation/README.md) — includes the supplied deck, [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](capstone/presentation/MIRA_Ironhack_Presentation_Validated_Stages.pptx)
+- [Presentation](capstone/presentation/README.md) — includes the supplied deck, [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](capstone/presentation/MIRA_Ironhack_Presentation_Validated_Stages.pptx), and a newer export, [`MIRA_Ironhack_Presentation_Final.pdf`](capstone/presentation/MIRA_Ironhack_Presentation_Final.pdf) — the latter has two unresolved accuracy issues flagged in `capstone/presentation/README.md`, not yet corrected
 - [Staged validation evidence](capstone/evidence/staged_validation_evidence.md) — per-stage git branch/commit references and test results
 - [Round 1 verification (latest checkpoint)](docs/ROUND1_VERIFICATION.md) — the most recent live-verification pass, superseding older per-stage status language below where they differ
 
