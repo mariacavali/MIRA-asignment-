@@ -2,7 +2,7 @@
 
 ## Status
 
-**No slide deck or recorded presentation exists in this repository.** This file is a content outline for building one, sourced entirely from the other documents in `capstone/`. It contains no new claims — every point below links to the document that grounds it.
+**The validated-stages slide deck is included:** [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](MIRA_Ironhack_Presentation_Validated_Stages.pptx) (22 slides, supplied for this submission and copied in unmodified — verified by checksum match against the source file at copy time). This README remains as a content-traceability outline: every point below links to the document in this repository that grounds it, so the deck's claims can be checked against real evidence.
 
 ## Suggested outline
 
@@ -26,8 +26,18 @@
 
 Every "status" label used across this document set (live-verified / code-verified / under development / pending / not implemented) should be used consistently in the live presentation and in any slide content built from this outline. Do not describe a "code-verified" or "under development" item as "working" or "live" when presenting — the distinction is the point of this submission's evidence discipline, and collapsing it in slide form would misrepresent what has actually been verified.
 
+## Known discrepancies between the supplied deck and this repository's documented evidence
+
+The deck's text was extracted and reviewed against this repository's own verified evidence before finalizing this submission. Two points need attention before presenting:
+
+1. **Slide 17 ("MIRA AI EVALUATION")** presents specific numbers — "4.2/5 · 5 cases · 0 failures," "Consistency 5/5," "Hallucination 3/5" — labeled "VERIFIED LAB EVIDENCE" from a "Custom MIRA LLM-as-judge" evaluation, and states LangSmith "traces AI stages, prompt version, latency, errors and token usage" for MIRA. **No such evaluation harness, LLM-as-judge rubric, evaluation dataset, or LangSmith integration exists anywhere in this codebase** — this was independently confirmed by a full-repository search (zero matches for "langsmith"/"langchain") during this project's own documentation work. This directly overlaps with two things this submission was explicitly told not to invent: MIRA-specific LangSmith tracing and real visual-generation evaluation results. Slide 16 ("MIRA MONITORING"), by contrast, is honest — it labels the same topic "EVIDENCE NEEDED" and asks for a dataset/experiment link or screenshots. **Do not present slide 17's numbers as real without first confirming their actual source with Maria; if no such evaluation was actually run, that slide should be corrected or removed before Round 1 is presented.**
+2. **Slide 9** shows a specific price, "PAYMENT €33.33 · MIRADEMO €0 test." `capstone/planning/cost_timeline.md` documents all pricing as `[TBD]` placeholders per explicit instruction (no price has been approved). If €33.33 is a real, approved price point, `cost_timeline.md` should be updated to say so explicitly; if it is illustrative/placeholder, the slide should say that too. This submission has not changed `cost_timeline.md` to reflect €33.33, since doing so without confirmation would itself be inventing a cost figure.
+
+Everything else reviewed in the deck (Stripe: live-verified with the same commit/branch this repository records; Resend/voice/moodboard/n8n: labeled "IN IMPLEMENTATION," "PARTIAL," or "EVIDENCE NEEDED"; the dashboard slide labeled "PLANNED") is consistent with this repository's own documented status.
+
 ## Still to do
 
-- [ ] Build the actual slide deck / presentation artifact (not started).
+- [x] ~~Build the actual slide deck / presentation artifact~~ — supplied deck included (see Status above).
 - [ ] Decide presentation format (live demo vs. recorded vs. static deck) — depends on whether a stable staging environment is available at presentation time.
 - [ ] If a live demo is planned, confirm in advance which stages can actually be demonstrated (Stripe checkout and the private Shoot Room UI are the most demonstrable today; real email delivery and real moodboard generation are not, per `../automation/automation_poc.md`).
+- [ ] Cross-check the deck's slide content against `../validation/staged_validation_evidence.md` before presenting, since this outline was not used to author the supplied deck and has not been diffed slide-by-slide against it.

@@ -2,7 +2,7 @@
 
 **Status:** Author analysis, grounded in this repository's implemented product and existing project documentation. This is not third-party market research and contains no external market-sizing, survey, or customer data.
 
-**Source evidence used:** `README.md`, `MIRA_SYSTEM_BRIEF_FOR_PEER_AUDIT.md`, `docs/MIRA_AI_AND_DATA_INVENTORY.md`, `docs/MIRA_ARCHITECTURE_FOR_AUDIT.md`, `docs/MIRA_V3_CONSTITUTION.md`, `ideas.md`, `docs/stripe-integration.md`, `server/miraCore/coreKnowledge.ts`, `server/miraCore/router.ts`, `server/miraCore/moodboardAdapter.ts`, `server/miraCore/creativeDnaAdapter.ts`, `server/miraCore/visualReferences.ts`.
+**Source evidence used:** `README.md`, `MIRA_SYSTEM_BRIEF_FOR_PEER_AUDIT.md`, `docs/MIRA_AI_AND_DATA_INVENTORY.md`, `docs/MIRA_ARCHITECTURE_FOR_AUDIT.md`, `docs/MIRA_V3_CONSTITUTION.md`, `ideas.md`, `docs/stripe-integration.md`, `server/miraCore/coreKnowledge.ts`, `server/miraCore/router.ts`, `server/miraCore/moodboardAdapter.ts`, `server/miraCore/creativeDnaAdapter.ts`, `server/miraCore/visualReferences.ts`, and the supplied research pack `capstone/research/Ironhack_Capstone_Recommendation_MIRA_Shoot_Compass.docx` (see Citations at the end of this document).
 
 ## 1. The sector this product sits in
 
@@ -13,7 +13,17 @@ MIRA is built for **remote/virtual photography sessions** — a photographer dir
 Three adjacent, already-solved problems sit around this workflow. MIRA does not attempt to re-solve any of them:
 
 ### a) Remote camera capture is already solved
-**Clos**[1] and **Shutter**[2] are the two specific remote-photography capture platforms this research references. Both already solve the mechanical problem of a photographer directing a client's smartphone camera in real time — connection, live framing, remote shutter control, and delivery of the captured frames. MIRA's own product knowledge explicitly names Clos as the capture layer it assumes[1] and does not implement camera capture, live video direction, or image capture itself anywhere in this codebase. MIRA has no camera-control code, no live-video-session code, and no capture-app integration code.
+**CLOS**[1] and **SHUTTER**[2] are the two specific remote-photography capture platforms this research references. Both already solve the mechanical problem of a photographer directing a client's smartphone camera in real time — connection, live framing, remote shutter control, and delivery of the captured frames:
+
+| | CLOS | SHUTTER |
+|---|---|---|
+| Remote model | Photographer controls the client's phone camera in a virtual room. | Client shares a generated session ID; photographer controls the session from a portal. |
+| Capture | High-resolution JPG; RAW/ProRAW on paid plans; actual sensor capture (not a screen recording). | High-resolution JPEG and RAW. |
+| Devices | Officially supports iPhone and Android. | iOS and Android listed on the official site; the US Apple App Store listing reviewed was iPhone-only. |
+| Published pricing | Free tier; Pro plan reported at US$7.99/month. | Client app reported as free; professional-side pricing was not clearly public in the pages reviewed. |
+| Public API/SDK | None found publicly documented. | None found publicly documented. |
+
+These comparative facts are reported in the supplied research pack[2] and have not been independently re-verified by fetching the original vendor pages during this documentation pass — they are cited to that document, not re-confirmed first-hand. MIRA's own product knowledge explicitly names Clos as the capture layer it assumes[1] and does not implement camera capture, live video direction, or image capture itself anywhere in this codebase. MIRA has no camera-control code, no live-video-session code, and no capture-app integration code.
 
 ### b) CRMs solve forms, reminders, and administration
 Photography CRMs (studio-management and client-management tools) already solve scheduling, contracts, invoicing, reminder emails, and client record-keeping. MIRA's own implemented email system (`server/email/`, `server/miraCore/router.ts`'s `sendInvitation`) deliberately reuses this same category of capability — adaptive reminder scheduling, delivery-status tracking, a private client link — rather than treating it as MIRA's point of differentiation. MIRA's invitation/reminder email pipeline is closer to a narrow, purpose-built CRM feature than to a new category of product.
@@ -52,6 +62,6 @@ MIRA sits **inside** the photographer's existing workflow (their Stripe purchase
 
 ## Citations
 
-[1]: `server/miraCore/coreKnowledge.ts` — Clos is named directly in MIRA's own product runtime knowledge as the assumed remote-capture layer ("Remote photoshoots use Clos."). This is a repository-code citation, independently verifiable in this codebase.
+[1]: `server/miraCore/coreKnowledge.ts` — CLOS is named directly in MIRA's own product runtime knowledge as the assumed remote-capture layer ("Remote photoshoots use Clos."). This is a repository-code citation, independently verifiable in this codebase.
 
-[2]: Confirmed by Maria (product owner/domain expert) as a second specific, named remote-photography capture platform in the same competitive category as Clos. Shutter does not appear in this codebase; this citation is a domain-expert confirmation, not a repository-code citation, and is recorded here as such rather than implied to be independently verifiable from the code.
+[2]: `capstone/research/Ironhack_Capstone_Recommendation_MIRA_Shoot_Compass.docx` (supplied research pack, authored 28 August 2026) — the source for SHUTTER as a named platform and for the CLOS/SHUTTER comparison table above (remote model, capture format, devices, pricing, public API availability). This document contains its own internal numbered citation markers (1–17) for these claims, but its "References" section was empty in the file as supplied — those underlying vendor/App Store sources are therefore not independently resolvable from this repository and have not been re-fetched or re-verified during this documentation pass. Confirmed by Maria (product owner) as accurate.

@@ -1,6 +1,10 @@
-# MIRA — Project 3
+# MIRA — Project 3 & Ironhack Capstone
 
-MIRA is a private, authenticated brand-recognition and creative-direction application. MIRA V4 is the current Project 3 Brand World path from structured creative evidence through Creative DNA to a five-image editorial moodboard. MIRA V3 remains an active, separate recognition product in the same codebase; it has not been superseded in routing or persistence.
+MIRA is a private, authenticated brand-recognition and creative-direction application. This repository now contains three separate, data-isolated product surfaces that share the same codebase but not the same routes, tables, or state:
+
+- **MIRA Core (the Ironhack Capstone product)** — a photographer's Stripe-paid dashboard, a private per-shoot "Shoot Room" link for the client, bounded visual-reference upload, a Discovery conversation, and a resulting Creative DNA + five-image moodboard the photographer reviews before the shoot. This is the product documented in [`capstone/`](capstone/) (see the Capstone Round 1 section below) and is the most recently and actively developed surface.
+- **MIRA V4** — the Project 3 Brand World path from structured creative evidence through Creative DNA to a five-image editorial moodboard, for an individual founder/creator building their own brand.
+- **MIRA V3** — an active, separate recognition product in the same codebase; it has not been superseded in routing or persistence.
 
 ## Peer Audit — Start Here
 
@@ -14,9 +18,10 @@ These documents provide factual system information for an independent audit and 
 
 ## What the application does
 
+- **MIRA Core** — a photographer creates an account (Stripe-verified purchase), creates a shoot, and sends one private client link. The client opens that link, uploads up to five visual references, and completes a Discovery conversation (voice or text) with MIRA. Once confirmed, MIRA synthesizes a structured Creative DNA record and a five-image moodboard, which the photographer reviews on their own dashboard before the shoot. See `capstone/automation/automation_poc.md` for the exact, honestly-labeled verification status of every stage of this flow.
 - MIRA V3 guides a user through meditation, adaptive reflection, a reviewable Mirror, and confirmation-gated Brand Soul and visual-direction deliverables.
 - MIRA V4 turns structured brand context and Creative DNA into visual directions and a five-image campaign moodboard.
-- Both surfaces use owner-scoped authentication and persistence. Their routes, tRPC namespaces, state machines, and database tables remain separate.
+- All three surfaces use owner-scoped authentication and persistence. Their routes, tRPC namespaces, state machines, and database tables remain separate.
 
 ## Architecture
 
@@ -42,6 +47,20 @@ pnpm check
 pnpm build
 ```
 
+## Demo walkthrough (MIRA Core)
+
+This is the real click-path through the implemented MIRA Core flow once the app is running locally. It requires `DATABASE_URL` for a real database, or `MIRA_LOCAL_FILE_STORE=true` for the local/demo persistence path (which has full coverage for accounts, shoots, invitations, and Stripe test mode, but not yet for Creative DNA/moodboard generation — see `capstone/automation/automation_poc.md`).
+
+1. **Create a photographer account** at `/mira/signup` (or `/mira/login` if one exists), then complete onboarding at `/mira/onboarding`.
+2. **Activate payment** — in local/test mode this uses the local test-checkout path; in Stripe mode it uses the hosted Stripe Checkout link, verified end-to-end in `docs/stripe-integration.md`.
+3. **Create a shoot** from `/mira/dashboard`, then open it at `/mira/shoots/:shootId`.
+4. **Send the client invitation** — this creates the private Shoot Room link and (if `RESEND_API_KEY` is configured) attempts real email delivery; otherwise the link is available to copy directly from the dashboard.
+5. **Open the private Shoot Room** at `/prepare/:token` as the client would. Upload up to five visual references, then start the Discovery conversation.
+6. **Confirm Discovery** — this triggers Creative DNA and moodboard generation. Without a configured `OPENAI_API_KEY`, this produces clearly-labeled demo/placeholder output (no external API is called); with a real key and a real database, it produces real generated output.
+7. **Review the result** back on the photographer's dashboard (`getShootMoodboard`) and in the client's Shoot Room (`MoodboardGallery`).
+
+For the exact, currently-verified status of each of these steps (live-verified / code-verified / pending), see `capstone/automation/automation_poc.md` and `capstone/validation/staged_validation_evidence.md` rather than assuming every step above has been exercised live.
+
 ## Key deliverables
 
 - `client/` — MIRA product interface
@@ -61,6 +80,7 @@ pnpm build
 - `drizzle/` — MySQL/TiDB schema, relations, and migrations
 - `docs/` — current-state, architecture, prompt, environment, provider, and validation documentation
 - `evidence/` — connected V3 journey screenshots, PDFs, transcript material, and validation records
+- `capstone/` — Ironhack Capstone Round 1 submission package (research, dashboard spec, automation POC, monitoring, planning, feedback, presentation, and staged validation evidence) — see the Capstone Round 1 section below
 
 ## Current Status
 
@@ -81,13 +101,14 @@ The verified environment was private staging, not a public deployment. Provider 
 The Round 1 business/research submission documents live in [`capstone/`](capstone/) and are separate from the application code above — they do not affect and are not affected by anything else in this README. Start with the checklist:
 
 - [Round 1 submission checklist](capstone/ROUND1_SUBMISSION_CHECKLIST.md) — status of every requirement (complete/partial/pending)
-- [Sector research](capstone/research/sector_research.md), [opportunities & risks](capstone/research/opportunities_risks.md), [use cases](capstone/research/use_cases.md)
-- [Dashboard metrics specification](capstone/dashboard/dashboard_documentation.md) — spec only; no dashboard artifact or live data exists yet
+- [Sector research](capstone/research/sector_research.md) (with the supplied research pack, [`Ironhack_Capstone_Recommendation_MIRA_Shoot_Compass.docx`](capstone/research/Ironhack_Capstone_Recommendation_MIRA_Shoot_Compass.docx)), [opportunities & risks](capstone/research/opportunities_risks.md), [use cases](capstone/research/use_cases.md)
+- [Dashboard metrics specification](capstone/dashboard/dashboard_documentation.md) — spec only, including an honest note that no Power BI/PBIX file or dashboard artifact exists yet
 - [Automation POC](capstone/automation/automation_poc.md) — Stripe → activation → shoot → invitation → Resend → Shoot Room → preparation → readiness, with an honest per-stage verification status
-- [LangSmith monitoring](capstone/monitoring/langsmith_monitoring.md) — existing Ironhack evaluation evidence, plus the (not-yet-built) plan for a MIRA-specific trace
+- [LangSmith monitoring](capstone/monitoring/langsmith_monitoring.md) — existing Ironhack evaluation evidence, clearly labeled as a separate course experiment, plus the (not-yet-built) plan for a MIRA-specific trace
 - [Cost & timeline template](capstone/planning/cost_timeline.md) — assumptions-based; all real figures are placeholders pending approval
 - [Round 1 decision](capstone/feedback/round1_decision.md) — current recommendation: **KEEP**
-- [Presentation outline](capstone/presentation/README.md)
+- [Presentation](capstone/presentation/README.md) — includes the supplied deck, [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](capstone/presentation/MIRA_Ironhack_Presentation_Validated_Stages.pptx)
+- [Staged validation evidence](capstone/validation/staged_validation_evidence.md) — per-stage git branch/commit references and test results
 
 These documents make no claims about deployment status, customer adoption, or willingness to pay beyond what is explicitly verified elsewhere in this repository; unverified items are marked as such throughout.
 

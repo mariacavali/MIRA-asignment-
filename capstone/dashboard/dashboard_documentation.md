@@ -74,6 +74,14 @@ Each metric below states: what it measures, why it matters to a stakeholder (pho
 3. Real invitations sent to real clients (none have been sent in this project — see `capstone/automation/automation_poc.md`).
 4. A decision on the dashboard's implementation surface (new photographer-facing page, internal operator tool, or exported report) — not yet made and out of scope for this document, which specifies *what* to measure, not *how* to render it.
 
+## Honest alternative: no Power BI (PBIX) file exists
+
+There is no `.pbix` file, no Power BI workspace, and no other BI-tool artifact anywhere in this repository or supplied for this submission. Rather than imply one exists, this section states the honest interim alternative:
+
+- **What exists today:** this specification document (the seven metric definitions, their exact source tables/columns, and their calculation logic above) and the underlying schema those calculations run against (`drizzle/schema.ts`), which is real, implemented, and already exercised by this project's own test suite.
+- **What does not exist:** any chart, workbook, connected data source, or rendered visualization. No dashboard screenshot accompanies this submission because none has been built.
+- **The honest static alternative, if one were needed for a live demo before a real dashboard is built:** a single read-only SQL view or scheduled export (e.g. a CSV or a static Markdown table) computed directly from the calculations in this document, refreshed manually or on a simple cron, and displayed as plain text/table — not a live BI tool. This would let a stakeholder see real numbers once real data exists, without committing to a dashboard build before the underlying pipeline (Section "Pending dependencies" above) is actually producing data worth visualizing. This alternative has not been built either; it is documented here only so the gap is explicit rather than silently absent.
+
 ## What this document deliberately does not do
 
 It does not propose a chart library, a UI design, or a build plan for the dashboard artifact itself — that is Round 2/build scope. It does not include any example or placeholder numeric values, because any such value would be invented data, which this submission is explicitly instructed not to produce.
