@@ -32,7 +32,7 @@ Every status is one of exactly four categories:
 **What these visuals honestly are**
 - The five reference visuals are locally created demo placeholders, generated without any external image API — **not original client photographs**.
 - The five moodboard scenes are demo-local placeholder assets, generated the same way — **not AI-generated photography**.
-- Both exist because no `OPENAI_API_KEY` was configured for this preview pass; the underlying pipeline (client input → Creative DNA → moodboard prompts) is real and code-verified, but its optional real-image-generation path was not exercised here (no paid image API was called, by design, for this checkpoint).
+- Real image generation was intentionally not invoked during this checkpoint. The five reference visuals and five moodboard scenes used token-safe demo-local placeholder assets, so no paid image-generation operation was performed.
 
 **This round's own verification**
 - Focused storage tests: 12/12 passed
