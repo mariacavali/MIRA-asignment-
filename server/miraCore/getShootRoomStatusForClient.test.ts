@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildDemoMiraV4CreativeDna } from "./demoCreativeDna";
+import { emptyShootMemory } from "./memory";
 import type { MiraV4CreativeDnaSource } from "../miraV4/creativeDna";
 
 // Regression coverage for the confirmed client Shoot Room rendering blocker:
@@ -95,13 +96,28 @@ function demoLocalCreativeDna() {
   return buildDemoMiraV4CreativeDna(source);
 }
 
-function seedDb(creativeDnaJson: unknown) {
+function seedDb(creativeDnaJson: unknown, memoryRevisions: Record<string, unknown>[] = []) {
   return createFakeDb({
     shoots: [{ id: 42, roomState: "preparation_active", status: "conversation_in_progress", location: "Home studio", scheduledAt: new Date("2026-09-04T12:00:00.000Z"), timezone: "Europe/Amsterdam", durationMinutes: 60 }],
     moodboard: [{ shootId: 42, confirmedMemoryVersion: 3, status: "complete", referencesJson: fiveSceneReferences() }],
     creativeDna: [{ shootId: 42, confirmedMemoryVersion: 3, status: "complete", creativeDnaJson }],
-    revisions: [],
+    revisions: memoryRevisions,
   });
+}
+
+// The exact shape recordShootScheduleResponse (server/miraCore/db.ts) writes
+// for a client's confirm/request-change response, per scheduleResponse.test.ts.
+function memoryWithScheduleConfirmation(value: [string] | [string, string]) {
+  const memory = emptyShootMemory();
+  memory.shootContext.scheduleConfirmation = {
+    value,
+    kind: "explicit",
+    confidence: "high",
+    sourceEventIds: ["11111111-1111-4111-8111-111111111111"],
+    clientConfirmed: true,
+    updatedAt: new Date().toISOString(),
+  };
+  return memory;
 }
 
 describe("getShootRoomStatusForClient: preparation brief survives the MariaDB JSON-column string/object boundary", () => {
@@ -174,5 +190,58 @@ describe("getShootRoomStatusForClient: preparation brief survives the MariaDB JS
     expect(status.images.map(image => image.id)).toEqual(["scene_1", "scene_2", "scene_3", "scene_4", "scene_5"]);
     expect(status.preparationBrief).not.toBeNull();
     expect(status.preparationReady).toBe(true);
+  });
+});
+
+// Regression coverage for the confirmed second client Shoot Room rendering
+// blocker: getLatestShootMemory (server/miraCore/db.ts) can return
+// snapshotJson as a raw string, the same MariaDB JSON-column string/object
+// boundary already fixed for the persisted Creative DNA above. Reading
+// `.shootContext.scheduleConfirmation` straight off that value threw
+// "Cannot read properties of undefined (reading 'scheduleConfirmation')".
+describe("getShootRoomStatusForClient: schedule response survives the MariaDB JSON-column string/object boundary", () => {
+  beforeEach(() => {
+    dbMocks.getDb.mockReset();
+    localFileStoreMocks.isLocalFileStoreEnabled.mockReturnValue(false);
+  });
+
+  it("returns a confirmed schedule response from a persisted memory revision, already an object", async () => {
+    const memory = memoryWithScheduleConfirmation(["confirmed"]);
+    const db = seedDb(demoLocalCreativeDna(), [{ shootId: 42, version: 1, snapshotJson: memory }]);
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.scheduleResponse).toEqual({ response: "confirmed", note: null });
+  });
+
+  it("returns a change-requested schedule response with its note, including when the driver returns the revision as a raw JSON string", async () => {
+    const memory = memoryWithScheduleConfirmation(["change_requested", "Can we move it an hour later?"]);
+    const db = seedDb(demoLocalCreativeDna(), [{ shootId: 42, version: 1, snapshotJson: JSON.stringify(memory) }]);
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.scheduleResponse).toEqual({ response: "change_requested", note: "Can we move it an hour later?" });
+  });
+
+  it("returns scheduleResponse: null, without crashing, when no memory revision has been persisted yet (no shootContext confirmation exists)", async () => {
+    const db = seedDb(demoLocalCreativeDna(), []);
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.scheduleResponse).toBeNull();
+  });
+
+  it("returns scheduleResponse: null, without crashing, for a persisted memory revision that has no scheduleConfirmation yet", async () => {
+    const db = seedDb(demoLocalCreativeDna(), [{ shootId: 42, version: 1, snapshotJson: emptyShootMemory() }]);
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.scheduleResponse).toBeNull();
+  });
+
+  it("fails safely on a malformed persisted memory revision - scheduleResponse is null, but the rest of the room status (moodboard, preparation brief) still returns", async () => {
+    const db = seedDb(demoLocalCreativeDna(), [{ shootId: 42, version: 1, snapshotJson: "{not valid json" }]);
+    dbMocks.getDb.mockResolvedValue(db);
+    const status = await getShootRoomStatusForClient(42);
+    expect(status.scheduleResponse).toBeNull();
+    expect(status.moodboardReady).toBe(true);
+    expect(status.images).toHaveLength(5);
+    expect(status.preparationBrief).not.toBeNull();
   });
 });

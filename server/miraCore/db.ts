@@ -50,6 +50,7 @@ import { ENV } from "../_core/env";
 import { buildShootPreparationBrief, type ShootPreparationBrief } from "./preparationBrief";
 import { parseInvitationAccessToken, verifyInvitationAccessSignature } from "./invitationAccessLink";
 import { mapCompletedMoodboardImages, normalizeCreativeDnaInput } from "./moodboardAdapter";
+import { normalizeShootMemorySnapshot } from "./creativeDnaAdapter";
 
 const TEXT_TEST_QUESTIONS = [
   "To begin, what do you do—and what is this shoot meant to help you communicate?",
@@ -1300,11 +1301,23 @@ export async function getShootRoomStatusForClient(shootId: number) {
     }
   }
 
-  const latestMemory = await getLatestShootMemory(shootId);
-  const scheduleValue = latestMemory.shootContext.scheduleConfirmation?.value;
-  const scheduleResponse = Array.isArray(scheduleValue) && (scheduleValue[0] === "confirmed" || scheduleValue[0] === "change_requested")
-    ? { response: scheduleValue[0] as "confirmed" | "change_requested", note: scheduleValue[1] ?? null }
-    : null;
+  // Same MariaDB JSON-column string/object boundary already fixed for the
+  // Creative DNA read above: getLatestShootMemory can return snapshotJson as
+  // a raw string, which makes shootContext undefined. Normalizing here (and
+  // failing safely, without inventing a confirmation, on a genuinely
+  // malformed record) keeps a schedule-confirmation lookup from crashing the
+  // rest of the client's room status (moodboard, room state, preparation
+  // brief), the same way the Creative DNA boundary above does.
+  let scheduleResponse: { response: "confirmed" | "change_requested"; note: string | null } | null = null;
+  try {
+    const latestMemory = normalizeShootMemorySnapshot(await getLatestShootMemory(shootId));
+    const scheduleValue = latestMemory.shootContext.scheduleConfirmation?.value;
+    scheduleResponse = Array.isArray(scheduleValue) && (scheduleValue[0] === "confirmed" || scheduleValue[0] === "change_requested")
+      ? { response: scheduleValue[0] as "confirmed" | "change_requested", note: scheduleValue[1] ?? null }
+      : null;
+  } catch (error) {
+    console.warn("MIRA schedule response unavailable - persisted shoot memory failed normalization", error instanceof Error ? error.message : "unknown error");
+  }
 
   return {
     roomState,
