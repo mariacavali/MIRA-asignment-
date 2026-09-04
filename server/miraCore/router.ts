@@ -47,7 +47,7 @@ import { deliverClientInvitation, notifyPhotographerOfCompletion } from "./deliv
 import { createRealtimeWebRtcCall } from "./realtime";
 import { classifyRealtimeTranscript } from "./noise";
 import { generateShootCreativeDnaForConfirmedMemory, getShootCreativeDnaForOwner } from "./creativeDnaAdapter";
-import { generateShootMoodboardForCreativeDna } from "./moodboardAdapter";
+import { generateShootMoodboardForCreativeDna, getShootMoodboardForOwner } from "./moodboardAdapter";
 import { createLocalPhotographer, isLocalFileStoreEnabled } from "../localFileStore";
 import { createPendingCheckout } from "../payment/pendingCheckout";
 import { DrizzleEmailOutboxRepository, recordImmediateInvitationAsSent, scheduleMiraEmailMilestones, cancelMiraEmailOutbox } from "../email/outbox";
@@ -71,7 +71,7 @@ function notFound(): never {
 
 function visualUploadError(error: unknown): TRPCError {
   const message = error instanceof Error ? error.message : "";
-  if (/^(Reference image|A shoot can contain)/.test(message)) {
+  if (/^(Reference image|A shoot can (contain|include))/.test(message)) {
     return new TRPCError({ code: "BAD_REQUEST", message });
   }
   console.warn("MIRA visual reference upload unavailable", message || "unknown error");
@@ -489,6 +489,7 @@ export const miraCoreRouter = router({
   }),
   deleteRealtimeQaEvents: protectedProcedure.input(z.object({ shootId: z.number().int().positive() })).mutation(async ({ ctx, input }) => ({ deleted: await deleteRealtimeQaEventsForOwner(ctx.user.id, input.shootId) })),
   getShootCreativeDna: protectedProcedure.input(z.object({ shootId: z.number().int().positive() })).query(({ ctx, input }) => getShootCreativeDnaForOwner(ctx.user.id, input.shootId)),
+  getShootMoodboard: protectedProcedure.input(z.object({ shootId: z.number().int().positive() })).query(({ ctx, input }) => getShootMoodboardForOwner(ctx.user.id, input.shootId)),
   // Photographer-only completion of the journey. Only succeeds once the
   // creative pipeline has actually activated Preparation (roomState) for this
   // shoot - never lets the photographer skip ahead of the client's own room.

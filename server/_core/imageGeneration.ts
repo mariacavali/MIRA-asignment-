@@ -53,7 +53,11 @@ function extractPlaceholderLabel(prompt: string) {
   return directMatches.find((value): value is string => Boolean(value)) ?? "LOCAL TEST PLACEHOLDER";
 }
 
-async function createLocalPlaceholderImage(options: GenerateImageOptions): Promise<GenerateImageResponse> {
+// Exported so other local/demo generation paths (e.g. the MIRA Core shoot
+// moodboard's demo fallback) can reuse this exact placeholder renderer
+// directly, deterministically, and without going through generateImage's own
+// env-based gate (which is scoped to the V4/Level2Create Forge flow).
+export async function createLocalPlaceholderImage(options: GenerateImageOptions): Promise<GenerateImageResponse> {
   const label = extractPlaceholderLabel(options.prompt);
   const fingerprint = createHash("sha256")
     .update(JSON.stringify({

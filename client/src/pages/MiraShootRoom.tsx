@@ -112,6 +112,22 @@ export default function MiraShootRoom() {
         <div className="mt-6">
           <MoodboardGallery token={credential} />
         </div>
+        {/* Reuses the same Call/Text MIRA entry points already defined above -
+            no new conversation surface, just a clear way back into it once
+            there is a moodboard to talk about. */}
+        <Button
+          variant="ghost"
+          disabled={!consent}
+          onClick={() => {
+            if (!consent) return;
+            setConversationMode("voice");
+            setIsConnecting(true);
+            callStateRef.current = "calling";
+          }}
+          className="mt-6 text-[#d2b98b]"
+        >
+          Talk to MIRA about your moodboard
+        </Button>
       </section>
 
       {/* Section 4: Ready to Shoot */}

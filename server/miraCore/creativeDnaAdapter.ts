@@ -10,6 +10,7 @@ import {
   MIRA_V4_CREATIVE_DNA_PROMPT_VERSION,
   MIRA_V4_CREATIVE_DNA_SCHEMA_VERSION,
 } from "../../shared/miraV4CreativeDna";
+import { ENV } from "../_core/env";
 import { getDb } from "../db";
 import { isLocalFileStoreEnabled } from "../localFileStore";
 import {
@@ -17,6 +18,42 @@ import {
   synthesizeMiraV4CreativeDna,
   type MiraV4CreativeDnaSource,
 } from "../miraV4/creativeDna";
+import { buildDemoMiraV4CreativeDna, DEMO_CREATIVE_DNA_MODEL } from "./demoCreativeDna";
+import { listShootVisualReferencesForClient } from "./visualReferences";
+
+export type ShootVisualReferenceForCreativeDna = {
+  id: string;
+  referencePurpose: string | null;
+  clientDescription: string | null;
+  url: string | null;
+};
+
+// Turns the client's exactly-five uploaded references into the single
+// imageReference/userExplanation pair the existing Creative DNA schema
+// expects. This is additive evidence only (influenceRule stays
+// "supporting_evidence_only") - it never overrides the confirmed
+// conversation memory, matching the same precedence rule
+// synthesizeMiraV4CreativeDna already documents in its own system prompt.
+export function buildInspirationFromVisualReferences(
+  references: ShootVisualReferenceForCreativeDna[],
+): MiraV4CreativeDnaSource["inspiration"] {
+  if (references.length === 0) {
+    return { imageReference: null, userExplanation: null, influenceRule: "supporting_evidence_only" };
+  }
+  const primary = references.find(reference => reference.referencePurpose === "direction_to_explore")
+    ?? references.find(reference => reference.referencePurpose === "like")
+    ?? references[0];
+  const imageReference = primary.url && primary.url.length > 0 && primary.url.length <= 1024 ? primary.url : null;
+  const digest = references
+    .map((reference, index) => `[${index + 1}] ${reference.referencePurpose ?? "reference"}: ${reference.clientDescription ?? "no description shared"}`)
+    .join(" | ")
+    .trim();
+  return {
+    imageReference,
+    userExplanation: digest.length > 0 ? digest.slice(0, 500) : null,
+    influenceRule: "supporting_evidence_only",
+  };
+}
 
 function memoryValue(value: unknown) {
   if (!value || typeof value !== "object" || !("value" in value)) return null;
@@ -29,6 +66,7 @@ export function buildShootCreativeDnaSource(params: {
   photographer: typeof miraPhotographerProfiles.$inferSelect | null;
   memory: (typeof miraShootMemoryRevisions.$inferSelect)["snapshotJson"];
   summaryText: string;
+  visualReferences?: ShootVisualReferenceForCreativeDna[];
 }): MiraV4CreativeDnaSource {
   const { shoot, photographer, memory } = params;
   return {
@@ -66,11 +104,7 @@ export function buildShootCreativeDnaSource(params: {
       role: "user",
       content: params.summaryText,
     }],
-    inspiration: {
-      imageReference: null,
-      userExplanation: null,
-      influenceRule: "supporting_evidence_only",
-    },
+    inspiration: buildInspirationFromVisualReferences(params.visualReferences ?? []),
   };
 }
 
@@ -100,7 +134,8 @@ export async function generateShootCreativeDnaForConfirmedMemory(params: {
   if (!revision) throw new Error("Confirmed ShootMemory revision is unavailable");
   const profiles = await db.select().from(miraPhotographerProfiles)
     .where(eq(miraPhotographerProfiles.userId, params.photographerUserId)).limit(1);
-  const source = buildShootCreativeDnaSource({ shoot, photographer: profiles[0] ?? null, memory: revision.snapshotJson, summaryText: summary.summaryText });
+  const visualReferences = await listShootVisualReferencesForClient(params.shootId);
+  const source = buildShootCreativeDnaSource({ shoot, photographer: profiles[0] ?? null, memory: revision.snapshotJson, summaryText: summary.summaryText, visualReferences });
   const sourceFingerprint = fingerprintMiraV4CreativeDnaSource(source);
   const existing = await db.select().from(miraShootCreativeDna).where(and(
     eq(miraShootCreativeDna.shootId, params.shootId),
@@ -122,7 +157,14 @@ export async function generateShootCreativeDnaForConfirmedMemory(params: {
       .where(eq(miraShootCreativeDna.id, existing[0].id));
   }
   try {
-    const generated = await synthesizeMiraV4CreativeDna({ source });
+    // Demo fallback: when no paid OpenAI key is configured, synthesize a
+    // deterministic, schema-valid Creative DNA object locally instead of
+    // calling an external model. Everything downstream (the campaign
+    // compiler, the moodboard prompts, the gallery) runs for real off this
+    // object - only the paid text-synthesis boundary is swapped out.
+    const generated = ENV.embeddingApiKey
+      ? await synthesizeMiraV4CreativeDna({ source, inspirationImageUrl: source.inspiration.imageReference ?? undefined })
+      : { creativeDna: buildDemoMiraV4CreativeDna(source), model: DEMO_CREATIVE_DNA_MODEL };
     await db.update(miraShootCreativeDna).set({
       status: "complete",
       creativeDnaJson: generated.creativeDna,

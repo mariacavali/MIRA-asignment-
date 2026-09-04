@@ -28,6 +28,12 @@ export const referencePurposeSchema = z.enum([
 ]);
 export type ReferencePurpose = z.infer<typeof referencePurposeSchema>;
 
+// The downstream Creative DNA synthesis step is designed around exactly five
+// client references - distinct from and stricter than
+// MIRA_V3_MAX_IMAGE_COUNT, which bounds the shoot's combined photographer +
+// client total and is unrelated to this per-role limit.
+export const MIRA_CORE_MAX_CLIENT_VISUAL_REFERENCES = 5;
+
 export function evidenceKindForReferencePurpose(purpose: ReferencePurpose): "observed" | "explicit_preference" {
   switch (purpose) {
     case "like":
@@ -160,6 +166,12 @@ export async function uploadShootVisualReference(params: {
 }) {
   if (isLocalFileStoreEnabled()) {
     const parsed = shootVisualReferenceUploadSchema.parse(params.input);
+    if (params.uploaderRole === "client") {
+      const existingClientReferences = await listLocalReferences(params.shootId, "client");
+      if (existingClientReferences.length >= MIRA_CORE_MAX_CLIENT_VISUAL_REFERENCES) {
+        throw new Error(`A shoot can include up to ${MIRA_CORE_MAX_CLIENT_VISUAL_REFERENCES} client visual references`);
+      }
+    }
     const bytes = decodeAndValidateReferenceImage({ journeyId: params.shootId, ...parsed });
     const assetId = randomUUID();
     const reference = await createLocalReference({
@@ -183,6 +195,16 @@ export async function uploadShootVisualReference(params: {
     ne(miraShootVisualReferences.status, "removed"),
   ));
   if ((totals[0]?.total ?? 0) >= MIRA_V3_MAX_IMAGE_COUNT) throw new Error("A shoot can contain up to six visual references");
+  if (params.uploaderRole === "client") {
+    const clientTotals = await db.select({ total: count() }).from(miraShootVisualReferences).where(and(
+      eq(miraShootVisualReferences.shootId, params.shootId),
+      eq(miraShootVisualReferences.uploaderRole, "client"),
+      ne(miraShootVisualReferences.status, "removed"),
+    ));
+    if ((clientTotals[0]?.total ?? 0) >= MIRA_CORE_MAX_CLIENT_VISUAL_REFERENCES) {
+      throw new Error(`A shoot can include up to ${MIRA_CORE_MAX_CLIENT_VISUAL_REFERENCES} client visual references`);
+    }
+  }
   const bytes = decodeAndValidateReferenceImage({ journeyId: params.shootId, ...parsed });
   const assetId = randomUUID();
   const stored = await storagePut(buildShootReferenceStorageKey({
