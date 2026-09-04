@@ -6,6 +6,46 @@
 
 **Source evidence used for what exists today (not for pricing):** `docs/stripe-integration.md`, `docs/ENVIRONMENT_VARIABLES.md`, `server/_core/imageGeneration.ts`, `server/miraCore/moodboardAdapter.ts`, this project's Resend integration and visual-pipeline implementation work.
 
+## Illustrative worked example (explicit assumptions — not confirmed prices)
+
+The detailed line-item template below (Sections 1–9) intentionally leaves real prices as `[TBD]` because no real quote has been confirmed. This section instead gives one **fully worked, explicitly illustrative** example — every rate is labeled as an assumption, not a confirmed price, so the *shape* of the estimate (what drives cost, and how the pieces combine) is visible without presenting anything as real.
+
+### Assumptions table
+
+| Assumption | Value | Basis |
+|---|---|---|
+| Pilot scale | 50 shoots/month | Illustrative — sized for a small pilot across a handful of photographers, not a confirmed target |
+| Creative DNA calls per shoot | 1 | **Confirmed from code** — idempotent, one call per confirmed shoot (`server/miraCore/creativeDnaAdapter.ts`) |
+| Moodboard images per shoot | 5 | **Confirmed from code** — one coherent five-scene moodboard (`server/miraCore/moodboardAdapter.ts`) |
+| Emails per shoot | 1–4 | **Confirmed from code** — adaptive schedule, invitation plus up to 3 reminders (`shared/miraEmailSequence.ts`); this example assumes 3 as a mid-range estimate |
+| Illustrative text-generation cost | €0.02 / Creative DNA call | **ILLUSTRATIVE — not a confirmed OpenAI rate.** No real (non-demo) call has been run to measure an actual figure; this is a placeholder order-of-magnitude assumption only, for a short structured-JSON completion. |
+| Illustrative image-generation cost | €0.08 / image | **ILLUSTRATIVE — not a confirmed rate.** Same caveat as above; assumes a small/standard generation tier. |
+| Illustrative email cost | negligible (<€0.001/email at pilot volume) | Illustrative — most transactional-email providers' entry tiers cover this volume within a free/starter allowance |
+| Illustrative hosting + database | €50/month | Illustrative — small-instance placeholder, not a vendor quote |
+
+### Resulting illustrative monthly total (pilot scale, 50 shoots/month)
+
+| Line | Calculation | Illustrative monthly total |
+|---|---|---|
+| Text generation | 50 × 1 × €0.02 | €1.00 |
+| Image generation | 50 × 5 × €0.08 | €20.00 |
+| Email | 50 × 3 × ~€0 | ~€0 (within a starter tier) |
+| Hosting + database | flat | €50.00 |
+| **Illustrative total** | | **≈ €71/month at 50 shoots/month** |
+
+**This number must not be treated as a real budget figure or quoted to a stakeholder as a cost commitment.** It exists only to show the calculation shape (volume × per-shoot usage × unit rate + fixed hosting) so that once real rates are confirmed (Round 2 Phase 2, `capstone/round2/strategic-deployment-plan.md`), the same formula can be re-run with real numbers instead of illustrative ones.
+
+### Rough implementation timeline (unconfirmed estimate, not a committed schedule)
+
+| Phase | Rough estimate | Basis |
+|---|---|---|
+| Close known gaps (Calendar confirmation bug, data-retention extension, AI-content labeling) | 1–2 weeks | Illustrative — scoped, bounded engineering tasks with no external dependency |
+| First real (non-demo) generation run, synthetic data only | 2–3 days | Illustrative — mostly credential setup and one measured run using the already-built LangSmith sample (`capstone/langsmith/`) |
+| Controlled pilot setup (real Stripe price, real Resend domain, recruit photographers) | 2–4 weeks | Illustrative — dominated by external account approval and recruitment, not engineering |
+| Pilot run and evaluation | 4–8 weeks | Illustrative — enough real shoots to produce a meaningful readiness-rate/delivery-rate signal |
+
+**No calendar date is attached to any phase.** These are rough, unconfirmed duration estimates for planning purposes only — no start date, team availability, or external approval timeline has been confirmed. See `capstone/round2/cost-and-timeline.md` for the Round 2 phase-gated (dependency-ordered, not duration-estimated) version of this same plan.
+
 ## 1. Development
 
 | Item | Assumption | Value |

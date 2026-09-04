@@ -2,14 +2,18 @@
 
 ## Status
 
-**No live dashboard artifact exists in this repository. No live/production data exists to populate it.** This document is a **specification** for what the dashboard should measure and where each metric's data already lives in the implemented schema — it is not a built dashboard and contains no real numbers.
+**No PowerBI/.pbix workspace exists.** This coding environment has no PowerBI Desktop (a Windows/macOS desktop application, not something a CLI/server environment can run or produce a `.pbix` file from). In its place, a real, static HTML dashboard artifact now exists at [`dashboard.html`](dashboard.html) — the agreed alternative for this submission, built with the same 7 metrics a PowerBI report would show, in the same layout logic (metric, value, source), so the structure carries over directly if a real PowerBI report is built later. **No live/production data exists to populate it**, so every metric card in that artifact honestly reads "No production data yet" rather than an example or placeholder number. This document is the specification behind it: what each metric measures and where its data already lives in the implemented schema.
 
 | Item | Status |
 |---|---|
-| Dashboard artifact (UI, chart, exported report) | **PENDING — does not exist** |
+| Dashboard artifact (real, static HTML file with all 7 metric cards) | **Exists** — [`dashboard.html`](dashboard.html) |
 | Live/production data to populate metrics | **PENDING — no production deployment or live user base exists** |
 | Underlying data model to support these metrics | **Exists** — see per-metric source tables below |
 | Metric definitions and calculation logic | **Specified in this document** |
+
+## How to navigate
+
+Open [`dashboard.html`](dashboard.html) directly in any browser — it is fully static (no server, build step, or dependency required). Each of the 7 cards states the metric name, why it matters to a stakeholder, its current value ("No production data yet"), and the exact source table/column below. This document (`dashboard_documentation.md`) is the detailed reference each card's source note points back to: full calculation SQL, caveats, and the pending dependencies before real numbers can appear (see "Pending dependencies" below).
 
 **Source evidence used:** `drizzle/schema.ts` (`mira_shoots`, `mira_client_invitations`, `mira_email_outbox`, `mira_pending_checkouts`, `mira_stripe_billing_identities`, `mira_shoot_moodboard`, `mira_shoot_creative_dna`), `server/miraCore/db.ts`, `server/miraCore/router.ts`, `server/payment/`, `docs/stripe-integration.md`.
 
@@ -76,11 +80,11 @@ Each metric below states: what it measures, why it matters to a stakeholder (pho
 
 ## Honest alternative: no Power BI (PBIX) file exists
 
-There is no `.pbix` file, no Power BI workspace, and no other BI-tool artifact anywhere in this repository or supplied for this submission. Rather than imply one exists, this section states the honest interim alternative:
+There is no `.pbix` file and no Power BI workspace anywhere in this repository or supplied for this submission. In its place, [`dashboard.html`](dashboard.html) is the agreed alternative BI artifact:
 
-- **What exists today:** this specification document (the seven metric definitions, their exact source tables/columns, and their calculation logic above) and the underlying schema those calculations run against (`drizzle/schema.ts`), which is real, implemented, and already exercised by this project's own test suite.
-- **What does not exist:** any chart, workbook, connected data source, or rendered visualization. No dashboard screenshot accompanies this submission because none has been built.
-- **The honest static alternative, if one were needed for a live demo before a real dashboard is built:** a single read-only SQL view or scheduled export (e.g. a CSV or a static Markdown table) computed directly from the calculations in this document, refreshed manually or on a simple cron, and displayed as plain text/table — not a live BI tool. This would let a stakeholder see real numbers once real data exists, without committing to a dashboard build before the underlying pipeline (Section "Pending dependencies" above) is actually producing data worth visualizing. This alternative has not been built either; it is documented here only so the gap is explicit rather than silently absent.
+- **What exists today:** a real, static HTML dashboard (`dashboard.html`) rendering all seven metric cards — name, stakeholder rationale, exact source column, and an honest "No production data yet" value on every card — plus this specification document and the underlying schema those calculations run against (`drizzle/schema.ts`), real and already exercised by this project's own test suite.
+- **What does not exist:** any connected data source, live query, or real populated number. No screenshot image of the dashboard accompanies this submission — the HTML file itself is the artifact, directly viewable by opening it in any browser, which this project treats as more honest than a static image that could go stale or be mistaken for real data.
+- **Path to real data, when it exists:** the same read-only SQL calculations already specified below can populate this exact HTML artifact (or a scheduled CSV/Markdown export feeding it) once the "Pending dependencies" below are met — no rebuild of the dashboard's structure is needed, only wiring it to a real data source.
 
 ## What this document deliberately does not do
 

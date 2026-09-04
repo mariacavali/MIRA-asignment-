@@ -26,23 +26,41 @@ This recommendation is based on the implementation evidence gathered across this
 3. Does the voice conversation work reliably enough for a real client to complete Discovery unassisted?
 4. Does real Resend email delivery reach real inboxes reliably (not just queue/send successfully)?
 
+## What Round 2 will deepen, and the first MVP scope idea
+
+Round 2 does not change the industry or use case (decision remains **KEEP**, unchanged). It deepens exactly the gaps this Round 1 evidence already names as open, in this order:
+
+1. **Real (non-demo) generation quality and cost.** The visual pipeline (Creative DNA + five-scene moodboard) is now live-verified end-to-end in demo mode — five references in, five ordered moodboard scenes out, readiness correctly gated — but every asset shown so far is a local placeholder, not real AI output. The first concrete Round 2 step is running one real generation pass (real `OPENAI_API_KEY`, synthetic shoot data, no real client) to answer whether quality and per-shoot cost are good enough to show a paying client.
+2. **The two concrete blockers found during Round 1's own live-verification pass:** a Calendar-confirmation bug (reproducible "couldn't save your response" error) and unverified live voice conversation. Both are named, scoped engineering tasks, not open research questions.
+3. **Compliance groundwork.** A preliminary, non-legal EU AI Act classification and GDPR DPIA were produced during Round 2 preparation, surfacing real gaps (most personal-data categories have no retention/deletion policy yet, only realtime transcripts do) that should close before any real pilot, not after.
+
+**First MVP scope idea for Round 2:** a small (single-digit), consenting photographer pilot — real Stripe transaction at a real (non-€0.00) price, real invitations to real clients, voice conversation exercised live for the first time, and the seven already-specified dashboard metrics (`capstone/dashboard/dashboard_documentation.md`) instrumented against real pilot data for the first time. This is deliberately narrow: it is designed to produce the two data points this recommendation is currently missing — real willingness-to-pay signal, and real generation-quality judgment from an actual paying client's photographer — not to scale the product. Full detail: `capstone/round2/strategic-deployment-plan.md`.
+
 ---
 
 ## Teaching staff feedback
 
-**[PLACEHOLDER — not yet received. Do not fill in without a real, dated instructor comment.]**
+**Status: PENDING.** Not yet received as of this document. Recorded honestly rather than filled in with invented commentary — see `capstone/round2/README.md`'s status discipline, which governs this document equally.
+
+- `PENDING` — no dated instructor comment exists yet to summarize.
+- `PENDING`
+- `PENDING`
 
 | Date | Reviewer | Feedback | Response/action |
 |---|---|---|---|
-| `[TBD]` | `[TBD]` | `[PLACEHOLDER — no feedback received yet]` | `[TBD]` |
+| `PENDING` | `PENDING` | `PENDING — no feedback received yet` | `PENDING` |
 
 ## Class / peer feedback
 
-**[PLACEHOLDER — not yet received. Do not fill in without a real, dated peer comment.]**
+**Status: PENDING.** Not yet received as of this document.
+
+- `PENDING` — no dated peer comment exists yet to summarize.
+- `PENDING`
+- `PENDING`
 
 | Date | Reviewer | Feedback | Response/action |
 |---|---|---|---|
-| `[TBD]` | `[TBD]` | `[PLACEHOLDER — no feedback received yet]` | `[TBD]` |
+| `PENDING` | `PENDING` | `PENDING — no feedback received yet` | `PENDING` |
 
 ---
 

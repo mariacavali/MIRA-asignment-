@@ -27,14 +27,14 @@ These documents provide factual system information for an independent audit and 
 
 The product application uses React and Vite in `client/`, Express and tRPC in `server/`, shared TypeScript contracts in `shared/`, and Drizzle migrations for MySQL/TiDB in `drizzle/`. Model, image, storage, authentication, and optional provider integrations are server-side boundaries.
 
-n8n is an optional automation boundary, not the application source of truth. The importable synthetic photographer/model-client lifecycle POC is documented in [`capstone/round2/n8n/`](capstone/round2/n8n/); it does not authenticate users, store payment instruments, send email, or replace MIRA persistence.
+n8n is an optional automation boundary, not the application source of truth. Two real, importable, inactive-by-default n8n workflow exports exist at [`workflows/`](workflows/) for MIRA's client email-milestone scheduling — documented in [`capstone/automation/n8n_automation_poc.md`](capstone/automation/n8n_automation_poc.md) and [`docs/n8n-email-sequence-setup.md`](docs/n8n-email-sequence-setup.md); neither authenticates users, stores payment instruments, sends email itself, or replaces MIRA persistence.
 
 ## Run locally
 
-Requirements: Node.js and pnpm.
+Requirements: Node.js and pnpm. **This is a TypeScript/Node.js project, not Python — there is no `requirements.txt`; [`package.json`](package.json) (locked by [`pnpm-lock.yaml`](pnpm-lock.yaml)) is the equivalent dependency manifest.**
 
 1. Install dependencies with `pnpm install`.
-2. Create a local `.env` using the blank variable template in [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md). Never commit local credentials.
+2. Create a local `.env` using the blank variable template in [`.env.example`](.env.example) (or the fuller reference at [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md)). Every line in `.env.example` is a bare variable name or a non-secret default — never a real value. Never commit local credentials.
 3. Configure the required database and platform services for your environment.
 4. Apply database migrations with `pnpm db:push`.
 5. Start development with `pnpm dev`.
@@ -102,13 +102,14 @@ The Round 1 business/research submission documents live in [`capstone/`](capston
 
 - [Round 1 submission checklist](capstone/ROUND1_SUBMISSION_CHECKLIST.md) — status of every requirement (complete/partial/pending)
 - [Sector research](capstone/research/sector_research.md) (with the supplied research pack, [`Ironhack_Capstone_Recommendation_MIRA_Shoot_Compass.docx`](capstone/research/Ironhack_Capstone_Recommendation_MIRA_Shoot_Compass.docx)), [opportunities & risks](capstone/research/opportunities_risks.md), [use cases](capstone/research/use_cases.md)
-- [Dashboard metrics specification](capstone/dashboard/dashboard_documentation.md) — spec only, including an honest note that no Power BI/PBIX file or dashboard artifact exists yet
-- [Automation POC](capstone/automation/automation_poc.md) — Stripe → activation → shoot → invitation → Resend → Shoot Room → preparation → readiness, with an honest per-stage verification status
-- [LangSmith monitoring](capstone/monitoring/langsmith_monitoring.md) — existing Ironhack evaluation evidence, clearly labeled as a separate course experiment, plus the (not-yet-built) plan for a MIRA-specific trace
-- [Cost & timeline template](capstone/planning/cost_timeline.md) — assumptions-based; all real figures are placeholders pending approval
-- [Round 1 decision](capstone/feedback/round1_decision.md) — current recommendation: **KEEP**
+- [Dashboard metrics specification](capstone/dashboard/dashboard_documentation.md) — includes a real, static dashboard artifact, [`dashboard.html`](capstone/dashboard/dashboard.html) (the agreed alternative to a PowerBI/.pbix file), with all 7 stakeholder metrics shown in an honest "no production data yet" state — no fabricated numbers
+- [Automation POC](capstone/automation/automation_poc.md) — Stripe → activation → shoot → invitation → Resend → Shoot Room → preparation → readiness, with an honest per-stage verification status; the real, importable n8n workflow exports are documented separately in [`capstone/automation/n8n_automation_poc.md`](capstone/automation/n8n_automation_poc.md)
+- [LangSmith monitoring](capstone/monitoring/langsmith_monitoring.md) — existing Ironhack evaluation evidence, clearly labeled as a separate course experiment, plus a now-built (not yet run for real) [MIRA-specific monitoring sample](capstone/langsmith/README.md)
+- [Cost & timeline](capstone/planning/cost_timeline.md) — an explicitly-labeled illustrative worked example (assumptions table, resulting estimate, rough timeline) alongside the detailed placeholder-based template; no figure is presented as a confirmed real price
+- [Round 1 decision](capstone/feedback/round1_decision.md) — current recommendation: **KEEP**, including what Round 2 deepens and the first MVP scope idea
 - [Presentation](capstone/presentation/README.md) — includes the supplied deck, [`MIRA_Ironhack_Presentation_Validated_Stages.pptx`](capstone/presentation/MIRA_Ironhack_Presentation_Validated_Stages.pptx)
 - [Staged validation evidence](capstone/evidence/staged_validation_evidence.md) — per-stage git branch/commit references and test results
+- [Round 1 verification (latest checkpoint)](docs/ROUND1_VERIFICATION.md) — the most recent live-verification pass, superseding older per-stage status language below where they differ
 
 These documents make no claims about deployment status, customer adoption, or willingness to pay beyond what is explicitly verified elsewhere in this repository; unverified items are marked as such throughout.
 
@@ -116,12 +117,17 @@ These documents make no claims about deployment status, customer adoption, or wi
 
 | Layer | Branch | Commit | Status |
 |---|---|---|---|
-| Stripe payments | `fix/mira-final-ux-runtime` | `e2e99e1f47c5d749d6ca91281e24c00a51f10931` | Live-verified |
-| Resend email delivery | `fix/mira-stable-resend-email` | `8d6d2f8f755b1efbb1265a59500dea995a44c8d2` | Live-verified — preview `https://pc-6fh5ovldu7pa.manus.host` |
-| Visual preparation pipeline | `codex/mira-visual-stage3` | `90baaff9b9930bc82f0e6e93129d97ee350ce641` | Code-verified; live deployment pending |
-| Combined Resend + visual checkpoint | `fix/mira-resend-visual-integration` | `b1e44b8bca5dd195f632356a49bdad92fd099abc` | Code-verified combination only — does not itself add live verification to the visual pipeline |
+| Stripe payments | `fix/mira-final-ux-runtime` | `e2e99e1f47c5d749d6ca91281e24c00a51f10931` | Previously live-verified |
+| Resend email delivery | `fix/mira-stable-resend-email` | `8d6d2f8f755b1efbb1265a59500dea995a44c8d2` | Previously live-verified — preview `https://pc-6fh5ovldu7pa.manus.host` |
+| Visual preparation pipeline | `codex/mira-visual-stage3` | `90baaff9b9930bc82f0e6e93129d97ee350ce641` | Code-verified; superseded by the row below |
+| Combined Resend + visual checkpoint | `fix/mira-resend-visual-integration` | `b1e44b8bca5dd195f632356a49bdad92fd099abc` | Code-verified combination only |
+| **Isolated-preview deployment (latest)** | `fix/mira-resend-visual-integration` | `6cf6b97c6dee65adc048d306b1131e691250f10a` | **Live-verified** — live Shoot Room, five demo references, Creative DNA/preparation, five demo moodboard scenes, and Ready to Shoot all confirmed live; Calendar confirmation currently blocked; voice remains pending. See `docs/ROUND1_VERIFICATION.md`. |
 
-Full detail, including exact test counts and what remains pending for each row, is in [`capstone/evidence/staged_validation_evidence.md`](capstone/evidence/staged_validation_evidence.md).
+Full detail, including exact test counts and what remains pending for each row, is in [`capstone/evidence/staged_validation_evidence.md`](capstone/evidence/staged_validation_evidence.md) and [`docs/ROUND1_VERIFICATION.md`](docs/ROUND1_VERIFICATION.md).
+
+## Capstone Round 2 — Consulting Package
+
+The Round 2 consulting package lives in [`capstone/round2/`](capstone/round2/), built around the existing MVP above without rebuilding or redesigning it. Start with [`capstone/round2/README.md`](capstone/round2/README.md), which indexes: use-case definition, early-PoC documentation, current MVP verification status, a no-invented-numbers ROI/risk assessment, a preliminary EU AI Act classification, a preliminary GDPR DPIA, a four-phase evidence-gated deployment plan, an evaluation/monitoring rollup, a cost/timeline update, and a presentation outline.
 
 ## Security
 

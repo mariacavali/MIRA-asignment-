@@ -46,6 +46,23 @@ Consistent with the Round 1 decision (`capstone/feedback/round1_decision.md`, **
 
 A go/no-go/adjust decision, made from Phase 3's real data, not from this plan's assumptions. Out of scope for this document to pre-decide.
 
+## Go-to-market and commercialisation
+
+**This section is explicitly speculative** — it describes the intended commercial motion, not a validated plan, and depends entirely on Phase 3's pilot results before any of it is committed to.
+
+- **Segment sequencing:** solo photographers first (`capstone/research/use_cases.md`, Use case 1) — the shortest sales cycle (one decision-maker, immediate personal time-cost pain) and the cheapest to pilot. Small studios and higher-volume businesses (Use cases 2–3) follow only once the solo-photographer motion is validated, since they involve more stakeholders per sale and a stronger case for the dashboard/volume metrics that only matter at their scale.
+- **Channel:** direct outreach to photographers already using a remote-capture platform (Clos/Shutter-class — `capstone/research/sector_research.md` §1a) is the most plausible first channel, since that audience has already self-selected into remote-shoot workflows; no channel has been tested.
+- **Pricing model:** the current implementation is a one-time purchase (`docs/stripe-integration.md`); the illustrative ROI projection above assumes a monthly-subscription reframe purely to make a 12/36-month calculation legible — **which pricing model is actually right (one-time, subscription, per-shoot, or usage-based) is itself an open question the Phase 3 pilot should test**, not a decision this plan makes in advance.
+- **Commercialisation gate:** no marketing spend, sales hire, or paid acquisition channel should be committed before Phase 3 produces a real conversion signal — this plan deliberately sequences "does anyone pay" before "how do we get more people to pay."
+
+### KPIs
+
+Reuses the metrics already specified rather than inventing new ones — no metric here has a real value yet:
+
+- The seven stakeholder metrics fully specified in `capstone/dashboard/dashboard_documentation.md` (shoots created, invitations sent, invitation delivery rate, preparation completion rate, readiness rate, average preparation time, payment-to-active-account success rate) — these are the operational KPIs this plan tracks from Phase 3 onward.
+- The go-to-market-specific KPI this plan adds: **pilot-to-paid conversion rate** (of recruited pilot photographers, how many convert to a real, paid transaction) — the direct measure of the "will photographers pay" open question (`capstone/feedback/round1_decision.md`).
+- **Photographer acceptance of the generated Creative DNA/moodboard without regeneration** (`capstone/round2/use-case-definition.md`, "Measurable success criteria") — the quality-side KPI, measurable only once Phase 2's real generation run exists.
+
 ## What this plan deliberately does not do
 
 - It does not commit to dates (`capstone/round2/cost-and-timeline.md` explains why).

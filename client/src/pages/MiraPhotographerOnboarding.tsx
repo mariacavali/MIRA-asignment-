@@ -79,7 +79,7 @@ export function PhotographerShell({ children }: { children: React.ReactNode }) {
       <button onClick={() => window.location.assign("/mira")} className="mira-dark-display text-2xl">MIRA</button>
       <span className="text-right text-[10px] uppercase tracking-[0.24em] text-[#b7a98f]">Shoot preparation</span>
     </header>
-    <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl items-center justify-center py-12">{children}</div>
+    <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-6xl flex-col items-center justify-start py-12">{children}</div>
   </main>;
 }
 
