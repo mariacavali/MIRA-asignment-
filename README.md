@@ -76,6 +76,21 @@ Useful evidence includes the [V3 screenshot/PDF journey](evidence/journey-30001/
 
 The verified environment was private staging, not a public deployment. Provider credentials and service availability are required for live model, image, storage, OAuth, and optional birth-context integrations. Known boundaries—including disabled optional modules, the placeholder welcome video, and external image-provider availability—are documented in the status and handoff files.
 
+## Capstone Round 1 — Ironhack Submission
+
+The Round 1 business/research submission documents live in [`capstone/`](capstone/) and are separate from the application code above — they do not affect and are not affected by anything else in this README. Start with the checklist:
+
+- [Round 1 submission checklist](capstone/ROUND1_SUBMISSION_CHECKLIST.md) — status of every requirement (complete/partial/pending)
+- [Sector research](capstone/research/sector_research.md), [opportunities & risks](capstone/research/opportunities_risks.md), [use cases](capstone/research/use_cases.md)
+- [Dashboard metrics specification](capstone/dashboard/dashboard_documentation.md) — spec only; no dashboard artifact or live data exists yet
+- [Automation POC](capstone/automation/automation_poc.md) — Stripe → activation → shoot → invitation → Resend → Shoot Room → preparation → readiness, with an honest per-stage verification status
+- [LangSmith monitoring](capstone/monitoring/langsmith_monitoring.md) — existing Ironhack evaluation evidence, plus the (not-yet-built) plan for a MIRA-specific trace
+- [Cost & timeline template](capstone/planning/cost_timeline.md) — assumptions-based; all real figures are placeholders pending approval
+- [Round 1 decision](capstone/feedback/round1_decision.md) — current recommendation: **KEEP**
+- [Presentation outline](capstone/presentation/README.md)
+
+These documents make no claims about deployment status, customer adoption, or willingness to pay beyond what is explicitly verified elsewhere in this repository; unverified items are marked as such throughout.
+
 ## Security
 
 Local `.env` files, credentials, dependencies, build output, logs, and private platform metadata are intentionally excluded from version control.
