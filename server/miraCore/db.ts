@@ -393,6 +393,16 @@ export async function createClientInvitation(params: {
   return { invitationId, token, expiresAt: params.expiresAt };
 }
 
+// MariaDB/Drizzle can map a nullable timestamp column to a JS Date object
+// whose internal time value is NaN ("Invalid Date") instead of null. That
+// value is not nullish, so `?? new Date()` alone does not catch it, and
+// serializing an Invalid Date back to the database throws
+// "Invalid time value". Used only to decide whether an existing
+// lastOpenedAt is safe to reuse - never to hide other database errors.
+function isValidDate(value: unknown): value is Date {
+  return value instanceof Date && Number.isFinite(value.getTime());
+}
+
 export async function getClientInvitation(token: string, markOpened = false) {
   if (isLocalFileStoreEnabled()) {
     const state = await getLocalInvitation(token, markOpened);
@@ -437,7 +447,7 @@ export async function getClientInvitation(token: string, markOpened = false) {
   if (!row) return null;
   finalizeInvitationRoomRow(row);
   if (markOpened && row.invitation.status === "active") {
-    const openedAt = row.invitation.lastOpenedAt ?? new Date();
+    const openedAt = isValidDate(row.invitation.lastOpenedAt) ? row.invitation.lastOpenedAt : new Date();
     await db.update(miraClientInvitations).set({
       lastOpenedAt: openedAt,
       ...(row.invitation.deliveryStatus === "created" || row.invitation.deliveryStatus === "sent"
