@@ -28,6 +28,10 @@ export const ENV = {
   devLocalAuthBypass: process.env.DEV_LOCAL_AUTH_BYPASS === "true",
   devLocalOpenId: process.env.DEV_LOCAL_OPEN_ID ?? "local-dev-mira-user",
   miraLocalFileStore: process.env.MIRA_LOCAL_FILE_STORE === "true",
+  // Local-only continuous recording demo mode. Explicit opt-in, off by
+  // default; never activates implicitly in production. See
+  // docs/MIRA_RECORDING_DEMO.md.
+  recordingDemoEnabled: process.env.MIRA_RECORDING_DEMO === "true",
   paymentMode: (process.env.MIRA_PAYMENT_MODE ?? (process.env.NODE_ENV === "production" ? "stripe" : "local")) as "local" | "stripe",
   stripePaymentLinkUrl: process.env.STRIPE_PAYMENT_LINK_URL ?? "",
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",

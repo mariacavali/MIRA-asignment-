@@ -11,6 +11,8 @@ import { PhotographerShell } from "./MiraPhotographerOnboarding";
 
 export default function MiraShoot() {
   const { user, loading } = useAuth({ redirectOnUnauthenticated: true });
+  const recordingDemo = trpc.recordingDemo.status.useQuery(undefined, { retry: false });
+  const isRecordingDemo = recordingDemo.data?.enabled === true;
   const params = useParams<{ shootId: string }>();
   const shootId = Number(params.shootId);
   const [, navigate] = useLocation();
@@ -105,20 +107,26 @@ export default function MiraShoot() {
           <ContactField label="Invitation message"><Textarea maxLength={800} value={contact.invitationMessage} onChange={event => setContact({ ...contact, invitationMessage: event.target.value })} /></ContactField>
           <Button type="submit" variant="outline" disabled={updateContact.isPending} className="w-full border-white/15 bg-transparent text-[#ded5c5]">Save client details</Button>
         </form>
-        <Button variant="ghost" disabled={invitation.isPending || updateContact.isPending} onClick={async () => { await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null }); invitation.mutate({ shootId, expiresInDays: 7 }); }} className="mt-2 w-full text-[#d2b98b]"><Link2 className="mr-2 size-4" /> Create or regenerate private link</Button>
-        <Button
-          variant="outline"
-          disabled={sendInvitation.isPending || updateContact.isPending || !contact.clientEmail.trim()}
-          onClick={async () => {
-            await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null });
-            sendInvitation.mutate({ shootId, expiresInDays: 7, force: invitationAlreadySent });
-          }}
-          className="mt-2 w-full border-[#d2b98b]/40 bg-transparent text-[#d2b98b]"
-        >
-          {sendInvitation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : invitationAlreadySent ? <RefreshCw className="mr-2 size-4" /> : <Send className="mr-2 size-4" />}
-          {invitationAlreadySent ? "Resend invitation" : "Send invitation"}
-        </Button>
-        {!contact.clientEmail.trim() ? <p className="mt-2 text-xs text-[#9e978b]">Add a client email to send the invitation by email.</p> : null}
+        <Button variant="ghost" disabled={invitation.isPending || updateContact.isPending} onClick={async () => { await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null }); invitation.mutate({ shootId, expiresInDays: 7 }); }} className="mt-2 w-full text-[#d2b98b]"><Link2 className="mr-2 size-4" /> Create private client link</Button>
+        {isRecordingDemo ? (
+          <p className="mt-2 text-xs leading-5 text-[#9e978b]">Recording demo mode does not call Resend. Resend delivery was verified separately; local recording mode uses a direct link.</p>
+        ) : (
+          <>
+            <Button
+              variant="outline"
+              disabled={sendInvitation.isPending || updateContact.isPending || !contact.clientEmail.trim()}
+              onClick={async () => {
+                await updateContact.mutateAsync({ shootId, clientName: contact.clientName.trim() || null, clientEmail: contact.clientEmail.trim() || null, clientPhone: contact.clientPhone.trim() || null, invitationMessage: contact.invitationMessage.trim() || null });
+                sendInvitation.mutate({ shootId, expiresInDays: 7, force: invitationAlreadySent });
+              }}
+              className="mt-2 w-full border-[#d2b98b]/40 bg-transparent text-[#d2b98b]"
+            >
+              {sendInvitation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : invitationAlreadySent ? <RefreshCw className="mr-2 size-4" /> : <Send className="mr-2 size-4" />}
+              {invitationAlreadySent ? "Resend invitation" : "Send invitation"}
+            </Button>
+            {!contact.clientEmail.trim() ? <p className="mt-2 text-xs text-[#9e978b]">Add a client email to send the invitation by email.</p> : null}
+          </>
+        )}
           <section className="mt-6 border-t border-white/10 pt-5">
             <p className="mira-dark-kicker">Client communications</p>
             <h2 className="mira-dark-display mt-3 text-3xl">Preparation email sequence</h2>
@@ -126,7 +134,7 @@ export default function MiraShoot() {
             <EmailSequencePreview scheduledAt={shoot.scheduledAt} timezone={shoot.timezone} clientEmail={shoot.clientEmail} />
           </section>
         {deliveryMessage ? <p className="mt-3 text-xs leading-5 text-[#bdb6a9]">{deliveryMessage}</p> : null}
-        {link ? <div className="mt-4 border border-[#d2b98b]/30 bg-black/20 p-4"><p className="text-sm text-[#ded5c5]">Invitation ready for {shoot.clientName || "your client"}.</p><div className="mt-3 grid gap-2 sm:grid-cols-2"><Button variant="ghost" onClick={() => window.location.assign(link)} className="justify-start text-[#d2b98b]"><Link2 className="mr-2 size-3.5" /> Open client view</Button><Button variant="ghost" onClick={() => { void navigator.clipboard.writeText(link); setDeliveryMessage("Invitation link copied."); }} className="justify-start text-[#d2b98b]"><Copy className="mr-2 size-3.5" /> Copy invitation link</Button></div></div> : null}
+        {link ? <div className="mt-4 border border-[#d2b98b]/30 bg-black/20 p-4"><p className="text-sm text-[#ded5c5]">{isRecordingDemo ? "Demo invitation ready — no email was sent." : `Invitation ready for ${shoot.clientName || "your client"}.`}</p><div className="mt-3 grid gap-2 sm:grid-cols-2"><Button variant="ghost" onClick={() => window.location.assign(link)} className="justify-start text-[#d2b98b]"><Link2 className="mr-2 size-3.5" /> {isRecordingDemo ? "Open client Shoot Room" : "Open client view"}</Button><Button variant="ghost" onClick={() => { void navigator.clipboard.writeText(link); setDeliveryMessage("Invitation link copied."); }} className="justify-start text-[#d2b98b]"><Copy className="mr-2 size-3.5" /> Copy link</Button></div></div> : null}
         <div className="mt-4 space-y-2">{invitations.map(item => <div key={item.id} className="flex items-center justify-between border-t border-white/10 pt-2 text-xs"><span className="uppercase tracking-[0.14em] text-[#9e978b]">{item.deliveryStatus.replaceAll("_", " ")}</span>{item.consentAcknowledgedAt ? <span className="flex items-center gap-1 text-[#d2b98b]"><Check className="size-3" /> Consent acknowledged</span> : null}</div>)}</div>
       </aside>
     </div>

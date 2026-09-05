@@ -1,6 +1,20 @@
 import { ArrowRight, Check, LockKeyhole } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { useLocation } from "wouter";
 
 export default function MiraLanding() {
+  const [, navigate] = useLocation();
+  const recordingDemo = trpc.recordingDemo.status.useQuery(undefined, { retry: false });
+  const isRecordingDemo = recordingDemo.data?.enabled === true;
+  // Recording demo mode skips real signup and goes straight to the demo
+  // checkout screen. href stays the real /mira/signup target (so normal
+  // behavior and existing link-shape checks are unaffected); only the click
+  // is intercepted, and only once recording demo mode is confirmed enabled.
+  const interceptForDemo = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isRecordingDemo) return;
+    event.preventDefault();
+    navigate("/mira/checkout");
+  };
   return (
     <main className="mira-dark-surface min-h-screen px-5 py-8 text-[#f1eadc] sm:px-10 sm:py-12">
       <div className="mx-auto max-w-4xl">
@@ -21,7 +35,7 @@ export default function MiraLanding() {
           <p className="text-base leading-7 text-[#c9c3b7] max-w-2xl mb-10">
             MIRA prepares your client for the remote shoot, so you can arrive with shared direction, fewer loose ends and more space for the photographs that matter.
           </p>
-          <a href="/mira/signup" className="inline-flex h-11 items-center rounded-full bg-[#d2b98b] px-8 text-sm font-medium text-[#171613] hover:bg-[#e0c99e]">
+          <a href="/mira/signup" onClick={interceptForDemo} className="inline-flex h-11 items-center rounded-full bg-[#d2b98b] px-8 text-sm font-medium text-[#171613] hover:bg-[#e0c99e]">
             Prepare your next shoot <ArrowRight className="ml-2 size-4" />
           </a>
         </section>
@@ -117,8 +131,8 @@ export default function MiraLanding() {
             <div className="flex flex-col justify-center border-t border-white/10 pt-10 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
               <p className="text-4xl font-semibold tracking-[-0.03em] text-[#d2b98b] sm:text-5xl">€33.33<span className="text-lg font-normal tracking-normal text-[#b7a98f]"> one-time</span></p>
               <p className="mt-3 text-sm text-[#b7a98f]">One payment. No recurring charges.</p>
-              <a href="/mira/signup" className="mt-9 inline-flex h-13 w-full items-center justify-center rounded-full bg-[#d2b98b] px-8 text-sm font-semibold tracking-[0.08em] text-[#171613] transition-colors hover:bg-[#e0c99e]">
-                BUY MIRA <ArrowRight className="ml-2 size-4" />
+              <a href="/mira/signup" onClick={interceptForDemo} className="mt-9 inline-flex h-13 w-full items-center justify-center rounded-full bg-[#d2b98b] px-8 text-sm font-semibold tracking-[0.08em] text-[#171613] transition-colors hover:bg-[#e0c99e]">
+                {isRecordingDemo ? "Activate demo workspace" : "BUY MIRA"} <ArrowRight className="ml-2 size-4" />
               </a>
               <p className="mt-4 flex items-center justify-center gap-2 text-xs text-[#9e978b]">
                 <LockKeyhole className="size-3.5" /> Secure checkout powered by Stripe

@@ -24,6 +24,7 @@ import MiraPhotographerHome from "./pages/MiraPhotographerHome";
 import MiraPhotographerSignup from "./pages/MiraPhotographerSignup";
 import MiraPhotographerLogin from "./pages/MiraPhotographerLogin";
 import MiraPaymentSuccess from "./pages/MiraPaymentSuccess";
+import { RecordingDemoBanner } from "./components/mira/RecordingDemoBanner";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -74,6 +75,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <RecordingDemoBanner />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

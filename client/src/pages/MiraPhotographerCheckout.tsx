@@ -7,18 +7,52 @@ import { useLocation } from "wouter";
 
 export default function MiraPhotographerCheckout() {
   const [, navigate] = useLocation();
-  const { user, loading, error: authError } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/mira/signup" });
+  const recordingDemo = trpc.recordingDemo.status.useQuery(undefined, { retry: false });
+  const isRecordingDemo = recordingDemo.data?.enabled === true;
+  const { user, loading, error: authError } = useAuth({ redirectOnUnauthenticated: !isRecordingDemo, redirectPath: "/mira/signup" });
   const [error, setError] = useState<string | null>(null);
   const purchase = trpc.miraCore.completeLocalPurchase.useMutation({ onSuccess: result => { if (result.mode === "stripe") window.location.assign(result.redirectUrl); else navigate("/mira/payment-success"); } });
+  const activateDemo = trpc.recordingDemo.activate.useMutation({ onSuccess: () => navigate("/mira/dashboard") });
   const cancelled = new URLSearchParams(window.location.search).get("cancelled") === "true";
   const purchaseEmail = window.sessionStorage.getItem("mira_purchase_email") ?? undefined;
- 
+
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!user) { setError("Create or sign in to your photographer account first."); return; }
     setError(null);
     purchase.mutate({ email: purchaseEmail });
   };
+
+  // Recording demo mode: no Stripe, no real account required beforehand -
+  // "Activate demo photographer workspace" both seeds and logs in the
+  // fixture account (server/miraCore/recordingDemoRouter.ts, activate).
+  if (isRecordingDemo) {
+    return <Frame>
+      <section className="mira-dark-panel p-8 sm:p-10">
+        <p className="mira-dark-kicker">MIRA for photographers</p>
+        <h1 className="mira-dark-display mt-6 text-5xl">Prepare every client before the shoot begins.</h1>
+        <p className="mt-6 text-base leading-7 text-[#c9c3b7]">Create private preparation rooms, collect creative direction and references, and arrive at every shoot with greater clarity.</p>
+        <div className="mt-10 border-t border-white/10 pt-8">
+          <p className="text-4xl font-semibold tracking-[-0.03em] text-[#d2b98b]">€33.33<span className="text-base font-normal tracking-normal text-[#b7a98f]"> one-time</span></p>
+        </div>
+      </section>
+      <section className="mira-dark-panel p-8 sm:p-10">
+        <p className="mira-dark-kicker">Demo checkout — no payment will be processed.</p>
+        <h2 className="mira-dark-display mt-6 text-5xl">Activate your demo workspace.</h2>
+        <p className="mt-6 text-base leading-7 text-[#c9c3b7]">This seeds one fictional photographer account and one fictional shoot in local storage. No Stripe, no charge, no external call.</p>
+        <Button
+          type="button"
+          disabled={activateDemo.isPending}
+          onClick={() => activateDemo.mutate()}
+          className="mt-8 h-12 w-full rounded-full bg-[#d2b98b] text-[#171613] text-base font-medium hover:bg-[#e0c99e]"
+        >
+          {activateDemo.isPending ? <Loader2 className="mr-2 size-5 animate-spin" /> : null} Activate demo photographer workspace
+        </Button>
+        {activateDemo.error ? <p role="alert" className="mt-4 text-base text-red-200">{activateDemo.error.message}</p> : null}
+      </section>
+    </Frame>;
+  }
+
   if (loading) return <Frame><section className="mira-dark-panel p-10" role="status"><Loader2 className="size-6 animate-spin text-[#d2b98b]" /><p className="mt-5 text-sm text-[#c9c3b7]">Confirming your photographer account…</p></section></Frame>;
   if (!user) return <Frame><section className="mira-dark-panel p-10"><p className="text-sm text-[#c9c3b7]">Redirecting to photographer signup…</p>{authError ? <p role="alert" className="mt-4 text-sm text-red-200">Your account session could not be confirmed.</p> : null}</section></Frame>;
   return <Frame>

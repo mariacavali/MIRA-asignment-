@@ -1257,6 +1257,26 @@ export async function getShootRoomStatusForClient(shootId: number) {
     const state = await (await import("../localFileStore")).getLocalState();
     const shoot = state.shoots.find(item => item.id === shootId);
     const invitation = await getLocalInvitationForShoot(shootId);
+    // MIRA_RECORDING_DEMO only: the seeded fixture shoot (localFileStore
+    // LocalShoot.recordingDemo === true) is the *only* local-file-store shoot
+    // that ever takes this branch - every other local/dev shoot keeps the
+    // existing stubbed-out behavior above (moodboardReady: false) unchanged.
+    // Once the scripted conversation completes (roomState "preparation_active",
+    // set by completeRecordingDemoConversation), this returns deterministic,
+    // offline, clearly-labeled demo Creative DNA and a 5-scene demo moodboard.
+    if (shoot?.recordingDemo && (await import("./recordingDemo")).isRecordingDemoEnabled() && shoot.roomState === "preparation_active") {
+      const { buildRecordingDemoMoodboard, buildRecordingDemoPreparationBrief } = await import("./recordingDemoAssets");
+      const scheduledAt = shoot.scheduledAt ? new Date(shoot.scheduledAt) : null;
+      return {
+        roomState: shoot.roomState, creativeDirectionConfirmed: true, preparationReady: true,
+        readyToShoot: shoot.status === "ready_to_shoot", moodboardReady: true, moodboardStillWorking: false,
+        moodboardNeedsRetry: false, images: buildRecordingDemoMoodboard(shoot.id),
+        preparationBrief: buildRecordingDemoPreparationBrief({ location: shoot.location, scheduledAt, timezone: shoot.timezone }),
+        scheduledAt: shoot.scheduledAt, timezone: shoot.timezone,
+        durationMinutes: shoot.durationMinutes, location: shoot.location,
+        scheduleResponse: invitation?.scheduleResponse ?? null,
+      };
+    }
     return {
       roomState: shoot?.roomState ?? "welcome", creativeDirectionConfirmed: false, preparationReady: false,
       readyToShoot: shoot?.status === "ready_to_shoot", moodboardReady: false, moodboardStillWorking: false,

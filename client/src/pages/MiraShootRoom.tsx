@@ -10,6 +10,7 @@ import { ReadyToShootSection } from "@/components/mira/ReadyToShootSection";
 import { deriveClientFacingShootTitle } from "@/components/mira/shootPresentation";
 import { VisualReferenceUpload } from "@/components/mira/VisualReferenceUpload";
 import { ClientShootRoomWelcome } from "@/components/mira/ClientShootRoomWelcome";
+import { RecordingDemoConversation } from "@/components/mira/RecordingDemoConversation";
 
 // The persistent /prepare/:token Shoot Room. Composes independent modules
 // (shoot details, visual references, creative vision, preparation) in a clear
@@ -24,6 +25,8 @@ export default function MiraShootRoom() {
   const { token, signedAccessToken } = useParams<{ token?: string; signedAccessToken?: string }>();
   const credential = token ?? signedAccessToken ?? "";
   const invitation = trpc.miraCore.openInvitation.useQuery({ token: credential }, { retry: false });
+  const recordingDemo = trpc.recordingDemo.status.useQuery(undefined, { retry: false });
+  const isRecordingDemo = recordingDemo.data?.enabled === true;
   const [accepted, setAccepted] = useState(false);
   const [consent, setConsent] = useState(false);
   const [callError, setCallError] = useState<string | null>(null);
@@ -100,6 +103,7 @@ export default function MiraShootRoom() {
           isLoading={isConnecting}
           error={callError}
         />
+        {isRecordingDemo ? <RecordingDemoConversation token={credential} consent={consent} onComplete={() => {}} /> : null}
       </section>
 
       {/* Section 1: Your Shoot Details */}
@@ -122,6 +126,11 @@ export default function MiraShootRoom() {
       <section className="mira-dark-panel mb-20 lg:mb-32">
         <p className="mira-dark-kicker">Moodboard</p>
         <p className="mt-2 text-sm text-[#b7a98f]">Your creative direction.</p>
+        {isRecordingDemo ? (
+          <p className="mt-3 text-xs uppercase tracking-[0.12em] text-[#d2b98b]">
+            Demo-local visual assets — real AI image generation not invoked.
+          </p>
+        ) : null}
         <div className="mt-6">
           <MoodboardGallery token={credential} />
         </div>

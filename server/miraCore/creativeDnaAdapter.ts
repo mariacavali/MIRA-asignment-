@@ -222,7 +222,22 @@ export async function generateShootCreativeDnaForConfirmedMemory(params: {
 }
 
 export async function getShootCreativeDnaForOwner(photographerUserId: number, shootId: number) {
-  if (isLocalFileStoreEnabled()) return [];
+  if (isLocalFileStoreEnabled()) {
+    const { findRecordingDemoShoot } = await import("../localFileStore");
+    const { isRecordingDemoEnabled } = await import("./recordingDemo");
+    const shoot = await findRecordingDemoShoot();
+    if (shoot && shoot.id === shootId && shoot.photographerUserId === photographerUserId && isRecordingDemoEnabled() && shoot.roomState === "preparation_active") {
+      const { buildRecordingDemoCreativeDna } = await import("./recordingDemoAssets");
+      return [{
+        id: 0, shootId, photographerUserId, confirmedMemoryVersion: 1,
+        schemaVersion: "1.0", promptVersion: "demo", sourceFingerprint: "demo",
+        status: "complete" as const, model: "demo-local",
+        creativeDnaJson: buildRecordingDemoCreativeDna(), errorCode: null,
+        createdAt: new Date(shoot.recordingDemoPreparationAt ?? shoot.updatedAt), updatedAt: new Date(shoot.updatedAt),
+      }];
+    }
+    return [];
+  }
   const db = await getDb();
   if (!db) throw new Error("Database unavailable");
   return db.select().from(miraShootCreativeDna).where(and(

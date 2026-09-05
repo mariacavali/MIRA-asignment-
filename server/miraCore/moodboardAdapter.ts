@@ -228,7 +228,16 @@ export function mapCompletedMoodboardImages(status: string, referencesJson: unkn
 // Photographer-dashboard read of the latest moodboard for a shoot they own.
 // Mirrors getShootCreativeDnaForOwner's ownership-scoped, read-only shape.
 export async function getShootMoodboardForOwner(photographerUserId: number, shootId: number): Promise<{ status: string; renderStatus: string; images: ShootMoodboardImage[] } | null> {
-  if (isLocalFileStoreEnabled()) return null;
+  if (isLocalFileStoreEnabled()) {
+    const { findRecordingDemoShoot } = await import("../localFileStore");
+    const { isRecordingDemoEnabled } = await import("./recordingDemo");
+    const shoot = await findRecordingDemoShoot();
+    if (shoot && shoot.id === shootId && shoot.photographerUserId === photographerUserId && isRecordingDemoEnabled() && shoot.roomState === "preparation_active") {
+      const { buildRecordingDemoMoodboard } = await import("./recordingDemoAssets");
+      return { status: "complete", renderStatus: "complete", images: buildRecordingDemoMoodboard(shoot.id) };
+    }
+    return null;
+  }
   const db = await requireDb();
   const rows = await db.select().from(miraShootMoodboard).where(and(
     eq(miraShootMoodboard.photographerUserId, photographerUserId),

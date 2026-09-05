@@ -52,6 +52,10 @@ export type LocalShoot = {
   photographerNotes: string | null;
   roomState: string;
   callAllowanceSeconds: number;
+  // Marks the single seeded fixture shoot used by MIRA_RECORDING_DEMO mode
+  // (see server/miraCore/recordingDemo.ts). Never set for a real shoot.
+  recordingDemo?: boolean;
+  recordingDemoPreparationAt?: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -567,4 +571,51 @@ export async function getLocalInvitationForShoot(shootId: number) {
 
 export async function listLocalInvitations(shootId: number) {
   return (await load()).invitations?.filter(item => item.shootId === shootId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)) ?? [];
+}
+
+// --- MIRA_RECORDING_DEMO helpers ---------------------------------------
+// A single fixture shoot, flagged recordingDemo:true, that the recording
+// demo mode seeds/reads/resets. Kept isolated from every other local-file-
+// store function above so normal MIRA_LOCAL_FILE_STORE usage is unaffected
+// when MIRA_RECORDING_DEMO is not enabled.
+
+export async function findRecordingDemoShoot() {
+  return (await load()).shoots.find(shoot => shoot.recordingDemo === true) ?? null;
+}
+
+export async function markRecordingDemoPreparationComplete(shootId: number) {
+  return update(state => {
+    const shoot = state.shoots.find(item => item.id === shootId && item.recordingDemo === true);
+    if (!shoot) return null;
+    const now = new Date().toISOString();
+    shoot.roomState = "preparation_active";
+    shoot.status = "ready_to_shoot";
+    shoot.recordingDemoPreparationAt = now;
+    shoot.updatedAt = now;
+    return shoot;
+  });
+}
+
+export async function resetRecordingDemoShoot(shootId: number) {
+  return update(state => {
+    const shoot = state.shoots.find(item => item.id === shootId && item.recordingDemo === true);
+    if (!shoot) return null;
+    const now = new Date().toISOString();
+    shoot.roomState = "welcome";
+    shoot.status = "confirmed";
+    shoot.recordingDemoPreparationAt = null;
+    shoot.updatedAt = now;
+    state.textTestSessions = (state.textTestSessions ?? []).filter(session => session.shootId !== shootId);
+    for (const invitation of state.invitations ?? []) {
+      if (invitation.shootId === shootId) {
+        invitation.consentAcknowledgedAt = null;
+        invitation.lastOpenedAt = null;
+        invitation.preparationStartedAt = null;
+        invitation.completedAt = null;
+        invitation.status = "active";
+        invitation.deliveryStatus = "created";
+      }
+    }
+    return shoot;
+  });
 }
