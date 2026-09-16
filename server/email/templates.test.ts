@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { callMiraReminderEmail, clientShootRoomInvitationEmail, invitationEmail, preparationCompletedEmail, preparationGuidanceEmail, shootDayReminderEmail } from "./templates";
+import { callMiraReminderEmail, clientShootRoomInvitationEmail, invitationEmail, preparationCompletedEmail, preparationGuidanceEmail, readyToShootEmail, shootDayReminderEmail } from "./templates";
 
 describe("MIRA transactional email templates", () => {
   it("identifies the actual photographer without Maria-branded marketing", () => {
@@ -66,6 +66,25 @@ describe("MIRA transactional email templates", () => {
     expect(reminder.subject).toBe("A reminder to prepare with MIRA");
     expect(day.subject).toBe("Your remote photoshoot is tomorrow");
     expect(day.html).toContain("<ul>");
+  });
+
+  it("confirms the shoot is ready with the same private Shoot Room link and escaped content", () => {
+    const preparationUrl = "https://mira.example/prepare/access/signed-token";
+    const email = readyToShootEmail({
+      clientFirstName: "<Jamie>",
+      photographerName: "North & Light",
+      shootTitle: "Founder <portraits>",
+      scheduledAt: "2026-10-15T10:00:00.000Z",
+      timeZone: "Europe/Amsterdam",
+      preparationUrl,
+    });
+    expect(email.subject).toBe("You're ready to shoot");
+    expect(email.text).toContain("confirmed the creative direction");
+    expect(email.text).toContain(preparationUrl);
+    expect(email.text).toContain("TALK TO MIRA");
+    expect(email.html).toContain("&lt;Jamie&gt;");
+    expect(email.html).not.toContain("<Jamie>");
+    expect(email.html).toContain(`href="${preparationUrl}"`);
   });
 
   it("compresses close shoots into one combined invitation and uses a concise talk-now message inside 24 hours", () => {

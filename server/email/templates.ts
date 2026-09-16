@@ -205,6 +205,24 @@ export function invitationEmail(params: {
   };
 }
 
+export function readyToShootEmail(params: {
+  clientFirstName: string | null;
+  photographerName: string;
+  shootTitle: string;
+  scheduledAt: string | Date | null;
+  timeZone: string;
+  preparationUrl: string;
+}) {
+  const hello = greeting(params.clientFirstName);
+  const dateTime = formatShootDateTime(params.scheduledAt, params.timeZone);
+  const text = `${hello}\n\n${params.photographerName} has reviewed your preparation and confirmed the creative direction. You're ready to shoot.\n\nShoot: ${params.shootTitle}\nDate: ${dateTime}\n\nREVIEW YOUR SHOOT ROOM: ${params.preparationUrl}${talkToMiraCtaText(params.preparationUrl)}\n\nSee you soon.`;
+  return {
+    subject: "You're ready to shoot",
+    text,
+    html: `<p>${escapeHtml(hello)}</p><p>${escapeHtml(params.photographerName)} has reviewed your preparation and confirmed the creative direction. You're ready to shoot.</p><p><strong>${escapeHtml(params.shootTitle)}</strong><br>${escapeHtml(dateTime)}</p>${ctaHtml("REVIEW YOUR SHOOT ROOM", params.preparationUrl)}${talkToMiraCtaHtml(params.preparationUrl)}<p>See you soon.</p>`,
+  };
+}
+
 export function preparationCompletedEmail(params: {
   clientName: string | null;
   shootTitle: string;

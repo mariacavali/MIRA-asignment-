@@ -43,7 +43,7 @@ import {
   markShootReadyToShoot,
   recordShootScheduleResponse,
 } from "./db";
-import { deliverClientInvitation, notifyPhotographerOfCompletion } from "./delivery";
+import { deliverClientInvitation, notifyClientShootIsReadyToShoot, notifyPhotographerOfCompletion } from "./delivery";
 import { createRealtimeWebRtcCall } from "./realtime";
 import { classifyRealtimeTranscript } from "./noise";
 import { generateShootCreativeDnaForConfirmedMemory, getShootCreativeDnaForOwner } from "./creativeDnaAdapter";
@@ -67,6 +67,39 @@ const tokenSchema = z.string().trim().min(32).max(256);
 
 function notFound(): never {
   throw new TRPCError({ code: "NOT_FOUND", message: "MIRA preparation not found" });
+}
+
+// Shared by confirmRealtimeSummary (voice) and submitTextTestTurn (text
+// fallback): once Discovery is confirmed for a shoot, by either path, both
+// must run the identical Creative DNA -> moodboard -> preparation-activation
+// sequence so a client who completes preparation by text ends up with the
+// same room state and moodboard as one who completes it by voice. Preparation
+// is only allowed to activate once the real creative pipeline has actually
+// produced its artifact - Discovery stays confirmed-but-processing until
+// then. Never throws; a failed pipeline call just leaves the shoot retryable.
+async function runShootCreativePipeline(shoot: { id: number; photographerUserId: number }) {
+  let creativeDnaStatus: "complete" | "retryable_error" = "retryable_error";
+  let moodboardStatus: "complete" | "retryable_error" = "retryable_error";
+  let moodboardRenderStatus: "not_configured" | "pending" | "complete" | "failed" = "not_configured";
+  try {
+    const record = await generateShootCreativeDnaForConfirmedMemory({ shootId: shoot.id, photographerUserId: shoot.photographerUserId });
+    creativeDnaStatus = record?.status === "complete" ? "complete" : "retryable_error";
+    if (creativeDnaStatus === "complete" && record?.creativeDnaJson) {
+      const moodboard = await generateShootMoodboardForCreativeDna({
+        shootId: shoot.id,
+        photographerUserId: shoot.photographerUserId,
+        confirmedMemoryVersion: record.confirmedMemoryVersion,
+        creativeDna: record.creativeDnaJson,
+      });
+      moodboardStatus = moodboard?.status === "complete" ? "complete" : "retryable_error";
+      moodboardRenderStatus = moodboard?.renderStatus ?? "not_configured";
+    }
+  } catch (error) {
+    console.warn("Shoot Creative DNA/moodboard generation deferred after confirmation", error instanceof Error ? error.message : "unknown error");
+  }
+  const activated = shouldActivateShootPreparation(creativeDnaStatus, moodboardStatus);
+  if (activated) await activatePreparationRoom(shoot.id);
+  return { creativeDnaStatus, moodboardStatus, moodboardRenderStatus, activated };
 }
 
 function visualUploadError(error: unknown): TRPCError {
@@ -432,34 +465,14 @@ export const miraCoreRouter = router({
       if (!result.confirmed) return result;
       const state = await getClientInvitation(input.token);
       if (!state) notFound();
-      // Preparation is only allowed to activate once the real creative
-      // pipeline (Creative DNA, then the existing V4 moodboard/campaign
-      // engine) has actually produced its artifact. Discovery stays
-      // confirmed-but-processing until then; it must never be skipped.
-      let creativeDnaStatus: "complete" | "retryable_error" = "retryable_error";
-      let moodboardStatus: "complete" | "retryable_error" = "retryable_error";
-      let moodboardRenderStatus: "not_configured" | "pending" | "complete" | "failed" = "not_configured";
-      try {
-        const record = await generateShootCreativeDnaForConfirmedMemory({ shootId: state.shoot.id, photographerUserId: state.shoot.photographerUserId });
-        creativeDnaStatus = record?.status === "complete" ? "complete" : "retryable_error";
-        if (creativeDnaStatus === "complete" && record?.creativeDnaJson) {
-          const moodboard = await generateShootMoodboardForCreativeDna({
-            shootId: state.shoot.id,
-            photographerUserId: state.shoot.photographerUserId,
-            confirmedMemoryVersion: record.confirmedMemoryVersion,
-            creativeDna: record.creativeDnaJson,
-          });
-          moodboardStatus = moodboard?.status === "complete" ? "complete" : "retryable_error";
-          moodboardRenderStatus = moodboard?.renderStatus ?? "not_configured";
-        }
-      } catch (error) {
-        console.warn("Shoot Creative DNA/moodboard generation deferred after confirmation", error instanceof Error ? error.message : "unknown error");
-      }
-      if (shouldActivateShootPreparation(creativeDnaStatus, moodboardStatus)) {
-        await activatePreparationRoom(state.shoot.id);
-        return { ...result, roomState: "preparation_active" as const, creativeDnaStatus, moodboardStatus, moodboardRenderStatus };
-      }
-      return { ...result, roomState: "discovery_confirmed" as const, creativeDnaStatus, moodboardStatus, moodboardRenderStatus };
+      const pipeline = await runShootCreativePipeline({ id: state.shoot.id, photographerUserId: state.shoot.photographerUserId });
+      return {
+        ...result,
+        roomState: pipeline.activated ? ("preparation_active" as const) : ("discovery_confirmed" as const),
+        creativeDnaStatus: pipeline.creativeDnaStatus,
+        moodboardStatus: pipeline.moodboardStatus,
+        moodboardRenderStatus: pipeline.moodboardRenderStatus,
+      };
     }),
   checkPreparationStatus: publicProcedure.input(z.object({ token: tokenSchema })).mutation(async ({ input }) => {
     const state = await getClientInvitation(input.token);
@@ -497,6 +510,13 @@ export const miraCoreRouter = router({
     .mutation(async ({ ctx, input }) => {
       const updated = await markShootReadyToShoot({ photographerUserId: ctx.user.id, shootId: input.shootId });
       if (!updated) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "This shoot isn't ready to be marked Ready to Shoot yet." });
+      if (!ENV.miraLocalFileStore) {
+        void notifyClientShootIsReadyToShoot({
+          photographerUserId: ctx.user.id,
+          shootId: input.shootId,
+          repository: new DrizzleEmailOutboxRepository(),
+        }).catch(error => console.warn("MIRA ready-to-shoot email was not delivered", error instanceof Error ? error.message : "unknown error"));
+      }
       return { readyToShoot: true as const };
     }),
   setRealtimePaused: publicProcedure.input(z.object({ token: tokenSchema, sessionId: z.string().uuid(), paused: z.boolean() }))
@@ -525,6 +545,17 @@ export const miraCoreRouter = router({
     const result = await submitTextTestTurn(input);
     if (!result) notFound();
     if (result.complete) {
+      // The local file store's text-test completion never produces a
+      // Discovery summary (see submitTextTestTurn in db.ts), so this must be
+      // skipped there exactly like the database-mode branch it depends on.
+      if (!ENV.miraLocalFileStore) {
+        try {
+          const state = await getClientInvitation(input.token);
+          if (state) await runShootCreativePipeline({ id: state.shoot.id, photographerUserId: state.shoot.photographerUserId });
+        } catch (error) {
+          console.warn("Shoot Creative DNA/moodboard generation deferred after text preparation completion", error instanceof Error ? error.message : "unknown error");
+        }
+      }
       void notifyPhotographerOfCompletion({
         shootId: result.shootId,
         requestOrigin: requestOrigin(ctx.req),

@@ -98,11 +98,24 @@ describe("MIRA shoot memory", () => {
     });
   });
 
-  it("rejects a text-test answer outside the six-question contract", () => {
+  it("rejects a text-test answer outside the eight-question contract", () => {
     expect(() => memoryPatchForTextTestAnswer({
-      answerIndex: 6,
+      answerIndex: 8,
       answer: "Extra answer",
       sourceEventId: "550e8400-e29b-41d4-a716-446655440000",
     })).toThrow("outside the memory contract");
+  });
+
+  it("covers every Discovery signal group across the eight text-test answers, so the fixed script can clear the Discovery gate", () => {
+    let memory = emptyShootMemory();
+    for (let answerIndex = 0; answerIndex < 8; answerIndex += 1) {
+      const patch = memoryPatchForTextTestAnswer({
+        answerIndex,
+        answer: `Answer ${answerIndex}`,
+        sourceEventId: "550e8400-e29b-41d4-a716-446655440000",
+      });
+      memory = applyShootMemoryPatch(memory, patch);
+    }
+    expect(evaluateDiscoveryGate(memory)).toMatchObject({ ready: true, covered: 8, explicitOrConfirmed: 8 });
   });
 });

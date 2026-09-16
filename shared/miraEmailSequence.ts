@@ -3,6 +3,12 @@ export const MIRA_EMAIL_MILESTONES = [
   { id: "preparation_guidance", name: "Preparation guidance" },
   { id: "call_mira_reminder", name: "Call MIRA reminder" },
   { id: "shoot_day_reminder", name: "Shoot-day reminder" },
+  // Not part of buildMiraEmailSequence()'s date-driven schedule below - it is
+  // triggered directly when a photographer marks a shoot Ready to Shoot (see
+  // notifyClientShootIsReadyToShoot in miraCore/delivery.ts), reusing this
+  // same outbox table purely as an idempotency ledger (schedule+markSent) so
+  // a repeated "Mark Ready to Shoot" click can never send a duplicate email.
+  { id: "ready_to_shoot", name: "Ready to shoot" },
 ] as const;
 
 export type MiraClientEmailMilestoneId = typeof MIRA_EMAIL_MILESTONES[number]["id"];

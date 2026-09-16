@@ -52,6 +52,11 @@ import { parseInvitationAccessToken, verifyInvitationAccessSignature } from "./i
 import { mapCompletedMoodboardImages, normalizeCreativeDnaInput } from "./moodboardAdapter";
 import { normalizeShootMemorySnapshot } from "./creativeDnaAdapter";
 
+// Order and length are load-bearing: index N here must patch the same memory
+// path as TEXT_TEST_MEMORY_PATHS[N] in memory.ts, and together the eight
+// answers must cover every Discovery signal group so this fixed script can
+// clear evaluateDiscoveryGate() the same way an adaptive voice conversation
+// does. Only append; never reorder or remove existing questions.
 const TEXT_TEST_QUESTIONS = [
   "To begin, what do you do—and what is this shoot meant to help you communicate?",
   "Who needs to recognise themselves in these images, and where will the images be used?",
@@ -59,6 +64,8 @@ const TEXT_TEST_QUESTIONS = [
   "What kind of light, colour, place, material, or atmosphere feels most like you?",
   "What should this shoot never look or feel like?",
   "What practical details should your photographer know about the location, wardrobe, timing, or deliverables?",
+  "What are you offering or building right now, and what would you like these photographs to help you achieve?",
+  "What values or personality should come through in how you're photographed?",
 ] as const;
 
 async function requireDb() {
@@ -482,10 +489,48 @@ export async function getInvitationRoomStateById(invitationId: string) {
   return row ? finalizeInvitationRoomRow(row) : null;
 }
 
+// Owner-scoped lookup used only to find *which* invitation to email when a
+// photographer-driven action (Ready to Shoot) has no client-presented token
+// to resolve from - never exposed to a client-facing procedure.
+export async function getLatestInvitationIdForOwnedShoot(params: { photographerUserId: number; shootId: number }) {
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await requireDb();
+  const rows = await db.select({ id: miraClientInvitations.id })
+    .from(miraClientInvitations)
+    .innerJoin(miraShoots, eq(miraShoots.id, miraClientInvitations.shootId))
+    .where(and(
+      eq(miraClientInvitations.shootId, params.shootId),
+      eq(miraShoots.photographerUserId, params.photographerUserId),
+    ))
+    .orderBy(desc(miraClientInvitations.createdAt))
+    .limit(1);
+  return rows[0]?.id ?? null;
+}
+
 export async function acknowledgeClientInvitation(token: string) {
-  if (!isLocalFileStoreEnabled()) return null;
-  const invitation = await acceptLocalInvitation(token);
-  return invitation ? { accepted: true as const } : null;
+  if (isLocalFileStoreEnabled()) {
+    const invitation = await acceptLocalInvitation(token);
+    return invitation ? { accepted: true as const } : null;
+  }
+  const db = await requireDb();
+  const condition = await resolveInvitationCondition(token);
+  if (!condition) return null;
+  const rows = await db.select({
+    id: miraClientInvitations.id,
+    status: miraClientInvitations.status,
+    lastOpenedAt: miraClientInvitations.lastOpenedAt,
+    preparationStartedAt: miraClientInvitations.preparationStartedAt,
+  }).from(miraClientInvitations).where(condition).limit(1);
+  const row = rows[0];
+  if (!row || row.status !== "active") return null;
+  const now = new Date();
+  await db.update(miraClientInvitations).set({
+    consentAcknowledgedAt: now,
+    lastOpenedAt: isValidDate(row.lastOpenedAt) ? row.lastOpenedAt : now,
+    deliveryStatus: "preparation_in_progress",
+    preparationStartedAt: isValidDate(row.preparationStartedAt) ? row.preparationStartedAt : now,
+  }).where(eq(miraClientInvitations.id, row.id));
+  return { accepted: true as const };
 }
 
 export async function updateOwnedShootContact(params: {
@@ -741,6 +786,32 @@ export async function submitTextTestTurn(params: { token: string; sessionId: str
         status: "completed", deliveryStatus: "completed", completedAt: new Date(),
       })
         .where(eq(miraClientInvitations.id, row.invitation.id));
+      // The text fallback is a fixed script, not an adaptive conversation, so
+      // there is no separate "review the summary" step for the client to
+      // confirm - their eight explicit answers already are the summary. Auto-
+      // confirming here (rather than leaving this session's Discovery
+      // unconfirmed forever) is what lets a text-only client reach the same
+      // Creative DNA -> moodboard -> preparation pipeline a voice client
+      // reaches after confirming their summary. Without this, completing the
+      // text fallback silently stalled the room at "welcome" with no
+      // moodboard and no visible error (the confirmed production bug this
+      // fixes).
+      const clientAnswers = await tx.select({ content: miraCallEvents.content }).from(miraCallEvents)
+        .where(and(eq(miraCallEvents.sessionId, params.sessionId), eq(miraCallEvents.role, "client")))
+        .orderBy(asc(miraCallEvents.ordinal));
+      const summaryText = clientAnswers.map(event => event.content).join("\n\n");
+      const now = new Date();
+      await tx.insert(miraDiscoverySummaries).values({
+        id: randomUUID(),
+        shootId: row.session.shootId,
+        sessionId: params.sessionId,
+        photographerUserId: row.session.photographerUserId,
+        memoryVersion,
+        summaryText,
+        confirmedAt: now,
+      });
+      await tx.update(miraShoots).set({ roomState: "discovery_confirmed" })
+        .where(eq(miraShoots.id, row.session.shootId));
     }
     return {
       shootId: row.session.shootId,

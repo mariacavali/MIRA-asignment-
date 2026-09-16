@@ -96,6 +96,13 @@ export function evaluateDiscoveryGate(memoryInput: ShootMemory) {
   return { ready, covered, required: DISCOVERY_SIGNALS.length, explicitOrConfirmed, unresolvedQuestions: memory.openQuestions.length };
 }
 
+// Every path here must land in a different DISCOVERY_SIGNALS group above, and
+// together they must cover all eight groups. The text fallback is a fixed
+// script (no adaptive follow-up), so this is the only way it can ever satisfy
+// evaluateDiscoveryGate() and reach Creative DNA/moodboard generation, the
+// same gate the adaptive voice conversation must also clear. Existing indices
+// 0-5 are load-bearing (memory.test.ts asserts index 1 -> "brand.audience");
+// only append new entries here, never reorder or insert.
 const TEXT_TEST_MEMORY_PATHS = [
   "identity.relevantContext",
   "brand.audience",
@@ -103,6 +110,8 @@ const TEXT_TEST_MEMORY_PATHS = [
   "visualWorld.references",
   "visualWorld.avoid",
   "shootContext.constraints",
+  "brand.offer",
+  "identity.personality",
 ] as const;
 
 export function memoryPatchForTextTestAnswer(params: {

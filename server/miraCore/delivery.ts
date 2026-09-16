@@ -2,9 +2,13 @@ import { ENV } from "../_core/env";
 import { buildPublicUrl } from "../_core/publicUrl";
 import { requireEmailConfiguration } from "../email";
 import { isValidEmailAddress } from "../email/provider";
-import { clientShootRoomInvitationEmail, preparationCompletedEmail } from "../email/templates";
+import type { EmailOutboxRepository } from "../email/outbox";
+import { clientShootRoomInvitationEmail, preparationCompletedEmail, readyToShootEmail } from "../email/templates";
+import { createInvitationAccessToken } from "./invitationAccessLink";
 import {
   getCompletionNotificationContext,
+  getInvitationRoomStateById,
+  getLatestInvitationIdForOwnedShoot,
   getOwnedShoot,
   getPhotographerProfile,
   markInvitationSent,
@@ -62,6 +66,53 @@ export async function deliverClientInvitation(params: {
     messageId: delivery.messageId,
   });
   return { preparationUrl, provider: delivery.provider, providerMessageId: delivery.messageId, deliveryStatus: "sent" as const, replyToWarning: replyTo ? null : "Photographer Reply-To is missing or invalid; invitation was sent without it." };
+}
+
+// Sent once, directly, when a photographer marks a shoot Ready to Shoot
+// (markShootReadyToShoot has no idempotency gate of its own - a repeated
+// click still succeeds each time). The outbox's unique (invitationId,
+// milestoneId) row is used purely as a send ledger here, not a schedule: this
+// event is photographer-triggered right now, not date-driven, so it
+// deliberately bypasses buildMiraEmailSequence(). Reuses the same signed
+// Shoot Room access link the other reminder emails use, so the client keeps
+// returning to the same private room throughout.
+export async function notifyClientShootIsReadyToShoot(params: {
+  photographerUserId: number;
+  shootId: number;
+  repository: EmailOutboxRepository;
+}) {
+  if (!ENV.invitationLinkSecret) return false;
+  const invitationId = await getLatestInvitationIdForOwnedShoot({ photographerUserId: params.photographerUserId, shootId: params.shootId });
+  if (!invitationId) return false;
+  const state = await getInvitationRoomStateById(invitationId);
+  if (!state || !state.shoot.clientEmail || !isValidEmailAddress(state.shoot.clientEmail)) return false;
+  const job = await params.repository.schedule({
+    shootId: params.shootId,
+    invitationId: state.invitation.id,
+    milestoneId: "ready_to_shoot",
+    scheduledAt: new Date(),
+    idempotencyKey: `mira:shoot:${params.shootId}:milestone:ready_to_shoot`,
+  });
+  if (job.status === "sent") return false;
+  const signedAccessToken = createInvitationAccessToken({
+    invitationId: state.invitation.id,
+    tokenHash: state.invitation.tokenHash,
+    secret: ENV.invitationLinkSecret,
+  });
+  const preparationUrl = publicUrl(`/prepare/access/${signedAccessToken}`);
+  const photographerName = state.photographer?.businessName || state.photographer?.displayName || "Your photographer";
+  const content = readyToShootEmail({
+    clientFirstName: state.shoot.clientName?.trim().split(/\s+/)[0] ?? null,
+    photographerName,
+    shootTitle: state.shoot.title,
+    scheduledAt: state.shoot.scheduledAt,
+    timeZone: state.shoot.timezone,
+    preparationUrl,
+  });
+  const { provider, from } = requireEmailConfiguration();
+  const delivery = await provider.send({ to: state.shoot.clientEmail, from, ...content });
+  await params.repository.markSent(job.id, new Date(), delivery.messageId);
+  return true;
 }
 
 export async function notifyPhotographerOfCompletion(params: {

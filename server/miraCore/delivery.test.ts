@@ -4,6 +4,8 @@ const mocks = vi.hoisted(() => ({
   getOwnedShoot: vi.fn(),
   getPhotographerProfile: vi.fn(),
   getCompletionNotificationContext: vi.fn(),
+  getLatestInvitationIdForOwnedShoot: vi.fn(),
+  getInvitationRoomStateById: vi.fn(),
   markInvitationSent: vi.fn(),
   markPhotographerNotified: vi.fn(),
   provider: { send: vi.fn() },
@@ -14,12 +16,23 @@ vi.mock("./db", () => ({
   getOwnedShoot: mocks.getOwnedShoot,
   getPhotographerProfile: mocks.getPhotographerProfile,
   getCompletionNotificationContext: mocks.getCompletionNotificationContext,
+  getLatestInvitationIdForOwnedShoot: mocks.getLatestInvitationIdForOwnedShoot,
+  getInvitationRoomStateById: mocks.getInvitationRoomStateById,
   markInvitationSent: mocks.markInvitationSent,
   markPhotographerNotified: mocks.markPhotographerNotified,
 }));
 vi.mock("../email", () => ({ requireEmailConfiguration: mocks.requireEmailConfiguration }));
+vi.mock("../_core/env", () => ({ ENV: { invitationLinkSecret: "synthetic-invitation-link-secret", publicAppBaseUrl: "" } }));
 
-import { deliverClientInvitation, notifyPhotographerOfCompletion } from "./delivery";
+import { deliverClientInvitation, notifyClientShootIsReadyToShoot, notifyPhotographerOfCompletion } from "./delivery";
+
+function fakeOutboxRepository(initialStatus: "pending" | "sent" = "pending") {
+  let status = initialStatus;
+  return {
+    schedule: vi.fn(async () => ({ id: "job-1", status })),
+    markSent: vi.fn(async () => { status = "sent"; }),
+  };
+}
 
 const shoot = {
   id: 7,
@@ -106,6 +119,70 @@ describe("MIRA email delivery routing", () => {
       expiresAt: new Date("2026-10-14T10:00:00.000Z"),
       requestOrigin: "https://temporary-tunnel.example",
     })).rejects.toThrow("MIRA_PUBLIC_APP_BASE_URL is not configured");
+    expect(mocks.provider.send).not.toHaveBeenCalled();
+  });
+});
+
+describe("notifyClientShootIsReadyToShoot", () => {
+  const INVITATION_ID = "55555555-5555-4555-8555-555555555555";
+  const invitationRoomState = {
+    invitation: { id: INVITATION_ID, tokenHash: "a".repeat(64) },
+    shoot,
+    photographer: { displayName: "North Light", businessName: null },
+  };
+
+  beforeEach(() => {
+    mocks.getLatestInvitationIdForOwnedShoot.mockReset();
+    mocks.getInvitationRoomStateById.mockReset();
+    mocks.getLatestInvitationIdForOwnedShoot.mockResolvedValue(INVITATION_ID);
+    mocks.getInvitationRoomStateById.mockResolvedValue(invitationRoomState);
+  });
+
+  it("sends a ready-to-shoot email using a fresh signed Shoot Room link and records it as sent", async () => {
+    const repository = fakeOutboxRepository("pending");
+
+    const sent = await notifyClientShootIsReadyToShoot({ photographerUserId: 9, shootId: 7, repository });
+
+    expect(sent).toBe(true);
+    expect(repository.schedule).toHaveBeenCalledWith(expect.objectContaining({
+      shootId: 7,
+      invitationId: INVITATION_ID,
+      milestoneId: "ready_to_shoot",
+      idempotencyKey: "mira:shoot:7:milestone:ready_to_shoot",
+    }));
+    expect(mocks.provider.send).toHaveBeenCalledWith(expect.objectContaining({ to: "client@example.test" }));
+    const delivered = mocks.provider.send.mock.calls[0]?.[0];
+    expect(delivered?.html).toContain('href="https://mira.example/prepare/access/');
+    expect(repository.markSent).toHaveBeenCalledWith("job-1", expect.any(Date), "message-1");
+  });
+
+  it("never sends a second time once the outbox ledger already shows this milestone sent (idempotent against repeated clicks)", async () => {
+    const repository = fakeOutboxRepository("sent");
+
+    const sent = await notifyClientShootIsReadyToShoot({ photographerUserId: 9, shootId: 7, repository });
+
+    expect(sent).toBe(false);
+    expect(mocks.provider.send).not.toHaveBeenCalled();
+    expect(repository.markSent).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when the shoot has no invitation to notify", async () => {
+    mocks.getLatestInvitationIdForOwnedShoot.mockResolvedValue(null);
+    const repository = fakeOutboxRepository("pending");
+
+    const sent = await notifyClientShootIsReadyToShoot({ photographerUserId: 9, shootId: 7, repository });
+
+    expect(sent).toBe(false);
+    expect(mocks.provider.send).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when the client has no valid email on file", async () => {
+    mocks.getInvitationRoomStateById.mockResolvedValue({ ...invitationRoomState, shoot: { ...shoot, clientEmail: "invalid" } });
+    const repository = fakeOutboxRepository("pending");
+
+    const sent = await notifyClientShootIsReadyToShoot({ photographerUserId: 9, shootId: 7, repository });
+
+    expect(sent).toBe(false);
     expect(mocks.provider.send).not.toHaveBeenCalled();
   });
 });
