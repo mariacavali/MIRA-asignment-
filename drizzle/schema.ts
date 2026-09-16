@@ -124,6 +124,27 @@ export const miraEmailOutbox = mysqlTable(
   ],
 );
 
+// Isolated 1:1 credential store for the MIRA photographer product's own
+// email/password signup (distinct from Manus OAuth, which never has a row
+// here). Kept separate from `users` so OAuth accounts are entirely
+// unaffected - a user simply has no row here unless they signed up with a
+// password. The session issued after a successful password check is the
+// same signed JWT (`sdk.createSessionToken`) the OAuth callback issues, not
+// a separate/weaker mechanism.
+export const miraPhotographerCredentials = mysqlTable(
+  "mira_photographer_credentials",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  table => [uniqueIndex("mira_photographer_credentials_user_uidx").on(table.userId)],
+);
+
 export const miraPhotographerProfiles = mysqlTable(
   "mira_photographer_profiles",
   {
@@ -428,6 +449,7 @@ export const miraShootVisualReferences = mysqlTable(
   ],
 );
 
+export type MiraPhotographerCredential = typeof miraPhotographerCredentials.$inferSelect;
 export type MiraPhotographerProfile = typeof miraPhotographerProfiles.$inferSelect;
 export type MiraShoot = typeof miraShoots.$inferSelect;
 export type MiraClientInvitation = typeof miraClientInvitations.$inferSelect;

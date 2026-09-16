@@ -1,8 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, miraStripeBillingIdentities, users, type User } from "../drizzle/schema";
+import { InsertUser, miraPhotographerCredentials, miraStripeBillingIdentities, users, type User } from "../drizzle/schema";
 import { ENV } from './_core/env';
-import { activateLocalPlan, createLocalPaidPhotographer, getLocalAccess, getLocalUserByEmail, getLocalUserByOpenId, isLocalFileStoreEnabled, resetLocalPhotographerJourney, upsertLocalUser } from "./localFileStore";
+import { activateLocalPlan, createLocalPaidPhotographer, getLocalAccess, getLocalUserByEmail, getLocalUserByOpenId, hashLocalPassword, isLocalFileStoreEnabled, resetLocalPhotographerJourney, upsertLocalUser, verifyLocalPassword } from "./localFileStore";
 import { paymentStateGrantsAccess } from "./payment/paymentEventProcessor";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -151,6 +152,48 @@ export async function getLocalPhotographerByEmail(email: string) {
   if (!isLocalFileStoreEnabled()) return null;
   const user = await getLocalUserByEmail(email);
   return user ? { ...user, createdAt: new Date(user.createdAt), updatedAt: new Date(user.updatedAt), lastSignedIn: new Date(user.lastSignedIn) } : null;
+}
+
+// Database-mode counterpart to createLocalPhotographer (localFileStore.ts):
+// the MIRA photographer product's own email/password signup, kept isolated
+// from Manus OAuth users. Reuses the exact same salted-scrypt password
+// hashing (hashLocalPassword) already used in local-file-store mode - only
+// the persistence target differs. Returns null on a duplicate email, the
+// same contract createLocalPhotographer already has, so router callers don't
+// need a mode-specific branch for that case.
+export async function createDbPhotographerAccount(input: { firstName: string; lastName: string; email: string; password: string }) {
+  if (isLocalFileStoreEnabled()) throw new Error("Database account creation is unavailable in local-file-store mode");
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  const email = input.email.trim().toLowerCase();
+  const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
+  if (existing[0]) return null;
+  const openId = `mira-account-${randomUUID()}`;
+  const name = `${input.firstName.trim()} ${input.lastName.trim()}`.trim();
+  await db.insert(users).values({ openId, name, email, loginMethod: "mira-password-account", role: "user" });
+  const inserted = await db.select({ id: users.id }).from(users).where(eq(users.openId, openId)).limit(1);
+  const userId = inserted[0]?.id;
+  if (!userId) throw new Error("Photographer account was not created");
+  await db.insert(miraPhotographerCredentials).values({ userId, passwordHash: hashLocalPassword(input.password) });
+  return { openId };
+}
+
+// Database-mode counterpart to the local password check backing
+// localPhotographerLogin - verifies with the same timing-safe comparison
+// verifyLocalPassword already uses in local-file-store mode.
+export async function verifyDbPhotographerPassword(email: string, password: string) {
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await getDb();
+  if (!db) return null;
+  const normalizedEmail = email.trim().toLowerCase();
+  const rows = await db.select({ openId: users.openId, passwordHash: miraPhotographerCredentials.passwordHash })
+    .from(users)
+    .innerJoin(miraPhotographerCredentials, eq(miraPhotographerCredentials.userId, users.id))
+    .where(eq(users.email, normalizedEmail))
+    .limit(1);
+  const row = rows[0];
+  if (!row || !verifyLocalPassword(password, row.passwordHash)) return null;
+  return { openId: row.openId };
 }
 
 // TODO: add feature queries here as your schema grows.

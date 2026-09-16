@@ -1,5 +1,8 @@
 import { TRPCError } from "@trpc/server";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { ENV } from "../_core/env";
+import { getSessionCookieOptions } from "../_core/cookies";
+import { sdk } from "../_core/sdk";
 import { z } from "zod";
 import {
   createShootInputSchema,
@@ -151,10 +154,28 @@ export const miraCoreRouter = router({
     return { signedIn: true as const };
   }),
   createLocalPhotographerAccount: publicProcedure.input(z.object({ firstName: z.string().trim().min(1).max(80), lastName: z.string().trim().min(1).max(80), email: z.string().email(), password: z.string().min(8).max(200) })).mutation(async ({ input, ctx }) => {
-    if (!isLocalFileStoreEnabled()) throw new TRPCError({ code: "FORBIDDEN", message: "Account creation is unavailable in this environment" });
-    const user = await createLocalPhotographer(input);
-    if (!user) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email" });
-    ctx.res.cookie("mira_local_session", user.openId, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+    if (isLocalFileStoreEnabled()) {
+      const user = await createLocalPhotographer(input);
+      if (!user) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email" });
+      ctx.res.cookie("mira_local_session", user.openId, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+      return { created: true as const };
+    }
+    // Database-mode signup for the MIRA photographer product's own
+    // email/password account (createDbPhotographerAccount, server/db.ts) -
+    // isolated from Manus OAuth users (see miraPhotographerCredentials in
+    // drizzle/schema.ts). The session this issues is the exact same signed
+    // JWT (sdk.createSessionToken) the OAuth callback issues under the same
+    // cookie name, so every existing protectedProcedure - including the
+    // Stripe checkout handoff below - authenticates it identically. This is
+    // not a parallel/weaker auth mechanism.
+    const { createDbPhotographerAccount } = await import("../db");
+    const account = await createDbPhotographerAccount(input);
+    if (!account) throw new TRPCError({ code: "CONFLICT", message: "An account already exists for this email" });
+    const sessionToken = await sdk.createSessionToken(account.openId, {
+      name: `${input.firstName.trim()} ${input.lastName.trim()}`.trim(),
+      expiresInMs: ONE_YEAR_MS,
+    });
+    ctx.res.cookie(COOKIE_NAME, sessionToken, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
     return { created: true as const };
   }),
   getPhotographerAccess: protectedProcedure.query(async ({ ctx }) => (await import("../db")).getPhotographerAccess(ctx.user.openId)),
