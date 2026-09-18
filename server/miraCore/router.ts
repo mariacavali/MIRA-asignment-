@@ -51,11 +51,14 @@ import { createRealtimeWebRtcCall } from "./realtime";
 import { classifyRealtimeTranscript } from "./noise";
 import { generateShootCreativeDnaForConfirmedMemory, getShootCreativeDnaForOwner } from "./creativeDnaAdapter";
 import { generateShootMoodboardForCreativeDna, getShootMoodboardForOwner } from "./moodboardAdapter";
-import { createLocalPhotographer, isLocalFileStoreEnabled } from "../localFileStore";
+import { createLocalPhotographer, isLocalFileStoreEnabled, verifyLocalPassword } from "../localFileStore";
 import { createPendingCheckout } from "../payment/pendingCheckout";
 import { DrizzleEmailOutboxRepository, recordImmediateInvitationAsSent, scheduleMiraEmailMilestones, cancelMiraEmailOutbox } from "../email/outbox";
 import { createPortalSessionForUser } from "../payment/stripePortal";
 import { DrizzlePaymentRepository } from "../payment/drizzlePaymentRepository";
+import { createPhotographerPasswordResetToken, inspectPhotographerPasswordResetToken, photographerPasswordResetBinding, verifyPhotographerPasswordResetToken } from "../auth/photographerPasswordReset";
+import { createPhotographerSessionToken, PHOTOGRAPHER_SESSION_COOKIE } from "../auth/photographerSession";
+import { sendPhotographerPasswordResetEmail } from "../email/passwordReset";
 import {
   analyzeShootVisualReference,
   listShootVisualReferencesForOwner,
@@ -146,12 +149,50 @@ export const miraCoreRouter = router({
     if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Photographer account was not found" });
     return { mode: "local" as const, paid: true as const, paymentStatus: user.paymentStatus, selectedPlan: user.selectedPlan };
   }),
-  localPhotographerLogin: publicProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ input, ctx }) => {
-    if (!isLocalFileStoreEnabled()) throw new TRPCError({ code: "FORBIDDEN", message: "Local login is unavailable" });
-    const user = await (await import("../db")).getLocalPhotographerByEmail(input.email);
-    if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "No photographer account was found for that email" });
-    ctx.res.cookie("mira_local_session", user.openId, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+  localPhotographerLogin: publicProcedure.input(z.object({ email: z.string().email(), password: z.string().min(8).max(200) })).mutation(async ({ input, ctx }) => {
+    if (isLocalFileStoreEnabled()) {
+      const user = await (await import("../db")).getLocalPhotographerByEmail(input.email);
+      if (!user?.passwordHash || !verifyLocalPassword(input.password, user.passwordHash)) throw new TRPCError({ code: "UNAUTHORIZED", message: "The email or password is incorrect" });
+      ctx.res.cookie("mira_local_session", user.openId, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+      return { signedIn: true as const };
+    }
+    const account = await (await import("../db")).verifyDbPhotographerPassword(input.email, input.password);
+    if (!account) throw new TRPCError({ code: "UNAUTHORIZED", message: "The email or password is incorrect" });
+    const sessionToken = await createPhotographerSessionToken({ userId: account.userId, passwordHash: account.passwordHash, secret: ENV.cookieSecret, expiresInMs: ONE_YEAR_MS });
+    ctx.res.cookie(PHOTOGRAPHER_SESSION_COOKIE, sessionToken, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
     return { signedIn: true as const };
+  }),
+  requestPhotographerPasswordReset: publicProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ input, ctx }) => {
+    if (isLocalFileStoreEnabled()) return { accepted: true as const };
+    const { getDbPhotographerPasswordResetAccount } = await import("../db");
+    const account = await getDbPhotographerPasswordResetAccount(input.email);
+    if (!account) return { accepted: true as const };
+    try {
+      const token = createPhotographerPasswordResetToken({ userId: account.userId, accountBinding: photographerPasswordResetBinding(account.openId, account.passwordHash), secret: ENV.cookieSecret });
+      const baseUrl = ENV.publicAppBaseUrl || requestOrigin(ctx.req);
+      if (!baseUrl) throw new Error("Public application URL is not configured");
+      const resetUrl = new URL("/mira/reset-password", baseUrl);
+      resetUrl.searchParams.set("token", token);
+      await sendPhotographerPasswordResetEmail({ to: account.email, resetUrl: resetUrl.toString() });
+      return { accepted: true as const };
+    } catch {
+      throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "Password reset email is temporarily unavailable" });
+    }
+  }),
+  resetPhotographerPassword: publicProcedure.input(z.object({ token: tokenSchema, password: z.string().min(8).max(200) })).mutation(async ({ input, ctx }) => {
+    if (isLocalFileStoreEnabled()) throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link is invalid or expired" });
+    const parsed = inspectPhotographerPasswordResetToken(input.token);
+    if (!parsed) throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link is invalid or expired" });
+    const { getDbPhotographerPasswordResetTargetByUserId, setDbPhotographerPassword } = await import("../db");
+    const account = await getDbPhotographerPasswordResetTargetByUserId(parsed.userId);
+    if (!account || !verifyPhotographerPasswordResetToken({ token: input.token, accountBinding: photographerPasswordResetBinding(account.openId, account.passwordHash), secret: ENV.cookieSecret })) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link is invalid or expired" });
+    }
+    const passwordHash = await setDbPhotographerPassword(account.userId, account.passwordHash, input.password);
+    if (!passwordHash) throw new TRPCError({ code: "BAD_REQUEST", message: "This reset link is invalid or expired" });
+    const sessionToken = await createPhotographerSessionToken({ userId: account.userId, passwordHash, secret: ENV.cookieSecret, expiresInMs: ONE_YEAR_MS });
+    ctx.res.cookie(PHOTOGRAPHER_SESSION_COOKIE, sessionToken, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
+    return { reset: true as const, signedIn: true as const };
   }),
   createLocalPhotographerAccount: publicProcedure.input(z.object({ firstName: z.string().trim().min(1).max(80), lastName: z.string().trim().min(1).max(80), email: z.string().email(), password: z.string().min(8).max(200) })).mutation(async ({ input, ctx }) => {
     if (isLocalFileStoreEnabled()) {

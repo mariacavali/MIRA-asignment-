@@ -23,6 +23,7 @@ import MiraPhotographerCheckout from "./pages/MiraPhotographerCheckout";
 import MiraPhotographerHome from "./pages/MiraPhotographerHome";
 import MiraPhotographerSignup from "./pages/MiraPhotographerSignup";
 import MiraPhotographerLogin from "./pages/MiraPhotographerLogin";
+import MiraPhotographerPasswordReset from "./pages/MiraPhotographerPasswordReset";
 import MiraPaymentSuccess from "./pages/MiraPaymentSuccess";
 
 function Router() {
@@ -43,6 +44,8 @@ function Router() {
       <Route path={"/for-photographers"} component={MiraLanding} />
       <Route path={"/mira/account"} component={MiraPhotographerHome} />
       <Route path={"/mira/login"} component={MiraPhotographerLogin} />
+      <Route path={"/mira/forgot-password"} component={MiraPhotographerPasswordReset} />
+      <Route path={"/mira/reset-password"} component={MiraPhotographerPasswordReset} />
       <Route path={"/mira/signup"} component={MiraPhotographerSignup} />
       <Route path={"/mira/checkout"} component={MiraPhotographerCheckout} />
       <Route path={"/mira/payment-success"} component={MiraPaymentSuccess} />

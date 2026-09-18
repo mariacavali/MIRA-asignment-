@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, miraPhotographerCredentials, miraStripeBillingIdentities, users, type User } from "../drizzle/schema";
+import { InsertUser, miraPhotographerCredentials, miraPhotographerProfiles, miraShoots, miraStripeBillingIdentities, users, type User } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { activateLocalPlan, createLocalPaidPhotographer, getLocalAccess, getLocalUserByEmail, getLocalUserByOpenId, hashLocalPassword, isLocalFileStoreEnabled, resetLocalPhotographerJourney, upsertLocalUser, verifyLocalPassword } from "./localFileStore";
 import { paymentStateGrantsAccess } from "./payment/paymentEventProcessor";
@@ -186,14 +186,94 @@ export async function verifyDbPhotographerPassword(email: string, password: stri
   const db = await getDb();
   if (!db) return null;
   const normalizedEmail = email.trim().toLowerCase();
-  const rows = await db.select({ openId: users.openId, passwordHash: miraPhotographerCredentials.passwordHash })
+  const rows = await db.select({ userId: users.id, openId: users.openId, name: users.name, passwordHash: miraPhotographerCredentials.passwordHash })
     .from(users)
     .innerJoin(miraPhotographerCredentials, eq(miraPhotographerCredentials.userId, users.id))
     .where(eq(users.email, normalizedEmail))
     .limit(1);
   const row = rows[0];
   if (!row || !verifyLocalPassword(password, row.passwordHash)) return null;
-  return { openId: row.openId };
+  return row;
+}
+
+export async function getDbPhotographerPasswordResetAccount(email: string) {
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select({ userId: users.id, openId: users.openId, email: users.email, passwordHash: miraPhotographerCredentials.passwordHash })
+    .from(users)
+    .leftJoin(miraPhotographerCredentials, eq(miraPhotographerCredentials.userId, users.id))
+    .where(eq(users.email, email.trim().toLowerCase()));
+  const passwordAccounts = rows.filter(row => row.passwordHash);
+  if (passwordAccounts.length > 1) return null;
+  let account: (typeof rows)[number] | null = passwordAccounts[0] ?? null;
+  if (!account) {
+    const userIds = rows.map(row => row.userId);
+    if (!userIds.length) return null;
+    const verifiedProfiles = await db.select({ userId: miraPhotographerProfiles.userId })
+      .from(miraPhotographerProfiles)
+      .where(and(inArray(miraPhotographerProfiles.userId, userIds), eq(miraPhotographerProfiles.onboardingStatus, "complete")));
+    const verifiedIds = Array.from(new Set(verifiedProfiles.map(profile => profile.userId)));
+    if (!verifiedIds.length) return null;
+    const latestShoot = await db.select({ photographerUserId: miraShoots.photographerUserId })
+      .from(miraShoots)
+      .where(inArray(miraShoots.photographerUserId, verifiedIds))
+      .orderBy(desc(miraShoots.id))
+      .limit(1);
+    const targetUserId = latestShoot[0]?.photographerUserId ?? (verifiedIds.length === 1 ? verifiedIds[0] : null);
+    account = rows.find(row => row.userId === targetUserId) ?? null;
+  }
+  return account?.email ? { ...account, email: account.email } : null;
+}
+
+export async function getDbPhotographerPasswordResetTargetByUserId(userId: number) {
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select({ userId: users.id, openId: users.openId, name: users.name, passwordHash: miraPhotographerCredentials.passwordHash })
+    .from(users)
+    .leftJoin(miraPhotographerCredentials, eq(miraPhotographerCredentials.userId, users.id))
+    .where(eq(users.id, userId))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getDbPhotographerCredentialByUserId(userId: number) {
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select({ userId: users.id, openId: users.openId, name: users.name, passwordHash: miraPhotographerCredentials.passwordHash })
+    .from(users)
+    .innerJoin(miraPhotographerCredentials, eq(miraPhotographerCredentials.userId, users.id))
+    .where(eq(users.id, userId))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function resetDbPhotographerPassword(userId: number, currentHash: string, password: string) {
+  if (isLocalFileStoreEnabled()) return false;
+  const db = await getDb();
+  if (!db) return false;
+  const passwordHash = hashLocalPassword(password);
+  const result = await db.update(miraPhotographerCredentials)
+    .set({ passwordHash })
+    .where(and(eq(miraPhotographerCredentials.userId, userId), eq(miraPhotographerCredentials.passwordHash, currentHash)));
+  const header = Array.isArray(result) ? result[0] : result;
+  return Number((header as { affectedRows?: number } | undefined)?.affectedRows ?? 0) === 1 ? passwordHash : null;
+}
+
+export async function setDbPhotographerPassword(userId: number, currentHash: string | null, password: string) {
+  if (currentHash) return resetDbPhotographerPassword(userId, currentHash, password);
+  if (isLocalFileStoreEnabled()) return null;
+  const db = await getDb();
+  if (!db) return null;
+  const passwordHash = hashLocalPassword(password);
+  try {
+    await db.insert(miraPhotographerCredentials).values({ userId, passwordHash });
+    return passwordHash;
+  } catch {
+    return null;
+  }
 }
 
 // TODO: add feature queries here as your schema grows.

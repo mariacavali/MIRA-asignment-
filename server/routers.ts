@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { miraV3Router } from "./miraV3/router";
 import { miraV4Router } from "./miraV4/router";
 import { miraCoreRouter } from "./miraCore/router";
+import { PHOTOGRAPHER_SESSION_COOKIE } from "./auth/photographerSession";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -14,6 +15,7 @@ export const appRouter = router({
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie(PHOTOGRAPHER_SESSION_COOKIE, { ...cookieOptions, maxAge: -1 });
       return {
         success: true,
       } as const;

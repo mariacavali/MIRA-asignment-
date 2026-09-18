@@ -2,6 +2,9 @@ import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
 import { getLocalUserByOpenId, isLocalFileStoreEnabled } from "../localFileStore";
+import { ENV } from "./env";
+import { getDbPhotographerCredentialByUserId, getUserByOpenId } from "../db";
+import { isPhotographerSessionCurrent, PHOTOGRAPHER_SESSION_COOKIE, verifyPhotographerSessionToken } from "../auth/photographerSession";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -26,6 +29,19 @@ export async function createContext(
       const localUser = await getLocalUserByOpenId(localSession);
       user = localUser ? { ...localUser, createdAt: new Date(localUser.createdAt), updatedAt: new Date(localUser.updatedAt), lastSignedIn: new Date(localUser.lastSignedIn) } : null;
       if (user) return { req: opts.req, res: opts.res, user };
+    }
+  }
+
+  if (!isLocalFileStoreEnabled()) {
+    const cookieHeader = typeof opts.req.headers.cookie === "string" ? opts.req.headers.cookie : "";
+    const photographerSession = cookieHeader.split(";").map(item => item.trim()).find(item => item.startsWith(`${PHOTOGRAPHER_SESSION_COOKIE}=`))?.slice(PHOTOGRAPHER_SESSION_COOKIE.length + 1);
+    if (photographerSession) {
+      const session = await verifyPhotographerSessionToken(photographerSession, ENV.cookieSecret);
+      const credential = session ? await getDbPhotographerCredentialByUserId(session.userId) : null;
+      if (session && credential && isPhotographerSessionCurrent({ passwordTag: session.passwordTag, passwordHash: credential.passwordHash, secret: ENV.cookieSecret })) {
+        user = await getUserByOpenId(credential.openId) ?? null;
+        if (user) return { req: opts.req, res: opts.res, user };
+      }
     }
   }
 
