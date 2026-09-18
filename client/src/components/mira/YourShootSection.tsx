@@ -54,7 +54,7 @@ export function YourShootSection({ data, token }: { data: ShootRoomInfo; token: 
   const { shoot, photographer } = data;
   return (
     <section className="mira-dark-panel">
-      <SectionHeader index="01" title="Your Shoot" subtitle="What are we doing?" />
+      <SectionHeader index="01" title="Confirm your shoot" subtitle="Check your date, time and location, then confirm below or request a change." />
       <dl className="mt-6 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
         <Field label="Photographer" value={photographer.businessName || photographer.displayName} />
         <Field label="Client" value={shoot.clientName ?? "Not yet provided"} />

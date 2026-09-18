@@ -26,21 +26,18 @@ export function ClientShootRoomWelcome({
   const photographerName = photographer.businessName || photographer.displayName;
 
   return (
-    <section className="mb-20 lg:mb-32">
-      <p className="mira-dark-kicker text-center">
-        {photographerName.toUpperCase()} INVITED YOU TO PREPARE FOR YOUR SHOOT
-      </p>
-      <h2 className="mira-dark-display mt-8 text-center text-4xl sm:text-5xl text-[#f1eadc]">
-        Let's prepare for your shoot.
+    <section>
+      <h2 className="mira-dark-display text-3xl text-[#f1eadc]">
+        Share your direction.
       </h2>
-      <p className="mx-auto mt-8 max-w-2xl text-center text-base leading-7 text-[#c9c3b7]">
-        Your photographer has already shared the essential details, which you can review below.
+      <p className="mt-4 text-sm leading-7 text-[#c9c3b7]">
+        Tell MIRA what you want from your photographs and what will help you feel prepared for your shoot with {photographerName}.
       </p>
-      <p className="mx-auto mt-5 max-w-2xl text-center text-base leading-7 text-[#c9c3b7]">
-        Now MIRA would like to learn more about you, what you want from the photographs and anything that will help you feel prepared. Call MIRA or continue in text for a private guided conversation.
+      <p className="mt-3 text-sm leading-7 text-[#c9c3b7]">
+        Choose voice or text. At the end, review and confirm your summary to complete this step.
       </p>
 
-      <div className="mx-auto mt-12 max-w-2xl">
+      <div className="mt-6">
         <label className="flex items-start gap-3 rounded border border-white/10 p-4 text-left text-xs leading-6 text-[#bdb6a9]">
           <input
             type="checkbox"

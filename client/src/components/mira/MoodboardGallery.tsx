@@ -37,7 +37,7 @@ export function MoodboardGallery({ token }: { token: string }) {
   if (status.data.moodboardNeedsRetry) {
     return (
       <p aria-live="polite" className="text-sm text-[#c5bfb3]">
-        Your confirmed creative direction is safe. Your moodboard needs a little more time to come together - it will appear here shortly.
+        Your confirmed creative direction is saved. We couldn't finish your moodboard. Please contact your photographer for help.
       </p>
     );
   }

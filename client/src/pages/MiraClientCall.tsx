@@ -48,7 +48,7 @@ export default function MiraClientCall({
   const [state, setState] = useState<CallState>("connecting");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const sessionIdRef = useRef<string | null>(null);
-  const [remaining, setRemaining] = useState(0);
+  const [remaining, setRemaining] = useState<number | null>(null);
   const [muted, setMuted] = useState(false);
   const [textOpen, setTextOpen] = useState(false);
   const [text, setText] = useState("");
@@ -94,15 +94,17 @@ export default function MiraClientCall({
   const endCall = useCallback(
     async (completed: boolean, reason: string) => {
       const activeSessionId = sessionIdRef.current;
-      if (finalizedRef.current || !activeSessionId) return;
+      if (finalizedRef.current) return;
       finalizedRef.current = true;
       try {
-        await finalize.mutateAsync({
-          token,
-          sessionId: activeSessionId,
-          completed,
-          reason,
-        });
+        if (activeSessionId) {
+          await finalize.mutateAsync({
+            token,
+            sessionId: activeSessionId,
+            completed,
+            reason,
+          });
+        }
       } finally {
         closeMedia();
         setState("ended");
@@ -372,6 +374,7 @@ export default function MiraClientCall({
     const timer = window.setInterval(
       () =>
         setRemaining(value => {
+          if (value === null) return null;
           if (value <= 1) {
             void endCall(false, "allowance_exhausted");
             return 0;
@@ -420,10 +423,10 @@ export default function MiraClientCall({
             <span />
             <span />
           </div>
-          <p className="mt-8 font-mono text-sm tabular-nums text-[#b7a98f]">
+          {remaining !== null && <p className="mt-8 font-mono text-sm tabular-nums text-[#b7a98f]">
             {String(Math.floor(remaining / 60)).padStart(2, "0")}:
             {String(remaining % 60).padStart(2, "0")} remaining
-          </p>
+          </p>}
         </> : <p className="mt-4 max-w-lg text-sm leading-6 text-[#b7a98f]">Share your answers in writing. They stay connected to this private Shoot Room for your photographer.</p>}
         {error && (
           <p role="alert" className="mt-6 text-sm text-red-200">
@@ -546,10 +549,15 @@ export default function MiraClientCall({
           <CallControl
             label={state === "ended" ? "Return to room" : "End"}
             onClick={() => {
+              if (state === "ended") {
+                closeMedia();
+                onSessionEnd?.();
+                return;
+              }
               const activeSessionId = sessionIdRef.current;
               if (conversationMode === "text") {
                 const close = async () => {
-                  if (state !== "ended" && activeSessionId) await endTextSession.mutateAsync({ token, sessionId: activeSessionId });
+                  if (activeSessionId) await endTextSession.mutateAsync({ token, sessionId: activeSessionId });
                   closeMedia();
                   onSessionEnd?.();
                 };

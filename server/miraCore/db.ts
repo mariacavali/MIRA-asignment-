@@ -916,10 +916,10 @@ export async function startOrResumeRealtimeSession(token: string) {
       reconnectUntil,
     });
     await tx.update(miraClientInvitations).set({
-      consentAcknowledgedAt: state.invitation.consentAcknowledgedAt ?? now,
+      consentAcknowledgedAt: isValidDate(state.invitation.consentAcknowledgedAt) ? state.invitation.consentAcknowledgedAt : now,
       lastOpenedAt: state.invitation.lastOpenedAt ?? now,
       deliveryStatus: "preparation_in_progress",
-      preparationStartedAt: state.invitation.preparationStartedAt ?? now,
+      preparationStartedAt: isValidDate(state.invitation.preparationStartedAt) ? state.invitation.preparationStartedAt : now,
     }).where(eq(miraClientInvitations.id, state.invitation.id));
     await tx.update(miraShoots).set({
       status: state.shoot.status === "preparation_ready" ? "preparation_ready" : "conversation_in_progress",

@@ -1,5 +1,4 @@
 import { trpc } from "@/lib/trpc";
-import { SectionHeader } from "@/components/mira/SectionHeader";
 
 // Renders the real, persisted preparation brief once Creative DNA and the
 // moodboard have actually completed - never fabricated or model-improvised
@@ -10,8 +9,8 @@ export function ReadyToShootSection({ token }: { token: string }) {
 
   if (status.isError) {
     return (
-      <section className="mira-dark-panel mt-6">
-        <SectionHeader index="03" title="Ready to Shoot" subtitle="Are you prepared?" />
+      <section className="mt-6 border-t border-white/10 pt-6">
+        <h3 className="mira-dark-kicker">Your preparation plan</h3>
         <p role="alert" className="mt-6 text-sm text-red-200">
           We couldn't load this section. It will keep trying automatically.
         </p>
@@ -24,14 +23,15 @@ export function ReadyToShootSection({ token }: { token: string }) {
   const brief = status.data?.preparationBrief ?? null;
 
   return (
-    <section className="mira-dark-panel mt-6">
-      <SectionHeader index="03" title="Ready to Shoot" subtitle="Are you prepared?" />
+    <section className="mt-6 border-t border-white/10 pt-6">
+      <h3 className="mira-dark-kicker">Your preparation plan</h3>
       <div aria-live="polite" className="mt-6 rounded border border-white/10 bg-white/[0.03] p-5 text-sm text-[#c5bfb3]">
-        {confirmed ? (
-          <p className="text-[#f1eadc]">
+        {confirmed && (
+          <p className="mb-5 text-[#f1eadc]">
             You're ready to shoot. Your photographer has confirmed everything is in place.
           </p>
-        ) : ready && brief ? (
+        )}
+        {ready && brief ? (
           <div className="space-y-5 text-left">
             <p className="text-[#f1eadc]">Your creative direction is confirmed. Here's how to prepare:</p>
             <BriefList title="Wardrobe" items={brief.wardrobe} />
@@ -40,7 +40,7 @@ export function ReadyToShootSection({ token }: { token: string }) {
             <BriefList title="Timing" items={brief.timingNotes} />
             <BriefList title="Good to know" items={brief.generalTips} />
             <BriefList title="Best avoided" items={brief.avoid} />
-            <p className="text-xs text-[#9e978b]">Your photographer will confirm here once everything is set.</p>
+            {!confirmed && <p className="text-xs text-[#9e978b]">Your photographer will confirm here once everything is set.</p>}
           </div>
         ) : ready ? (
           <p>Your creative direction is confirmed. Preparation guidance for your shoot will appear here shortly.</p>
