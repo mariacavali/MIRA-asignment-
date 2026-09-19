@@ -46,6 +46,8 @@ export default function MiraShoot() {
   const [selectedStep, setSelectedStep] = useState<ShootStep | null>(null);
   const [showNotes, setShowNotes] = useState(false);
   const [link, setLink] = useState<string | null>(null);
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const linkField = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [imageStates, setImageStates] = useState<Record<string, boolean>>({});
   const [contact, setContact] = useState({
@@ -106,14 +108,18 @@ export default function MiraShoot() {
     setSelectedStep(null);
     setMessage(null);
     setLink(null);
-    const previous = state.data.invitations[0];
-    if (
-      previous &&
-      "preparationUrl" in previous &&
-      typeof previous.preparationUrl === "string"
-    )
-      setLink(new URL(previous.preparationUrl, window.location.origin).href);
   }, [state.data?.shoot.id]);
+  useEffect(() => {
+    const previous = state.data?.invitations[0];
+    const path =
+      previous && "preparationUrl" in previous ? previous.preparationUrl : null;
+    setLink(
+      typeof path === "string"
+        ? new URL(path, window.location.origin).href
+        : null
+    );
+    setShareMessage(null);
+  }, [state.data?.invitations]);
   useEffect(() => {
     if (selectedStep !== null) heading.current?.focus();
   }, [selectedStep]);
@@ -382,9 +388,13 @@ export default function MiraShoot() {
                   <span className="mt-1 block text-xs">
                     {progress.completed[index]
                       ? "Complete"
-                      : index + 1 === progress.next
-                        ? "Next step"
-                        : "To do"}
+                      : index === 0 && setupProgress.completed[1]
+                        ? scheduleResponse?.[0] === "change_requested"
+                          ? "Change requested"
+                          : "Sent · waiting for confirmation"
+                        : index + 1 === progress.next
+                          ? "Next step"
+                          : "To do"}
                   </span>
                 </span>
               </button>
@@ -392,6 +402,77 @@ export default function MiraShoot() {
           </nav>
           <p className="mt-4 text-sm leading-6 text-[#ded5c5]">{nextMessage}</p>
         </section>
+        {(link || latestInvitation) && (
+          <section
+            className="mt-5 rounded-xl border border-stone-200 bg-white p-5"
+            aria-labelledby="client-link-title"
+          >
+            <h2 id="client-link-title" className="text-lg font-medium">
+              Your client’s private link
+            </h2>
+            {link ? (
+              <>
+                <p className="mt-2 text-base">
+                  Email missed? Copy this link and send it through WhatsApp or
+                  any message.
+                </p>
+                <Input
+                  ref={linkField}
+                  aria-label="Private client invitation link"
+                  readOnly
+                  value={link}
+                  onFocus={event => event.currentTarget.select()}
+                  className="mt-4 min-h-12 w-full"
+                />
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Button
+                    type="button"
+                    className={goldButton}
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(link);
+                        setShareMessage(
+                          "Link copied. Paste it into your message."
+                        );
+                      } catch {
+                        linkField.current?.focus();
+                        linkField.current?.select();
+                        setShareMessage(
+                          "The link is selected. Press ⌘C on Mac or Ctrl+C to copy it."
+                        );
+                      }
+                    }}
+                  >
+                    <Copy className="mr-2 size-4" />
+                    Copy link
+                  </Button>
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center ${quietButton} px-5`}
+                  >
+                    Open client room <ArrowRight className="ml-2 size-4" />
+                  </a>
+                </div>
+                <p className="mt-3 text-sm text-stone-600">
+                  Share only with this client. It opens the same Shoot Room.
+                </p>
+                {shareMessage && (
+                  <p role="status" className="mt-3 text-base">
+                    {shareMessage}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-2">
+                {latestInvitation?.status === "active"
+                  ? "This link could not be restored. Try Refresh above."
+                  : "This invitation is no longer active."}
+              </p>
+            )}
+          </section>
+        )}
         {message && (
           <p
             role="status"
@@ -571,17 +652,7 @@ export default function MiraShoot() {
                   More invitation options
                 </summary>
                 <div className="mt-3 flex flex-wrap gap-3">
-                  {setupProgress.completed[1] && (
-                    <Button
-                      variant="outline"
-                      onClick={() => void send()}
-                      disabled={busy || changed}
-                      className={quietButton}
-                    >
-                      Resend invitation
-                    </Button>
-                  )}
-                  {!link && (
+                  {!latestInvitation && !link && (
                     <Button
                       variant="outline"
                       disabled={busy || changed}
@@ -591,34 +662,15 @@ export default function MiraShoot() {
                       Create a link to share myself
                     </Button>
                   )}
-                  {link && (
-                    <>
-                      <a
-                        href={link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex min-h-11 items-center rounded-full border border-white/20 px-4 text-sm text-[#ded5c5]"
-                      >
-                        Open client room
-                      </a>
-                      <Button
-                        variant="outline"
-                        className={quietButton}
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(link);
-                            setMessage("Invitation link copied.");
-                          } catch {
-                            setMessage(
-                              "Copying wasn't available. Open the client room and copy its address."
-                            );
-                          }
-                        }}
-                      >
-                        <Copy className="mr-2 size-4" />
-                        Copy link
-                      </Button>
-                    </>
+                  {setupProgress.completed[1] && (
+                    <Button
+                      variant="outline"
+                      onClick={() => void send()}
+                      disabled={busy || changed}
+                      className={quietButton}
+                    >
+                      Resend invitation
+                    </Button>
                   )}
                 </div>
                 <details className="mt-4">

@@ -48,7 +48,7 @@ import { applyShootMemoryPatch, emptyShootMemory, memoryPatchForTextTestAnswer }
 import { evaluateDiscoveryGate } from "./memory";
 import { ENV } from "../_core/env";
 import { buildShootPreparationBrief, type ShootPreparationBrief } from "./preparationBrief";
-import { parseInvitationAccessToken, verifyInvitationAccessSignature } from "./invitationAccessLink";
+import { createInvitationAccessToken, parseInvitationAccessToken, verifyInvitationAccessSignature } from "./invitationAccessLink";
 import { mapCompletedMoodboardImages, normalizeCreativeDnaInput } from "./moodboardAdapter";
 import { normalizeShootMemorySnapshot } from "./creativeDnaAdapter";
 
@@ -310,6 +310,7 @@ export async function getOwnedShootState(photographerUserId: number, shootId: nu
   if (!shoot) return null;
   const invitations = await db.select({
     id: miraClientInvitations.id,
+    tokenHash: miraClientInvitations.tokenHash,
     status: miraClientInvitations.status,
     deliveryStatus: miraClientInvitations.deliveryStatus,
     deliveryProvider: miraClientInvitations.deliveryProvider,
@@ -325,7 +326,17 @@ export async function getOwnedShootState(photographerUserId: number, shootId: nu
     eq(miraClientInvitations.shootId, shootId),
     eq(miraClientInvitations.photographerUserId, photographerUserId),
   )).orderBy(desc(miraClientInvitations.createdAt));
-  return { shoot, invitations };
+  // Owner-only read: recover access to the existing room without rotating its
+  // token, creating a new invitation, or sending another email. Never return hashes.
+  return { shoot, invitations: invitations.map(({ tokenHash, ...item }) => {
+    let preparationUrl: string | null = null;
+    if (item.status === "active" && calculateShootAccessDeadline(shoot.scheduledAt, shoot.durationMinutes, item.expiresAt) > new Date() && ENV.invitationLinkSecret) {
+      try {
+        preparationUrl = `/prepare/access/${createInvitationAccessToken({ invitationId: item.id, tokenHash, secret: ENV.invitationLinkSecret })}`;
+      } catch { /* Keep the shoot readable if its stored invitation is malformed. */ }
+    }
+    return { ...item, preparationUrl };
+  }) };
 }
 
 export async function getShootQaInspection(photographerUserId: number, shootId: number) {
