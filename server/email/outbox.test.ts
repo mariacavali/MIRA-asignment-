@@ -159,3 +159,78 @@ describe("MIRA email outbox", () => {
     expect(provider.send).not.toHaveBeenCalled();
   });
 });
+
+describe("client-requested email reminders", () => {
+  const now = new Date("2026-10-08T10:00:00Z");
+  const input = { shootId: 7, invitationId: "client-reminder", scheduledAt: now };
+  it("checks opt-out for legacy notifications but leaves invitation delivery available", async () => {
+    const repository = new InMemoryEmailOutboxRepository();
+    await repository.schedule({ ...input, milestoneId: "call_mira_reminder", idempotencyKey: "legacy" });
+    await repository.schedule({ ...input, milestoneId: "shoot_room_invitation", idempotencyKey: "invite" });
+    const provider = { send: vi.fn().mockResolvedValue({ messageId: "fake" }) };
+    const worker = new MiraEmailOutboxWorker(repository, async () => context({ emailReminders: false }), provider, "test@example.test", () => now);
+    expect(await worker.processOne()).toBe("suppressed");
+    expect(await worker.processOne()).toBe("sent");
+    expect(provider.send).toHaveBeenCalledTimes(1);
+  });
+  it("suppresses legacy reminders once the client has made either email choice", async () => {
+    for (const emailReminders of [true, false]) {
+      const repository = new InMemoryEmailOutboxRepository();
+      for (const milestoneId of ["preparation_guidance", "call_mira_reminder", "shoot_day_reminder"] as const) {
+        await repository.schedule({ ...input, milestoneId, idempotencyKey: milestoneId });
+      }
+      const provider = { send: vi.fn() };
+      const worker = new MiraEmailOutboxWorker(repository, async () => context({ emailReminders }), provider, "test@example.test", () => now);
+      for (let i = 0; i < 3; i++) expect(await worker.processOne()).toBe("suppressed");
+      expect(provider.send).not.toHaveBeenCalled();
+    }
+  });
+  it("requires explicit opt-in and stops preparation reminders when the client prepares now", async () => {
+    for (const changes of [{ emailReminders: null }, { emailReminders: false }, { emailReminders: true, prepareChoice: "now" as const }, { emailReminders: true, preparationCompleted: true }]) {
+      const repository = new InMemoryEmailOutboxRepository();
+      await repository.schedule({ ...input, milestoneId: "client_preparation_reminder", idempotencyKey: "prep" });
+      const provider = { send: vi.fn() };
+      const worker = new MiraEmailOutboxWorker(repository, async () => context({ prepareChoice: "later", ...changes }), provider, "test@example.test", () => now);
+      expect(await worker.processOne()).toBe("suppressed");
+      expect(provider.send).not.toHaveBeenCalled();
+    }
+  });
+  it("keeps the requested shoot reminder after preparation completion and renders an accurate date", async () => {
+    const repository = new InMemoryEmailOutboxRepository();
+    await repository.schedule({ ...input, milestoneId: "client_preparation_reminder", idempotencyKey: "prep" });
+    await repository.schedule({ ...input, milestoneId: "client_shoot_reminder", idempotencyKey: "shoot" });
+    await repository.cancelPending(input.invitationId, "preparation_completed");
+    expect((await repository.list()).map(job => job.status)).toEqual(["cancelled", "pending"]);
+    const provider = { send: vi.fn().mockResolvedValue({ messageId: "fake" }) };
+    const worker = new MiraEmailOutboxWorker(repository, async () => context({ emailReminders: true, preparationCompleted: true }), provider, "test@example.test", () => now);
+    expect(await worker.processOne()).toBe("sent");
+    expect(provider.send.mock.calls[0][0].text).not.toContain("scheduled for tomorrow");
+  });
+  it("scopes claims and lease recovery to new opt-in jobs", async () => {
+    const repository = new InMemoryEmailOutboxRepository(["client_preparation_reminder", "client_shoot_reminder"]);
+    await repository.schedule({ ...input, milestoneId: "shoot_room_invitation", idempotencyKey: "invite" });
+    await repository.schedule({ ...input, milestoneId: "client_shoot_reminder", idempotencyKey: "shoot" });
+    expect((await repository.claimDue(now, 1000))?.milestoneId).toBe("client_shoot_reminder");
+    expect(await repository.claimDue(now, 1000)).toBeNull();
+    expect(await repository.recoverExpiredLeases(new Date(now.getTime() + 2000))).toBe(1);
+    expect((await repository.list())[0].status).toBe("pending");
+  });
+  it("suppresses expired access, inactive invitations and reminders at or after the shoot", async () => {
+    for (const changes of [{ accessUntil: now }, { invitationValid: false }, { scheduledAt: now }, { shootCancelled: true }]) {
+      const repository = new InMemoryEmailOutboxRepository();
+      await repository.schedule({ ...input, milestoneId: "client_shoot_reminder", idempotencyKey: "shoot" });
+      const provider = { send: vi.fn() };
+      const worker = new MiraEmailOutboxWorker(repository, async () => context({ emailReminders: true, ...changes }), provider, "test@example.test", () => now);
+      expect(await worker.processOne()).toBe("suppressed");
+      expect(provider.send).not.toHaveBeenCalled();
+    }
+  });
+  it("does not resurrect cancelled jobs when a provider failure completes late", async () => {
+    const repository = new InMemoryEmailOutboxRepository();
+    await repository.schedule({ ...input, milestoneId: "client_shoot_reminder", idempotencyKey: "shoot" });
+    const job = await repository.claimDue(now, 1000);
+    await repository.cancelPending(input.invitationId, "client_opted_out");
+    await repository.markFailed(job!.id, "provider_delivery", now, 3);
+    expect((await repository.list())[0].status).toBe("cancelled");
+  });
+});

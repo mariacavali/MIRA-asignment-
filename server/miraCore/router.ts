@@ -4,6 +4,10 @@ import { ENV } from "../_core/env";
 import { getSessionCookieOptions } from "../_core/cookies";
 import { sdk } from "../_core/sdk";
 import { z } from "zod";
+import { clientBriefInputSchema } from "../../shared/miraClientBrief";
+import { getClientBrief, saveClientBrief } from "./clientBrief";
+import { clientPreferencesInputSchema } from "../../shared/miraClientPreferences";
+import { getClientPreparationPreferences, saveClientPreparationPreferences } from "./clientPreferences";
 import {
   createShootInputSchema,
   createDiscoverySummaryInputSchema,
@@ -96,6 +100,7 @@ async function runShootCreativePipeline(shoot: { id: number; photographerUserId:
         photographerUserId: shoot.photographerUserId,
         confirmedMemoryVersion: record.confirmedMemoryVersion,
         creativeDna: record.creativeDnaJson,
+        clientBrief: record.clientBrief,
       });
       moodboardStatus = moodboard?.status === "complete" ? "complete" : "retryable_error";
       moodboardRenderStatus = moodboard?.renderStatus ?? "not_configured";
@@ -271,7 +276,7 @@ export const miraCoreRouter = router({
     .query(async ({ ctx, input }) => {
       const state = await getOwnedShootState(ctx.user.id, input.shootId);
       if (!state) notFound();
-      return state;
+      return { ...state, roomStatus: await getShootRoomStatusForClient(input.shootId) };
     }),
   getShootQaInspection: protectedProcedure.input(z.object({ shootId: z.number().int().positive() }))
     .query(async ({ ctx, input }) => {
@@ -438,6 +443,27 @@ export const miraCoreRouter = router({
     const state = await getClientInvitation(input.token);
     if (!state) notFound();
     return getShootRoomStatusForClient(state.shoot.id);
+  }),
+  getClientBrief: publicProcedure.input(z.object({ token: tokenSchema })).query(async ({ input }) => {
+    const state = await getClientInvitation(input.token);
+    if (!state || state.invitation.status !== "active") notFound();
+    return getClientBrief(state.shoot.id);
+  }),
+  getClientPreparationPreferences: publicProcedure.input(z.object({ token: tokenSchema })).query(async ({ input }) => {
+    const state = await getClientInvitation(input.token);
+    if (!state || !["active", "completed"].includes(state.invitation.status)) notFound();
+    return getClientPreparationPreferences({ shootId: state.shoot.id, photographerUserId: state.shoot.photographerUserId, invitationId: state.invitation.id });
+  }),
+  saveClientPreparationPreferences: publicProcedure.input(z.object({ token: tokenSchema, input: clientPreferencesInputSchema })).mutation(async ({ input }) => {
+    const state = await getClientInvitation(input.token);
+    if (!state || !["active", "completed"].includes(state.invitation.status)) notFound();
+    return saveClientPreparationPreferences({ shootId: state.shoot.id, photographerUserId: state.shoot.photographerUserId, invitationId: state.invitation.id }, input.input);
+  }),
+  saveClientBrief: publicProcedure.input(z.object({ token: tokenSchema, brief: clientBriefInputSchema })).mutation(async ({ input }) => {
+    const state = await getClientInvitation(input.token);
+    if (!state || state.invitation.status !== "active") notFound();
+    if (["discovery_confirmed", "preparation_active"].includes(state.shoot.roomState)) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Your direction is already confirmed. Discuss changes with your photographer." });
+    return saveClientBrief(state.shoot.id, state.shoot.photographerUserId, input.brief);
   }),
   uploadClientVisualReference: publicProcedure.input(z.object({
     token: tokenSchema,

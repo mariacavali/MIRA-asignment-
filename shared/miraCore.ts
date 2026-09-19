@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { clientBriefSchema } from "./miraClientBrief";
+import { clientPreferencesSchema } from "./miraClientPreferences";
 
 export const MIRA_SHOOT_MEMORY_SCHEMA_VERSION = "1.0" as const;
 export const MIRA_MASTER_PROMPT_VERSION = "shoot-preparation-v1" as const;
@@ -114,6 +116,10 @@ const completenessValueSchema = z.enum(["missing", "partial", "enough"]);
 
 export const shootMemorySchema = z.object({
   schemaVersion: z.literal(MIRA_SHOOT_MEMORY_SCHEMA_VERSION),
+  // Client selections and retrieved page excerpts live in the existing JSON
+  // snapshot. They do not count as completed Discovery or overwrite answers.
+  clientBrief: clientBriefSchema.optional(),
+  clientPreferences: clientPreferencesSchema.optional(),
   identity: identitySchema,
   brand: brandSchema,
   expression: expressionSchema,

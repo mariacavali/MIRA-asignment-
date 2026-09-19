@@ -7,7 +7,8 @@ import { createLocalPlaceholderImage } from "../_core/imageGeneration";
 import { getDb } from "../db";
 import { isLocalFileStoreEnabled } from "../localFileStore";
 import { generateMoodboardImageViaOpenAI } from "./openAiMoodboardImage";
-import { compileCampaignPlanAndPrompt } from "../miraV4/campaignCompiler";
+import { compileGuidedShootCampaign } from "./shootGuide";
+import { shootGuideSchema, type ShootGuide, type ClientBrief } from "../../shared/miraClientBrief";
 import { buildFinalMoodboardPrompts, type MiraV4SelectedVisualReference } from "../miraV4/moodboard";
 import { miraV4CreativeDnaSchema, type MiraV4CreativeDna } from "../../shared/miraV4CreativeDna";
 
@@ -55,7 +56,7 @@ export function normalizeCreativeDnaInput(value: unknown): MiraV4CreativeDna {
 // for the five-exploration-direction round) - this identifies the shoot
 // pipeline's own strategy of skipping the interactive select/refine round
 // and going straight to one coherent five-scene campaign deliverable.
-export const MIRA_CORE_MOODBOARD_PROMPT_VERSION = "shoot-coherent-v1";
+export const MIRA_CORE_MOODBOARD_PROMPT_VERSION = "shoot-guided-v2";
 
 // The Shoot Room has no UI for the V4 pipeline's interactive select/refine
 // round (a deliberate, documented scope choice - see the module doc below),
@@ -95,6 +96,7 @@ export async function generateShootMoodboardForCreativeDna(params: {
   // precisely because the raw driver value cannot be trusted to already be
   // an object - see normalizeCreativeDnaInput above.
   creativeDna: unknown;
+  clientBrief?: ClientBrief;
 }) {
   const db = await requireDb();
   const existing = await db.select().from(miraShootMoodboard).where(and(
@@ -104,19 +106,22 @@ export async function generateShootMoodboardForCreativeDna(params: {
   if (existing[0]?.status === "complete") return existing[0];
 
   const creativeDna = normalizeCreativeDnaInput(params.creativeDna);
-  const { campaignPlan, compositeImagePrompt } = compileCampaignPlanAndPrompt(creativeDna);
+  const { campaignPlan, compositeImagePrompt, guides } = compileGuidedShootCampaign(creativeDna, params.clientBrief);
   const selected = buildAutoSelectedDirection(compositeImagePrompt, campaignPlan.title);
   const refinement = {
     preserve: "the confirmed campaign world, palette, lighting, and continuity rules",
     avoid: "generic stock styling or any change of direction from the confirmed Creative DNA",
     note: null,
   };
-  const prompts = buildFinalMoodboardPrompts({ creativeDna, campaignPlan, compositeImagePrompt, selected, refinement });
+  const prompts = buildFinalMoodboardPrompts({ creativeDna, campaignPlan, compositeImagePrompt, selected, refinement }).map((prompt, index) => ({
+    ...prompt,
+    prompt: `${prompt.prompt}\nSHOOT-DAY ACTION: ${guides[index].steps.join(" ")} ${guides[index].hands} ${guides[index].gaze}\nThe client's comfort and actual available outfit/location override decorative or stylistic suggestions. Keep this an achievable original reference image. Do not imply that this generated person is an exact likeness of the client.`,
+  }));
   const sourceFingerprint = createHash("sha256")
-    .update(JSON.stringify({ creativeDna, promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION }))
+    .update(JSON.stringify({ creativeDna, clientBrief: params.clientBrief, promptVersion: MIRA_CORE_MOODBOARD_PROMPT_VERSION }))
     .digest("hex");
   const campaignPlanJson = campaignPlan as unknown as Record<string, unknown>;
-  const references = prompts.map(prompt => ({ id: prompt.id, direction: prompt.direction, shotNumber: prompt.shotNumber, prompt: prompt.prompt }));
+  const references = prompts.map((prompt, index) => ({ id: prompt.id, direction: prompt.direction, shotNumber: prompt.shotNumber, prompt: prompt.prompt, shootGuide: guides[index] }));
 
   if (!existing[0]) {
     await db.insert(miraShootMoodboard).values({
@@ -152,11 +157,11 @@ export async function generateShootMoodboardForCreativeDna(params: {
 
   const usingDemoImages = !ENV.embeddingApiKey;
   try {
-    const rendered = await Promise.all(prompts.map(async prompt => {
+    const rendered = await Promise.all(references.map(async prompt => {
       const image = usingDemoImages
         ? await createLocalPlaceholderImage({ prompt: prompt.prompt, quality: "medium" })
         : await generateMoodboardImageViaOpenAI({ prompt: prompt.prompt, quality: "medium" });
-      return { id: prompt.id, direction: prompt.direction, shotNumber: prompt.shotNumber, prompt: prompt.prompt, url: image.url ?? null };
+      return { ...prompt, url: image.url ?? null };
     }));
     const allRendered = rendered.every(reference => Boolean(reference.url));
     await db.update(miraShootMoodboard).set({
@@ -184,7 +189,7 @@ export async function generateShootMoodboardForCreativeDna(params: {
   return result[0] ?? null;
 }
 
-export type ShootMoodboardImage = { id: string; direction: string; url: string };
+export type ShootMoodboardImage = { id: string; direction: string; url: string; shootGuide?: ShootGuide };
 
 // Same MariaDB JSON-column string/object boundary as normalizeCreativeDnaInput
 // above, applied to mira_shoot_moodboard.referencesJson: the driver can
@@ -221,8 +226,11 @@ export function mapCompletedMoodboardImages(status: string, referencesJson: unkn
   const parsed = moodboardReferencesSchema.safeParse(candidate);
   if (!parsed.success) return [];
   return parsed.data
-    .filter((reference): reference is { id: string; direction: string; url: string } => Boolean(reference.url))
-    .map(reference => ({ id: reference.id, direction: reference.direction, url: reference.url as string }));
+    .filter(reference => Boolean(reference.url))
+    .map(reference => {
+      const guide = shootGuideSchema.safeParse(reference.shootGuide);
+      return { id: reference.id, direction: reference.direction, url: reference.url as string, ...(guide.success ? { shootGuide: guide.data } : {}) };
+    });
 }
 
 // Photographer-dashboard read of the latest moodboard for a shoot they own.

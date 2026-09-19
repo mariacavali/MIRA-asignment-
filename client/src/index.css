@@ -645,3 +645,43 @@ button:not(:disabled):active {
     grid-template-columns: 1fr;
   }
 }
+
+/* Guided shoot workspaces: large, calm, readable; voice overlay keeps its own theme. */
+.mira-light-surface {
+  background: #faf9f6;
+  color: #28251f;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.mira-light-content .mira-dark-panel,
+.mira-light-surface > div > .mira-dark-panel {
+  background: #fff;
+  border: 1px solid #e4dfd6;
+  border-radius: 16px;
+  color: #28251f;
+}
+.mira-light-content .mira-dark-kicker {
+  color: #756044;
+  font-size: .875rem;
+  letter-spacing: .08em;
+}
+.mira-light-content :is(.text-xs, .text-sm) { font-size: 1rem; line-height: 1.65; }
+.mira-light-content :is([class*='text-[#'], [class*='text-white']) { color: #4e493f; }
+.mira-light-content :is(h1,h2,h3) { color: #28251f; }
+.mira-light-content :is([class*='text-red-']) { color: #a02620; }
+.mira-light-content :is([class*='border-white/']) { border-color: #ddd6ca; }
+.mira-light-content :is([class*='bg-[#121211]'],[class*='bg-white/'],[class*='bg-[#171613]']) { background: #f4f1eb; }
+.mira-light-content :is(input:not([type=checkbox]):not([type=radio]), textarea, select) {
+  color: #28251f;
+  background: #fff;
+  border: 1px solid #c8c0b3;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.mira-light-content :is(button,a):focus-visible { outline: 2px solid #887044; outline-offset: 4px; }
+.mira-light-surface .mira-primary { color: #fff; background: #363e36; border: 1px solid #363e36; }
+.mira-light-surface .mira-primary:hover { background: #222c22; }
+.mira-light-surface .mira-secondary { color: #38362f; background: transparent; border: 1px solid #c8c0b3; }
+.mira-light-surface .mira-secondary:hover { background: #f0ede7; }
+.mira-light-content [class*='bg-[#d2b98b]'] { background: #363e36; color: #fff; }
+.mira-light-content progress { accent-color: #887044; }

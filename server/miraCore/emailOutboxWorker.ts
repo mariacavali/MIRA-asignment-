@@ -2,25 +2,31 @@ import { ENV } from "../_core/env";
 import { getTransactionalEmailProvider } from "../email";
 import { DrizzleEmailOutboxRepository, MiraEmailOutboxWorker } from "../email/outbox";
 import { resolveMiraEmailOutboxContext } from "./emailOutboxContext";
+import { CLIENT_REMINDER_MILESTONES } from "../../shared/miraClientPreferences";
+import { startEmailReminderTimer } from "../email/reminderTimer";
+import { normalizePublicBaseUrl } from "../_core/publicUrl";
 
-// Assembling this worker only wires dependencies together - it never claims
-// or sends a job by itself. Actual processing only happens when the secured
-// /api/internal/mira/email-outbox/process endpoint is called, so starting
-// the server (which calls this once, eagerly, like the Stripe webhook
-// handler) never sends anything on its own.
-//
-// Returns null - leaving the endpoint safely unavailable - unless every
-// piece of required production configuration (the link-signing secret, the
-// public base URL, and a configured transactional email provider) is
-// present. This is the single place that gates real Resend delivery.
-export function buildProductionMiraEmailOutboxWorker(): MiraEmailOutboxWorker | null {
+// Construction never claims jobs. The existing protected endpoint retains its
+// full queue; the app timer is restricted to explicitly requested reminders.
+export function buildProductionMiraEmailOutboxWorker(clientRemindersOnly = false): MiraEmailOutboxWorker | null {
   if (!ENV.invitationLinkSecret || !ENV.publicAppBaseUrl || !ENV.invitationFrom) return null;
+  try { normalizePublicBaseUrl(ENV.publicAppBaseUrl); } catch { return null; }
   const provider = getTransactionalEmailProvider();
   if (!provider) return null;
   return new MiraEmailOutboxWorker(
-    new DrizzleEmailOutboxRepository(),
+    new DrizzleEmailOutboxRepository(clientRemindersOnly ? CLIENT_REMINDER_MILESTONES : undefined),
     resolveMiraEmailOutboxContext,
     provider,
     ENV.invitationFrom,
   );
+}
+
+export function clientReminderInfrastructureAvailable(): boolean {
+  return Boolean(ENV.isProduction && !ENV.miraLocalFileStore && ENV.databaseUrl && buildProductionMiraEmailOutboxWorker(true));
+}
+
+export function startProductionClientReminderTimer() {
+  if (!clientReminderInfrastructureAvailable()) return null;
+  const worker = buildProductionMiraEmailOutboxWorker(true);
+  return worker ? startEmailReminderTimer(worker) : null;
 }

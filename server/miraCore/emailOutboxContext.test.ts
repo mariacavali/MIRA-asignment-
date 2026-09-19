@@ -2,13 +2,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   getInvitationRoomStateById: vi.fn(),
+  getLatestShootMemory: vi.fn(),
   env: {
     invitationLinkSecret: "synthetic-invitation-link-secret",
     publicAppBaseUrl: "https://mira.example",
   },
 }));
 
-vi.mock("./db", () => ({ getInvitationRoomStateById: mocks.getInvitationRoomStateById }));
+vi.mock("./db", () => ({ getInvitationRoomStateById: mocks.getInvitationRoomStateById, getLatestShootMemory: mocks.getLatestShootMemory }));
 vi.mock("../_core/env", () => ({ ENV: mocks.env }));
 
 import { resolveMiraEmailOutboxContext } from "./emailOutboxContext";
@@ -54,11 +55,19 @@ function state(overrides: Partial<{ tokenHash: string; status: string; completed
 
 beforeEach(() => {
   mocks.getInvitationRoomStateById.mockReset();
+  mocks.getLatestShootMemory.mockResolvedValue({});
   mocks.env.invitationLinkSecret = "synthetic-invitation-link-secret";
   mocks.env.publicAppBaseUrl = "https://mira.example";
 });
 
 describe("MIRA email outbox context resolver", () => {
+  it("reads the latest opt-out at processing time rather than caching preferences", async () => {
+    mocks.getInvitationRoomStateById.mockResolvedValue(state());
+    mocks.getLatestShootMemory.mockResolvedValue({ clientPreferences: { calendarChoice: null, emailReminders: false, prepareChoice: null, reminderAt: null, updatedAt: null } });
+    expect((await resolveMiraEmailOutboxContext(job))?.emailReminders).toBe(false);
+    expect(mocks.getLatestShootMemory).toHaveBeenCalledWith(job.shootId);
+  });
+
   it("resolves the recipient and mints a signed access link only when called, from current state", async () => {
     mocks.getInvitationRoomStateById.mockResolvedValue(state());
     const context = await resolveMiraEmailOutboxContext(job);

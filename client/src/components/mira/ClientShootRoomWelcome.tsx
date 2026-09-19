@@ -23,22 +23,18 @@ export function ClientShootRoomWelcome({
   isLoading: boolean;
   error: string | null;
 }) {
-  const photographerName = photographer.businessName || photographer.displayName;
+  const photographerName =
+    photographer.businessName || photographer.displayName;
 
   return (
     <section>
-      <h2 className="mira-dark-display text-3xl text-[#f1eadc]">
-        Share your direction.
-      </h2>
-      <p className="mt-4 text-sm leading-7 text-[#c9c3b7]">
-        Tell MIRA what you want from your photographs and what will help you feel prepared for your shoot with {photographerName}.
-      </p>
-      <p className="mt-3 text-sm leading-7 text-[#c9c3b7]">
-        Choose voice or text. At the end, review and confirm your summary to complete this step.
+      <p className="text-lg leading-8">
+        Talk with MIRA or use text. At the end, confirm your summary so{" "}
+        {photographerName} can review your direction.
       </p>
 
       <div className="mt-6">
-        <label className="flex items-start gap-3 rounded border border-white/10 p-4 text-left text-xs leading-6 text-[#bdb6a9]">
+        <label className="flex items-start gap-3 rounded border border-white/10 p-4 text-left text-base leading-7 text-[#bdb6a9]">
           <input
             type="checkbox"
             checked={consent}
@@ -47,7 +43,8 @@ export function ClientShootRoomWelcome({
           />
           <span>
             I agree to AI-assisted processing of what I share for this shoot
-            preparation. Short-lived text transcripts may be retained for service quality; raw audio is not stored.
+            preparation. Short-lived text transcripts may be retained for
+            service quality; raw audio is not stored.
           </span>
         </label>
 
@@ -63,7 +60,7 @@ export function ClientShootRoomWelcome({
             onClick={onCallMira}
             className="rounded-full bg-[#d2b98b] px-10 text-base text-[#171613] hover:bg-[#e0c99e]"
           >
-            <Mic className="mr-2 size-5" /> Call MIRA
+            <Mic className="mr-2 size-5" /> Talk to MIRA
           </Button>
           <Button
             disabled={!consent || isLoading}

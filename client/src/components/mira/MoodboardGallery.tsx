@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import { MoodboardShotCard } from "./MoodboardShotCard";
 
 // Displays only the real, persisted moodboard artifact. Never renders a
 // text-only or fabricated substitute - while it isn't ready yet, this shows
@@ -20,15 +21,9 @@ export function MoodboardGallery({ token }: { token: string }) {
     return (
       <div aria-live="polite">
         <p className="mira-dark-kicker">Your moodboard</p>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {status.data.images.map(image => (
-            <img
-              key={image.id}
-              src={image.url}
-              alt={image.direction}
-              className="aspect-[4/5] w-full rounded object-cover"
-            />
-          ))}
+        <p className="mt-3 text-sm leading-6 text-[#c5bfb3]">These images suggest a direction, not an exact result. Try one small action at a time, skip anything uncomfortable, and let your photographer adapt the shot to you.</p>
+        <div className="mt-4 grid items-start gap-4 sm:grid-cols-2">
+          {status.data.images.map((image, index) => <MoodboardShotCard key={image.id} image={image} number={index + 1} />)}
         </div>
       </div>
     );

@@ -13,7 +13,7 @@ import { createStripeWebhookHandler } from "../payment/stripeWebhook";
 import { DrizzlePaymentRepository } from "../payment/drizzlePaymentRepository";
 import { LocalPaymentRepository } from "../payment/localPaymentRepository";
 import { createEmailOutboxWorkerHandler } from "../email/outboxWorkerEndpoint";
-import { buildProductionMiraEmailOutboxWorker } from "../miraCore/emailOutboxWorker";
+import { buildProductionMiraEmailOutboxWorker, startProductionClientReminderTimer } from "../miraCore/emailOutboxWorker";
 import { createResendWebhookHandler } from "../email/resendWebhook";
 import { DrizzleEmailOutboxRepository } from "../email/outbox";
 import { healthHandler, readinessHandler } from "./readiness";
@@ -91,6 +91,8 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    const reminders = startProductionClientReminderTimer();
+    server.once("close", () => reminders?.stop());
   });
 }
 

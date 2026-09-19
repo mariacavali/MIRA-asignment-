@@ -43,8 +43,8 @@ export function buildInspirationFromVisualReferences(
   }
   const primary = references.find(reference => reference.referencePurpose === "direction_to_explore")
     ?? references.find(reference => reference.referencePurpose === "like")
-    ?? references[0];
-  const imageReference = primary.url && primary.url.length > 0 && primary.url.length <= 1024 ? primary.url : null;
+    ?? references.find(reference => reference.referencePurpose === "current_identity");
+  const imageReference = primary?.url && primary.url.length > 0 && primary.url.length <= 1024 ? primary.url : null;
   const digest = references
     .map((reference, index) => `[${index + 1}] ${reference.referencePurpose ?? "reference"}: ${reference.clientDescription ?? "no description shared"}`)
     .join(" | ")
@@ -129,6 +129,13 @@ export function buildShootCreativeDnaSource(params: {
         } : null,
         confirmedMemory: memory,
         confirmedSummary: params.summaryText,
+        // The legacy inspiration digest is capped at 500 characters. Keep
+        // every explicit reference note here so later choices are not lost.
+        visualReferences: (params.visualReferences ?? []).map(reference => ({
+          id: reference.id,
+          referencePurpose: reference.referencePurpose,
+          clientDescription: reference.clientDescription,
+        })),
       },
     },
     conversation: [{
@@ -168,12 +175,13 @@ export async function generateShootCreativeDnaForConfirmedMemory(params: {
     .where(eq(miraPhotographerProfiles.userId, params.photographerUserId)).limit(1);
   const visualReferences = await listShootVisualReferencesForClient(params.shootId);
   const source = buildShootCreativeDnaSource({ shoot, photographer: profiles[0] ?? null, memory: revision.snapshotJson, summaryText: summary.summaryText, visualReferences });
+  const clientBrief = normalizeShootMemorySnapshot(revision.snapshotJson).clientBrief;
   const sourceFingerprint = fingerprintMiraV4CreativeDnaSource(source);
   const existing = await db.select().from(miraShootCreativeDna).where(and(
     eq(miraShootCreativeDna.shootId, params.shootId),
     eq(miraShootCreativeDna.confirmedMemoryVersion, summary.memoryVersion),
   )).limit(1);
-  if (existing[0]?.status === "complete") return existing[0];
+  if (existing[0]?.status === "complete") return { ...existing[0], clientBrief };
   if (!existing[0]) {
     await db.insert(miraShootCreativeDna).values({
       shootId: params.shootId,
@@ -195,7 +203,7 @@ export async function generateShootCreativeDnaForConfirmedMemory(params: {
     // compiler, the moodboard prompts, the gallery) runs for real off this
     // object - only the paid text-synthesis boundary is swapped out.
     const generated = ENV.embeddingApiKey
-      ? await synthesizeMiraV4CreativeDna({ source, inspirationImageUrl: source.inspiration.imageReference ?? undefined })
+      ? await synthesizeMiraV4CreativeDna({ source, visualReferenceImages: visualReferences.filter(reference => Boolean(reference.url)).map(reference => ({ url: reference.url!, purpose: reference.referencePurpose ?? "other", note: reference.clientDescription ?? "" })) })
       : { creativeDna: buildDemoMiraV4CreativeDna(source), model: DEMO_CREATIVE_DNA_MODEL };
     await db.update(miraShootCreativeDna).set({
       status: "complete",
@@ -218,7 +226,7 @@ export async function generateShootCreativeDnaForConfirmedMemory(params: {
     eq(miraShootCreativeDna.shootId, params.shootId),
     eq(miraShootCreativeDna.confirmedMemoryVersion, summary.memoryVersion),
   )).limit(1);
-  return completed[0] ?? null;
+  return completed[0] ? { ...completed[0], clientBrief } : null;
 }
 
 export async function getShootCreativeDnaForOwner(photographerUserId: number, shootId: number) {

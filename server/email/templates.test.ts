@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { callMiraReminderEmail, clientShootRoomInvitationEmail, invitationEmail, preparationCompletedEmail, preparationGuidanceEmail, readyToShootEmail, shootDayReminderEmail } from "./templates";
+import {
+  callMiraReminderEmail,
+  clientShootRoomInvitationEmail,
+  invitationEmail,
+  preparationCompletedEmail,
+  preparationGuidanceEmail,
+  readyToShootEmail,
+  shootDayReminderEmail,
+} from "./templates";
 
 describe("MIRA transactional email templates", () => {
   it("identifies the actual photographer without Maria-branded marketing", () => {
@@ -39,32 +47,51 @@ describe("MIRA transactional email templates", () => {
       preparationUrl,
       talkToMiraUrl,
     });
-    const guidance = preparationGuidanceEmail({ clientFirstName: "Jamie", preparationUrl });
-    const reminder = callMiraReminderEmail({ clientFirstName: "Jamie", photographerName: "North & Light", preparationUrl });
-    const day = shootDayReminderEmail({ clientFirstName: "Jamie", photographerName: "North & Light", scheduledAt: "2026-10-15T10:00:00.000Z", timeZone: "Europe/Amsterdam", location: "Studio, Amsterdam", preparationUrl });
+    const guidance = preparationGuidanceEmail({
+      clientFirstName: "Jamie",
+      preparationUrl,
+    });
+    const reminder = callMiraReminderEmail({
+      clientFirstName: "Jamie",
+      photographerName: "North & Light",
+      preparationUrl,
+    });
+    const day = shootDayReminderEmail({
+      clientFirstName: "Jamie",
+      photographerName: "North & Light",
+      scheduledAt: "2026-10-15T10:00:00.000Z",
+      timeZone: "Europe/Amsterdam",
+      location: "Studio, Amsterdam",
+      preparationUrl,
+    });
 
-    expect(invitation.subject).toBe("North & Light invited you to prepare for your shoot");
+    expect(invitation.subject).toBe("North & Light invited you to a shoot");
     expect(invitation.text).toMatch(/Thursday,? 15 October 2026 at 12:00/);
-    expect(invitation.text).toMatch(/Your private Shoot Room will remain available until Friday,? 16 October 2026 at 12:00\./);
-    expect(invitation.text).toContain("Save this email so you can return to your private Shoot Room");
+    expect(invitation.text).toMatch(
+      /Your private Shoot Room will remain available until Friday,? 16 October 2026 at 12:00\./
+    );
+    expect(invitation.text).toContain(
+      "Save this email to return to the same private room."
+    );
     expect(invitation.html).toContain("&lt;Jamie&gt;");
     expect(invitation.html).not.toContain("<Jamie>");
-    expect(invitation.text).toContain(talkToMiraUrl);
+    expect(invitation.text).not.toContain(talkToMiraUrl);
     expect(invitation.html).toContain(`href="${preparationUrl}"`);
-    expect(invitation.html).toContain(`href="${talkToMiraUrl}"`);
-    expect(invitation.html).toContain("background:#efe6d4");
-    expect(invitation.html).toContain("background:#191816");
+    expect(invitation.html).not.toContain(`href="${talkToMiraUrl}"`);
+    expect(invitation.html.match(/href=/g)).toHaveLength(1);
+    expect(invitation.html).toContain("background:#faf9f6");
+    expect(invitation.html).toContain("background:#ffffff");
     expect(invitation.html).toContain("background:#d5bc89");
-    expect(invitation.html).toContain("YOU’RE INVITED TO PREPARE FOR YOUR SHOOT");
+    expect(invitation.html).toContain("YOUR SHOOT STARTS HERE");
     for (const email of [guidance, reminder, day]) {
       expect(email.text).toContain(preparationUrl);
       expect(email.html).toContain(`href="${preparationUrl}"`);
-      expect(email.text).toContain("TALK TO MIRA");
-      expect(email.html).toContain(">Talk to MIRA<");
+      expect(email.text).not.toContain("TALK TO MIRA");
+      expect(email.html.match(/href=/g)).toHaveLength(1);
     }
     expect(guidance.subject).toBe("Let’s prepare for your remote photoshoot");
     expect(reminder.subject).toBe("A reminder to prepare with MIRA");
-    expect(day.subject).toBe("Your remote photoshoot is tomorrow");
+    expect(day.subject).toBe("Your remote photoshoot is coming up");
     expect(day.html).toContain("<ul>");
   });
 
@@ -81,14 +108,14 @@ describe("MIRA transactional email templates", () => {
     expect(email.subject).toBe("You're ready to shoot");
     expect(email.text).toContain("confirmed the creative direction");
     expect(email.text).toContain(preparationUrl);
-    expect(email.text).toContain("TALK TO MIRA");
+    expect(email.text).not.toContain("TALK TO MIRA");
     expect(email.html).toContain("&lt;Jamie&gt;");
     expect(email.html).not.toContain("<Jamie>");
     expect(email.html).toContain(`href="${preparationUrl}"`);
   });
 
-  it("compresses close shoots into one combined invitation and uses a concise talk-now message inside 24 hours", () => {
-    const common = {
+  it("keeps close-shoot invitations calm, with a real date and one link", () => {
+    const email = clientShootRoomInvitationEmail({
       clientFirstName: "Jamie",
       photographerName: "North Light",
       shootTitle: "Founder portraits",
@@ -96,16 +123,26 @@ describe("MIRA transactional email templates", () => {
       location: "Studio",
       accessUntil: null,
       preparationUrl: "https://mira.example/prepare/private-room",
+      scheduledAt: "2026-10-14T20:00:00.000Z",
       sentAt: "2026-10-14T00:00:00.000Z",
-    };
-    const combined = clientShootRoomInvitationEmail({ ...common, scheduledAt: "2026-10-15T12:00:00.000Z" });
-    const urgent = clientShootRoomInvitationEmail({ ...common, scheduledAt: "2026-10-14T20:00:00.000Z" });
-
-    expect(combined.text).toContain("everything you need is in this one message");
-    expect(combined.text).toContain("continue in text");
-    expect(combined.text).toContain("TALK TO MIRA");
-    expect(urgent.subject).toContain("shoot is soon");
-    expect(urgent.text).toContain("talk to MIRA—or continue in text");
-    expect(urgent.text).toContain("TALK TO MIRA");
+    });
+    expect(email.text).toContain("Confirm your shoot");
+    expect(email.text).toContain("14 October 2026");
+    expect(email.html.match(/href=/g)).toHaveLength(1);
+    expect(email.text).not.toContain("very soon");
+  });
+  it("does not call a requested one-hour reminder tomorrow", () => {
+    const email = shootDayReminderEmail({
+      clientFirstName: "Jamie",
+      photographerName: "John",
+      scheduledAt: "2026-10-14T20:00:00.000Z",
+      timeZone: "Europe/Amsterdam",
+      location: null,
+      preparationUrl: "https://mira.example/prepare/room",
+      requestedReminder: true,
+    });
+    expect(email.subject).toBe("Your shoot reminder");
+    expect(email.text).not.toContain("tomorrow");
+    expect(email.text).toContain("14 October 2026");
   });
 });

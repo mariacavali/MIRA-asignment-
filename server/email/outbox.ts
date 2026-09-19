@@ -1,7 +1,8 @@
-import { and, eq, isNotNull, lte, or, sql } from "drizzle-orm";
+import { and, eq, inArray, lte, ne, or, sql } from "drizzle-orm";
 import { miraEmailOutbox } from "../../drizzle/schema";
 import { getDb } from "../db";
-import { buildMiraEmailSequence, type MiraClientEmailMilestoneId } from "../../shared/miraEmailSequence";
+import { CLIENT_REMINDER_MILESTONES } from "../../shared/miraClientPreferences";
+import { buildMiraEmailSequence, LEGACY_CLIENT_REMINDER_MILESTONES, type MiraClientEmailMilestoneId } from "../../shared/miraEmailSequence";
 import { callMiraReminderEmail, clientShootRoomInvitationEmail, preparationGuidanceEmail, shootDayReminderEmail } from "./templates";
 import type { TransactionalEmail, TransactionalEmailProvider } from "./provider";
 
@@ -23,6 +24,8 @@ export interface EmailOutboxRepository {
 export class InMemoryEmailOutboxRepository implements EmailOutboxRepository {
   private jobs: EmailOutboxJob[] = [];
   private nextId = 1;
+  constructor(private readonly permittedMilestoneIds?: readonly MiraClientEmailMilestoneId[]) {}
+  private permitted(job: EmailOutboxJob) { return !this.permittedMilestoneIds || this.permittedMilestoneIds.includes(job.milestoneId); }
   async schedule(input: Omit<EmailOutboxJob, "id" | "status" | "attemptCount" | "lastErrorCategory" | "providerMessageId" | "leaseUntil" | "claimedAt" | "sentAt">) {
     const existing = this.jobs.find(job => job.invitationId === input.invitationId && job.milestoneId === input.milestoneId);
     if (existing) {
@@ -34,7 +37,7 @@ export class InMemoryEmailOutboxRepository implements EmailOutboxRepository {
     return { ...job };
   }
   async claimDue(now: Date, leaseMs: number) {
-    const job = this.jobs.find(item => item.status === "pending" && item.scheduledAt <= now);
+    const job = this.jobs.find(item => this.permitted(item) && item.status === "pending" && item.scheduledAt <= now);
     if (!job) return null;
     job.status = "processing"; job.attemptCount += 1; job.claimedAt = now; job.leaseUntil = new Date(now.getTime() + leaseMs);
     return { ...job };
@@ -42,9 +45,9 @@ export class InMemoryEmailOutboxRepository implements EmailOutboxRepository {
   async markSent(id: string, now: Date, providerMessageId: string | null = null) { const job = this.jobs.find(item => item.id === id); if (job) { job.status = "sent"; job.sentAt = now; job.providerMessageId = providerMessageId; job.leaseUntil = null; } }
   async markDeliveredByMessageId(providerMessageId: string) { const job = this.jobs.find(item => item.providerMessageId === providerMessageId && item.status === "sent"); if (job) job.status = "delivered"; }
   async markSuppressed(id: string, category: string) { const job = this.jobs.find(item => item.id === id); if (job) { job.status = "suppressed"; job.lastErrorCategory = category; job.leaseUntil = null; } }
-  async markFailed(id: string, category: string, retryAt: Date, maxAttempts: number) { const job = this.jobs.find(item => item.id === id); if (!job) return; job.lastErrorCategory = category; job.leaseUntil = null; if (job.attemptCount >= maxAttempts) job.status = "failed"; else { job.status = "pending"; job.scheduledAt = retryAt; } }
-  async cancelPending(invitationId: string, category: string) { for (const job of this.jobs) if (job.invitationId === invitationId && (job.status === "pending" || job.status === "processing")) { job.status = "cancelled"; job.lastErrorCategory = category; job.leaseUntil = null; } }
-  async recoverExpiredLeases(now: Date) { let count = 0; for (const job of this.jobs) if (job.status === "processing" && job.leaseUntil && job.leaseUntil <= now) { job.status = "pending"; job.leaseUntil = null; count += 1; } return count; }
+  async markFailed(id: string, category: string, retryAt: Date, maxAttempts: number) { const job = this.jobs.find(item => item.id === id); if (!job || job.status !== "processing") return; job.lastErrorCategory = category; job.leaseUntil = null; if (job.attemptCount >= maxAttempts) job.status = "failed"; else { job.status = "pending"; job.scheduledAt = retryAt; } }
+  async cancelPending(invitationId: string, category: string) { for (const job of this.jobs) if (this.permitted(job) && !(category === "preparation_completed" && job.milestoneId === "client_shoot_reminder") && job.invitationId === invitationId && (job.status === "pending" || job.status === "processing")) { job.status = "cancelled"; job.lastErrorCategory = category; job.leaseUntil = null; } }
+  async recoverExpiredLeases(now: Date) { let count = 0; for (const job of this.jobs) if (this.permitted(job) && job.status === "processing" && job.leaseUntil && job.leaseUntil <= now) { job.status = "pending"; job.leaseUntil = null; count += 1; } return count; }
   async list() { return this.jobs.map(job => ({ ...job })); }
 }
 
@@ -63,18 +66,29 @@ function toJob(row: typeof miraEmailOutbox.$inferSelect): EmailOutboxJob { retur
 async function requireDb() { const db = await getDb(); if (!db) throw new Error("Email outbox database is unavailable"); return db; }
 
 export class DrizzleEmailOutboxRepository implements EmailOutboxRepository {
+  constructor(private readonly permittedMilestoneIds?: readonly MiraClientEmailMilestoneId[]) {}
+  private scope() { return this.permittedMilestoneIds ? inArray(miraEmailOutbox.milestoneId, [...this.permittedMilestoneIds]) : undefined; }
   async schedule(input: Omit<EmailOutboxJob, "id" | "status" | "attemptCount" | "lastErrorCategory" | "providerMessageId" | "leaseUntil" | "claimedAt" | "sentAt">) { const db = await requireDb(); await db.insert(miraEmailOutbox).values({ shootId: input.shootId, invitationId: input.invitationId, milestoneId: input.milestoneId, scheduledAt: input.scheduledAt, idempotencyKey: input.idempotencyKey }).onDuplicateKeyUpdate({ set: { scheduledAt: sql`IF(${miraEmailOutbox.status} = 'pending', VALUES(${miraEmailOutbox.scheduledAt}), ${miraEmailOutbox.scheduledAt})` } }); const rows = await db.select().from(miraEmailOutbox).where(eq(miraEmailOutbox.idempotencyKey, input.idempotencyKey)).limit(1); if (!rows[0]) throw new Error("Email outbox job was not created"); return toJob(rows[0]); }
-  async claimDue(now: Date, leaseMs: number) { const db = await requireDb(); const rows = await db.select().from(miraEmailOutbox).where(or(and(eq(miraEmailOutbox.status, "pending"), lte(miraEmailOutbox.scheduledAt, now)), and(eq(miraEmailOutbox.status, "processing"), lte(miraEmailOutbox.leaseUntil, now)))).limit(1); const row = rows[0]; if (!row) return null; const changed = await db.update(miraEmailOutbox).set({ status: "processing", attemptCount: sql`${miraEmailOutbox.attemptCount} + 1`, claimedAt: now, leaseUntil: new Date(now.getTime() + leaseMs) }).where(and(eq(miraEmailOutbox.id, row.id), or(eq(miraEmailOutbox.status, "pending"), and(eq(miraEmailOutbox.status, "processing"), lte(miraEmailOutbox.leaseUntil, now))))); return Number(changed[0].affectedRows) === 1 ? { ...toJob(row), status: "processing" as const, attemptCount: row.attemptCount + 1, claimedAt: now, leaseUntil: new Date(now.getTime() + leaseMs) } : null; }
+  async claimDue(now: Date, leaseMs: number) {
+    const db = await requireDb();
+    const due = or(and(eq(miraEmailOutbox.status, "pending"), lte(miraEmailOutbox.scheduledAt, now)), and(eq(miraEmailOutbox.status, "processing"), lte(miraEmailOutbox.leaseUntil, now)));
+    const rows = await db.select().from(miraEmailOutbox).where(and(this.scope(), due)).limit(1);
+    const row = rows[0];
+    if (!row) return null;
+    const changed = await db.update(miraEmailOutbox).set({ status: "processing", attemptCount: sql`${miraEmailOutbox.attemptCount} + 1`, claimedAt: now, leaseUntil: new Date(now.getTime() + leaseMs) })
+      .where(and(this.scope(), eq(miraEmailOutbox.id, row.id), eq(miraEmailOutbox.scheduledAt, row.scheduledAt), due));
+    return Number(changed[0].affectedRows) === 1 ? { ...toJob(row), status: "processing" as const, attemptCount: row.attemptCount + 1, claimedAt: now, leaseUntil: new Date(now.getTime() + leaseMs) } : null;
+  }
   async markSent(id: string, now: Date, providerMessageId: string | null = null) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "sent", sentAt: now, providerMessageId, leaseUntil: null }).where(eq(miraEmailOutbox.id, Number(id))); }
   async markDeliveredByMessageId(providerMessageId: string) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "delivered" }).where(and(eq(miraEmailOutbox.providerMessageId, providerMessageId), eq(miraEmailOutbox.status, "sent"))); }
   async markSuppressed(id: string, category: string) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "suppressed", lastErrorCategory: category, leaseUntil: null }).where(eq(miraEmailOutbox.id, Number(id))); }
-  async markFailed(id: string, category: string, retryAt: Date, maxAttempts: number) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "failed", lastErrorCategory: category, leaseUntil: null }).where(and(eq(miraEmailOutbox.id, Number(id)), sql`${miraEmailOutbox.attemptCount} >= ${maxAttempts}`)); await db.update(miraEmailOutbox).set({ status: "pending", lastErrorCategory: category, scheduledAt: retryAt, leaseUntil: null }).where(and(eq(miraEmailOutbox.id, Number(id)), sql`${miraEmailOutbox.attemptCount} < ${maxAttempts}`)); }
-  async cancelPending(invitationId: string, category: string) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "cancelled", lastErrorCategory: category, leaseUntil: null }).where(and(eq(miraEmailOutbox.invitationId, invitationId), or(eq(miraEmailOutbox.status, "pending"), eq(miraEmailOutbox.status, "processing")))); }
-  async recoverExpiredLeases(now: Date) { const db = await requireDb(); const result = await db.update(miraEmailOutbox).set({ status: "pending", leaseUntil: null }).where(and(eq(miraEmailOutbox.status, "processing"), lte(miraEmailOutbox.leaseUntil, now))); return Number(result[0].affectedRows); }
-  async list() { const db = await requireDb(); return (await db.select().from(miraEmailOutbox)).map(toJob); }
+  async markFailed(id: string, category: string, retryAt: Date, maxAttempts: number) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "failed", lastErrorCategory: category, leaseUntil: null }).where(and(eq(miraEmailOutbox.id, Number(id)), eq(miraEmailOutbox.status, "processing"), sql`${miraEmailOutbox.attemptCount} >= ${maxAttempts}`)); await db.update(miraEmailOutbox).set({ status: "pending", lastErrorCategory: category, scheduledAt: retryAt, leaseUntil: null }).where(and(eq(miraEmailOutbox.id, Number(id)), eq(miraEmailOutbox.status, "processing"), sql`${miraEmailOutbox.attemptCount} < ${maxAttempts}`)); }
+  async cancelPending(invitationId: string, category: string) { const db = await requireDb(); await db.update(miraEmailOutbox).set({ status: "cancelled", lastErrorCategory: category, leaseUntil: null }).where(and(this.scope(), category === "preparation_completed" ? ne(miraEmailOutbox.milestoneId, "client_shoot_reminder") : undefined, eq(miraEmailOutbox.invitationId, invitationId), or(eq(miraEmailOutbox.status, "pending"), eq(miraEmailOutbox.status, "processing")))); }
+  async recoverExpiredLeases(now: Date) { const db = await requireDb(); const result = await db.update(miraEmailOutbox).set({ status: "pending", leaseUntil: null }).where(and(this.scope(), eq(miraEmailOutbox.status, "processing"), lte(miraEmailOutbox.leaseUntil, now))); return Number(result[0].affectedRows); }
+  async list() { const db = await requireDb(); return (await db.select().from(miraEmailOutbox).where(this.scope())).map(toJob); }
 }
 
-export type EmailContext = { clientFirstName: string | null; photographerName: string; shootTitle: string; scheduledAt: Date | null; shootEndsAt: Date | null; timeZone: string; location: string | null; accessUntil: Date | null; preparationUrl: string; clientEmail: string | null; preparationCompleted: boolean; invitationValid: boolean; shootCancelled: boolean };
+export type EmailContext = { clientFirstName: string | null; photographerName: string; shootTitle: string; scheduledAt: Date | null; shootEndsAt: Date | null; timeZone: string; location: string | null; accessUntil: Date | null; preparationUrl: string; clientEmail: string | null; preparationCompleted: boolean; invitationValid: boolean; shootCancelled: boolean; emailReminders?: boolean | null; prepareChoice?: "now" | "later" | null };
 export type EmailContextResolver = (job: EmailOutboxJob) => Promise<EmailContext | null>;
 
 export function scheduleMiraEmailMilestones(repository: EmailOutboxRepository, input: { invitationId: string; shootId: number; scheduledAt: Date; timeZone: string; invitationSentAt: Date; acceptedAt?: Date | null; preparationCompletedAt?: Date | null; invitationValid?: boolean; shootCancelled?: boolean }) {
@@ -85,13 +99,49 @@ export function scheduleMiraEmailMilestones(repository: EmailOutboxRepository, i
 function renderMilestone(milestoneId: MiraClientEmailMilestoneId, context: EmailContext, now: Date) {
   if (milestoneId === "shoot_room_invitation") return clientShootRoomInvitationEmail({ clientFirstName: context.clientFirstName, photographerName: context.photographerName, shootTitle: context.shootTitle, scheduledAt: context.scheduledAt, timeZone: context.timeZone, location: context.location, accessUntil: context.accessUntil, preparationUrl: context.preparationUrl, sentAt: now });
   if (milestoneId === "preparation_guidance") return preparationGuidanceEmail({ clientFirstName: context.clientFirstName, preparationUrl: context.preparationUrl });
-  if (milestoneId === "call_mira_reminder") return callMiraReminderEmail({ clientFirstName: context.clientFirstName, photographerName: context.photographerName, preparationUrl: context.preparationUrl });
-  return shootDayReminderEmail({ clientFirstName: context.clientFirstName, photographerName: context.photographerName, scheduledAt: context.scheduledAt ?? new Date(), timeZone: context.timeZone, location: context.location, preparationUrl: context.preparationUrl });
+  if (milestoneId === "call_mira_reminder" || milestoneId === "client_preparation_reminder") return callMiraReminderEmail({ clientFirstName: context.clientFirstName, photographerName: context.photographerName, preparationUrl: context.preparationUrl });
+  return shootDayReminderEmail({ clientFirstName: context.clientFirstName, photographerName: context.photographerName, scheduledAt: context.scheduledAt ?? new Date(), timeZone: context.timeZone, location: context.location, preparationUrl: context.preparationUrl, requestedReminder: milestoneId === "client_shoot_reminder" });
 }
 
 export class MiraEmailOutboxWorker {
   constructor(private readonly repository: EmailOutboxRepository, private readonly resolveContext: EmailContextResolver, private readonly provider: TransactionalEmailProvider, private readonly from: string, private readonly now = () => new Date(), private readonly maxAttempts = 3) {}
-  async processOne() { const job = await this.repository.claimDue(this.now(), 5 * 60_000); if (!job) return "idle" as const; const context = await this.resolveContext(job); const now = this.now(); if (!context || !context.invitationValid || context.shootCancelled || context.preparationCompleted || (context.scheduledAt && now >= context.scheduledAt)) { await this.repository.markSuppressed(job.id, "not_deliverable"); return "suppressed" as const; } if (!context.clientEmail) { await this.repository.markFailed(job.id, "missing_recipient", new Date(now.getTime() + 60_000), this.maxAttempts); return "failed" as const; } try { const delivery = await this.provider.send({ to: context.clientEmail, from: this.from, ...renderMilestone(job.milestoneId, context, now) } as TransactionalEmail); await this.repository.markSent(job.id, now, delivery.messageId); return "sent" as const; } catch { await this.repository.markFailed(job.id, "provider_delivery", new Date(now.getTime() + 60_000), this.maxAttempts); return "failed" as const; } }
+  async processOne() {
+    const job = await this.repository.claimDue(this.now(), 5 * 60_000);
+    if (!job) return "idle" as const;
+    let context: EmailContext | null;
+    try { context = await this.resolveContext(job); }
+    catch {
+      await this.repository.markFailed(job.id, "context_unavailable", new Date(this.now().getTime() + 60_000), this.maxAttempts);
+      return "failed" as const;
+    }
+    const now = this.now();
+    const invitation = job.milestoneId === "shoot_room_invitation";
+    const explicitReminder = CLIENT_REMINDER_MILESTONES.some(id => id === job.milestoneId);
+    const completionStopsEmail = job.milestoneId !== "client_shoot_reminder";
+    if (!context || !context.invitationValid || context.shootCancelled
+      || (context.accessUntil && now >= context.accessUntil)
+      || (context.preparationCompleted && completionStopsEmail)
+      || (context.scheduledAt && now >= context.scheduledAt)
+      || (!invitation && context.emailReminders === false)
+      || (context.emailReminders !== null && context.emailReminders !== undefined && LEGACY_CLIENT_REMINDER_MILESTONES.some(id => id === job.milestoneId))
+      || (explicitReminder && (!context.scheduledAt || context.emailReminders !== true))
+      || (job.milestoneId === "client_preparation_reminder" && context.prepareChoice !== "later")) {
+      await this.repository.markSuppressed(job.id, "not_deliverable");
+      return "suppressed" as const;
+    }
+    if (!context.clientEmail) {
+      await this.repository.markFailed(job.id, "missing_recipient", new Date(now.getTime() + 60_000), this.maxAttempts);
+      return "failed" as const;
+    }
+    try {
+      const delivery = await this.provider.send({ to: context.clientEmail, from: this.from, ...renderMilestone(job.milestoneId, context, now) } as TransactionalEmail);
+      await this.repository.markSent(job.id, now, delivery.messageId);
+      return "sent" as const;
+    } catch {
+      await this.repository.markFailed(job.id, "provider_delivery", new Date(now.getTime() + 60_000), this.maxAttempts);
+      return "failed" as const;
+    }
+  }
 }
 
 export type EmailOutboxBatchResult = { claimed: number; sent: number; suppressed: number; failed: number };

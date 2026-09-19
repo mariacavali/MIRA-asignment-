@@ -139,6 +139,24 @@ const photographer = {
 };
 
 describe("references entering Creative DNA input (pure builder)", () => {
+  it("preserves all reference instructions even when the legacy inspiration digest is full", () => {
+    const references = Array.from({ length: 5 }, (_, index) => ({
+      id: `r${index + 1}`,
+      referencePurpose: index === 4 ? "dislike" : "like",
+      clientDescription: index === 4 ? "Avoid neon colours and stiff poses." : "Warm natural light. ".repeat(30),
+      url: `https://cdn.example/r${index + 1}.jpg`,
+    }));
+    const source = buildShootCreativeDnaSource({
+      shoot: shoot as any, photographer: photographer as any,
+      memory: emptyShootMemory(), summaryText: "Confirmed calm editorial direction.",
+      visualReferences: references,
+    });
+    expect(source.inspiration.userExplanation?.length).toBeLessThanOrEqual(500);
+    expect(source.journey.creativeInputs?.visualReferences).toEqual(references.map(({ id, referencePurpose, clientDescription }) => ({ id, referencePurpose, clientDescription })));
+    expect(source.journey.creativeInputs?.confirmedSummary).toBe("Confirmed calm editorial direction.");
+    expect(source.inspiration.influenceRule).toBe("supporting_evidence_only");
+  });
+
   it("leaves inspiration empty when the client shared no references, exactly as before", () => {
     expect(buildInspirationFromVisualReferences([])).toEqual({
       imageReference: null,
@@ -210,7 +228,7 @@ describe("generateShootCreativeDnaForConfirmedMemory (demo fallback + wiring)", 
     expect((result as any)?.creativeDnaJson?.creativeDirection?.creativeSummary).toContain("locally");
   });
 
-  it("calls the real synthesis with an inspiration image URL when references and a key are present", async () => {
+  it("passes labelled images to synthesis when references and a key are present", async () => {
     envMocks.env.embeddingApiKey = "sk-configured";
     referencesMocks.listShootVisualReferencesForClient.mockResolvedValue([
       { id: "r1", referencePurpose: "direction_to_explore", clientDescription: "This mood", url: "https://cdn.example/r1.jpg" },
@@ -219,7 +237,7 @@ describe("generateShootCreativeDnaForConfirmedMemory (demo fallback + wiring)", 
     dbMocks.getDb.mockResolvedValue(seedDb());
     await generateShootCreativeDnaForConfirmedMemory({ shootId: 42, photographerUserId: 9 });
     expect(synthesizeMocks.synthesizeMiraV4CreativeDna).toHaveBeenCalledWith(expect.objectContaining({
-      inspirationImageUrl: "https://cdn.example/r1.jpg",
+      visualReferenceImages: [{ url: "https://cdn.example/r1.jpg", purpose: "direction_to_explore", note: "This mood" }],
     }));
   });
 

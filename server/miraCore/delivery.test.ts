@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getCompletionNotificationContext: vi.fn(),
   getLatestInvitationIdForOwnedShoot: vi.fn(),
   getInvitationRoomStateById: vi.fn(),
+  getLatestShootMemory: vi.fn(),
   markInvitationSent: vi.fn(),
   markPhotographerNotified: vi.fn(),
   provider: { send: vi.fn() },
@@ -18,6 +19,7 @@ vi.mock("./db", () => ({
   getCompletionNotificationContext: mocks.getCompletionNotificationContext,
   getLatestInvitationIdForOwnedShoot: mocks.getLatestInvitationIdForOwnedShoot,
   getInvitationRoomStateById: mocks.getInvitationRoomStateById,
+  getLatestShootMemory: mocks.getLatestShootMemory,
   markInvitationSent: mocks.markInvitationSent,
   markPhotographerNotified: mocks.markPhotographerNotified,
 }));
@@ -74,7 +76,7 @@ describe("MIRA email delivery routing", () => {
     }));
     const delivered = mocks.provider.send.mock.calls[0]?.[0];
     expect(delivered?.html).toContain('href="https://mira.example/prepare/token"');
-    expect(delivered?.html).toContain('href="https://mira.example/prepare/token#mira-preparation"');
+    expect(delivered?.html).not.toContain('href="https://mira.example/prepare/token#mira-preparation"');
   });
 
   it("omits an invalid or missing photographer Reply-To without blocking the invitation", async () => {
@@ -134,8 +136,17 @@ describe("notifyClientShootIsReadyToShoot", () => {
   beforeEach(() => {
     mocks.getLatestInvitationIdForOwnedShoot.mockReset();
     mocks.getInvitationRoomStateById.mockReset();
+    mocks.getLatestShootMemory.mockResolvedValue({});
     mocks.getLatestInvitationIdForOwnedShoot.mockResolvedValue(INVITATION_ID);
     mocks.getInvitationRoomStateById.mockResolvedValue(invitationRoomState);
+  });
+
+  it("respects the current client opt-out before scheduling or sending", async () => {
+    mocks.getLatestShootMemory.mockResolvedValue({ clientPreferences: { calendarChoice: null, emailReminders: false, prepareChoice: null, reminderAt: null, updatedAt: null } });
+    const repository = fakeOutboxRepository("pending");
+    expect(await notifyClientShootIsReadyToShoot({ photographerUserId: 9, shootId: 7, repository })).toBe(false);
+    expect(repository.schedule).not.toHaveBeenCalled();
+    expect(mocks.provider.send).not.toHaveBeenCalled();
   });
 
   it("sends a ready-to-shoot email using a fresh signed Shoot Room link and records it as sent", async () => {

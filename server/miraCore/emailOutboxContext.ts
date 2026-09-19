@@ -2,7 +2,8 @@ import { ENV } from "../_core/env";
 import { buildPublicUrl } from "../_core/publicUrl";
 import type { EmailContext, EmailContextResolver, EmailOutboxJob } from "../email/outbox";
 import { createInvitationAccessToken } from "./invitationAccessLink";
-import { getInvitationRoomStateById } from "./db";
+import { getInvitationRoomStateById, getLatestShootMemory } from "./db";
+import { readClientPreferences } from "../../shared/miraClientPreferences";
 
 // The outbox never stores a recipient, token, or URL - every field an
 // asynchronous send needs is resolved fresh here, at the moment a job is
@@ -17,6 +18,7 @@ export const resolveMiraEmailOutboxContext: EmailContextResolver = async (job: E
   const state = await getInvitationRoomStateById(job.invitationId);
   if (!state) return null;
   const { invitation, shoot, photographer } = state;
+  const preferences = readClientPreferences(await getLatestShootMemory(job.shootId));
   let preparationUrl: string;
   try {
     const signedAccessToken = createInvitationAccessToken({
@@ -43,7 +45,9 @@ export const resolveMiraEmailOutboxContext: EmailContextResolver = async (job: E
     preparationUrl,
     clientEmail: shoot.clientEmail,
     preparationCompleted: Boolean(invitation.completedAt),
-    invitationValid: invitation.status === "active",
+    invitationValid: invitation.status === "active" || (job.milestoneId === "client_shoot_reminder" && invitation.status === "completed"),
     shootCancelled: shoot.status === "archived",
+    emailReminders: preferences.emailReminders,
+    prepareChoice: preferences.prepareChoice,
   };
 };

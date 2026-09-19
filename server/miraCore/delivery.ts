@@ -5,10 +5,12 @@ import { isValidEmailAddress } from "../email/provider";
 import type { EmailOutboxRepository } from "../email/outbox";
 import { clientShootRoomInvitationEmail, preparationCompletedEmail, readyToShootEmail } from "../email/templates";
 import { createInvitationAccessToken } from "./invitationAccessLink";
+import { readClientPreferences } from "../../shared/miraClientPreferences";
 import {
   getCompletionNotificationContext,
   getInvitationRoomStateById,
   getLatestInvitationIdForOwnedShoot,
+  getLatestShootMemory,
   getOwnedShoot,
   getPhotographerProfile,
   markInvitationSent,
@@ -86,6 +88,7 @@ export async function notifyClientShootIsReadyToShoot(params: {
   if (!invitationId) return false;
   const state = await getInvitationRoomStateById(invitationId);
   if (!state || !state.shoot.clientEmail || !isValidEmailAddress(state.shoot.clientEmail)) return false;
+  if (readClientPreferences(await getLatestShootMemory(params.shootId)).emailReminders === false) return false;
   const job = await params.repository.schedule({
     shootId: params.shootId,
     invitationId: state.invitation.id,
@@ -93,7 +96,7 @@ export async function notifyClientShootIsReadyToShoot(params: {
     scheduledAt: new Date(),
     idempotencyKey: `mira:shoot:${params.shootId}:milestone:ready_to_shoot`,
   });
-  if (job.status === "sent") return false;
+  if (job.status === "sent" || job.status === "delivered") return false;
   const signedAccessToken = createInvitationAccessToken({
     invitationId: state.invitation.id,
     tokenHash: state.invitation.tokenHash,

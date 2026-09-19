@@ -9,9 +9,12 @@ export const MIRA_EMAIL_MILESTONES = [
   // same outbox table purely as an idempotency ledger (schedule+markSent) so
   // a repeated "Mark Ready to Shoot" click can never send a duplicate email.
   { id: "ready_to_shoot", name: "Ready to shoot" },
+  { id: "client_preparation_reminder", name: "Your preparation reminder" },
+  { id: "client_shoot_reminder", name: "Your shoot reminder" },
 ] as const;
 
 export type MiraClientEmailMilestoneId = typeof MIRA_EMAIL_MILESTONES[number]["id"];
+export const LEGACY_CLIENT_REMINDER_MILESTONES = ["preparation_guidance", "call_mira_reminder", "shoot_day_reminder"] as const;
 export type MiraEmailStatus = "scheduled" | "sent" | "suppressed" | "cancelled";
 
 export type MiraClientEmailEvent = {
