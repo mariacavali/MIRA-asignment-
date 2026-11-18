@@ -35,15 +35,15 @@ describe("shared MIRA core foundation", () => {
     expect(schemaSource).not.toContain('token: varchar("token"');
   });
 
-  it("keeps the client interface minimal and does not render a transcript", () => {
-    expect(clientSource).toContain("Call MIRA");
+  it("keeps voice minimal while allowing the existing text conversation", () => {
     expect(clientSource).toContain("Text fallback");
     expect(clientSource).toContain("remaining");
     expect(clientSource).toContain('MIRA · {status}');
     expect(clientSource).not.toMatch(/MARIA CAVALI/i);
     expect(clientSource).not.toContain("Start preparation test");
     expect(clientSource).not.toContain("TEXT-ONLY DETERMINISTIC FOUNDATION");
-    expect(clientSource).not.toContain("messages.map");
+    expect(clientSource).toContain('conversationMode === "text" && messages.length > 0');
+    expect(clientSource).toContain("messages.map");
     expect(clientSource).not.toContain("qaEvents.data");
   });
 

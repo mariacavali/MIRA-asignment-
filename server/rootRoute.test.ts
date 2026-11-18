@@ -3,10 +3,10 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 describe("private staging entry route", () => {
-  it("mounts the real Mira V3 experience at both root and its explicit alias", () => {
+  it("mounts the product landing page while retaining the V3 alias", () => {
     const appSource = readFileSync(resolve(process.cwd(), "client/src/App.tsx"), "utf8");
 
-    expect(appSource).toContain('<Route path={"/"} component={MiraV3} />');
+    expect(appSource).toContain('<Route path={"/"} component={MiraLanding} />');
     expect(appSource).toContain('<Route path={"/mira-v3"} component={MiraV3} />');
     expect(appSource).not.toContain('component={Home}');
     expect(appSource).not.toContain('import Home from "./pages/Home"');

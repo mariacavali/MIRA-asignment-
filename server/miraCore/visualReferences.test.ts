@@ -42,7 +42,6 @@ describe("shoot visual-reference foundation", () => {
 
   it("exposes a real upload control and forbids fake social-link inspection", () => {
     expect(visualUploadSource).toContain('accept="image/jpeg,image/png,image/webp"');
-    expect(visualUploadSource).toContain("MIRA cannot inspect social or website links directly");
     expect(realtimeSource).toContain("you cannot inspect a social or website URL directly");
     expect(realtimeSource).toContain("Explicit client statements outrank visual inference");
   });

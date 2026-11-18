@@ -1,5 +1,36 @@
 # Local Environment Variable Template
 
+The complete copyable template is [`../.env.example`](../.env.example). Copy it to `.env`; do not commit `.env`. Blank values are intentional. Most variables are optional and their associated features are disabled by default. Configure only what your isolated local task requires.
+
+## Minimum local setup
+
+For the main application, use a disposable local MySQL/TiDB database and set `DATABASE_URL`, a newly generated local `JWT_SECRET`, and the app/OAuth identifiers and URLs needed by the configured login flow (`VITE_APP_ID`, `OAUTH_SERVER_URL`, `VITE_OAUTH_PORTAL_URL`). Set `PORT` only if 3000 is occupied. No provider API key is needed to install dependencies. Some platform-specific auth configurations cannot be reproduced without access to that platform's app console.
+
+## Credential sources and flags
+
+| Variables | Required when | Obtain/configure from |
+| --- | --- | --- |
+| `DATABASE_URL` | Running app features that persist to SQL | A dedicated local MySQL/TiDB instance; never production |
+| `JWT_SECRET` | Signing local sessions/tokens | Generate a unique random value locally; do not reuse another environment's secret |
+| `VITE_APP_ID`, `OAUTH_SERVER_URL`, `VITE_OAUTH_PORTAL_URL` | Platform OAuth login | The app/platform administrator's development app configuration |
+| `BUILT_IN_FORGE_API_URL`, `BUILT_IN_FORGE_API_KEY` | Forge-backed model, image, storage, or coach features | The authorized Forge/platform console; server-side key |
+| `OPENAI_API_KEY` and `OPENAI_*` | OpenAI embeddings, realtime, coach voice/vision or other enabled OpenAI features | OpenAI developer account; usage may be billed |
+| `PINECONE_API_KEY`, `PINECONE_INDEX_HOST`, `PINECONE_NAMESPACE` | Explicitly enabled Pinecone retrieval | Pinecone console; use the existing compatible index host only if authorized. Read/write feature flags remain off by default |
+| `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `MIRA_EMAIL_PROVIDER`, `MIRA_INVITATION_FROM`, `MIRA_PUBLIC_APP_BASE_URL` | Transactional email and delivery status | Resend account, verified sending domain and local callback configuration |
+| `MIRA_EMAIL_WORKER_SECRET`, `MIRA_INVITATION_LINK_SECRET` | Secured email worker and signed invitation links | Generate independent random secrets locally; server-side only |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` / `MIRA_STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, `STRIPE_PAYMENT_LINK_URL` | Stripe payment integration | Stripe test-mode dashboard and webhook endpoint; keep `MIRA_PAYMENT_MODE=local` unless intentionally testing Stripe |
+| `DAKIDARTS_API_KEY`, `DAKIDARTS_API_BASE_URL` | Optional V3 birth-context integration | Dakidarts provider account |
+| `NOTION_API_KEY`, `NOTION_DATABASE_ID`, `NOTION_API_BASE_URL` | Optional Notion retrieval | Notion integration settings and the intended database |
+| `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, `LANGSMITH_ENDPOINT`, `LANGSMITH_WORKSPACE_ID` | Optional coach telemetry | LangSmith account. Keep tracing/telemetry disabled unless deliberately enabled and data handling reviewed |
+| `MIRA_COACH_REFERENCE_ROOT`, `MIRA_KNOWLEDGE_DOCUMENT_ROOT`, `MIRA_PDF_PYTHON` | Local file storage/PDF extraction | Local paths and the isolated Python environment documented in `scripts/LOCAL_BOOK_TOOLS.md` |
+| `VITE_FRONTEND_FORGE_API_URL`, `VITE_FRONTEND_FORGE_API_KEY` | A browser-side Forge integration that explicitly needs them | Authorized development configuration only. Anything prefixed `VITE_` is exposed to the browser; never place a private secret there |
+
+Feature flags such as `MIRA_COACH_*_ENABLED`, `MIRA_KNOWLEDGE_ENABLED`, `MIRA_COACH_KNOWLEDGE_ENABLED`, `MIRA_PINECONE_READ_ENABLED`, `MIRA_V3_ENABLED`, `MIRA_V3_BIRTH_DATA_ENABLED`, and `NOTION_INTELLIGENCE_ENABLED` default to `false`. Enabling flags may incur provider charges or process personal data. Optional test controls (`RUN_MIRA_DB_TESTS`, `RUN_MIRA_PDF_TESTS`, `RUN_MIRA_LIVE_RECOGNITION`, `RUN_DAKIDARTS_CREDENTIAL_TEST`, `MIRA_TEST_DB_SOCKET`) are only for isolated tests; do not point them at production.
+
+`VITE_APP_TITLE`, `VITE_APP_LOGO`, `OPENAI_EMBEDDING_BASE_URL`, `OPENAI_EMBEDDING_MODEL`, audio model/voice settings, `MIRA_COACH_MODEL`, `MIRA_COACH_MAX_COMPLETION_TOKENS`, `MIRA_COACH_KNOWLEDGE_LANGUAGE`, `MIRA_COACH_KNOWLEDGE_BACKEND`, `MIRA_PILOT_QA_RETENTION_DAYS`, `STRIPE_CURRENCY`, and the `*_API_BASE_URL`/`*_ENDPOINT` values are non-secret configuration. Keep production endpoint values out of local `.env.example` when they identify private infrastructure.
+
+To rotate a credential, revoke it at its provider and issue a new one; replacing a value locally does not invalidate a previously exposed key. No credential values belong in Git, README files, issue trackers or browser-visible `VITE_*` variables.
+
 Copy the variable names below into a local `.env` file when configuring a development environment. Leave provider variables blank until valid local credentials are supplied. **Do not commit the local `.env` file.**
 
 ```dotenv

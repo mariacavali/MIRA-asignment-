@@ -1,0 +1,25 @@
+{
+  "captured": "2026-11-06",
+  "audience": "free",
+  "status": "staging",
+  "publicUrl": "https://mira-staging-production-93f3.up.railway.app/",
+  "projectId": "a8dd56cd-e4f3-4dcc-8b0a-60e6b6879027",
+  "serviceId": "6fb94c3c-3046-4055-ab0f-c75aeaa1d41d",
+  "deploymentIdObservedEarlierInThisConversation": "cde7f6c6-9c7f-4306-be86-a22c181c3183",
+  "savedSourceRoot": "/Users/mariacavali/Downloads/mira-v3-staging",
+  "verification": {
+    "method": "Read-only filesystem hashing in the existing Railway console; no database query, deployment or variable mutation in this versioning task.",
+    "deployedV3SliceFileCount": 35,
+    "deployedV3SliceSha256": "5e1fce8864ac6249482dbee9b8f059642bbdfb8d4eeb04bf0e7ed32943b0deef",
+    "savedV3SliceMatchesDeployed": true
+  },
+  "importantBoundary": "Only the 35 V3 files in source.zip are asserted byte-identical to deployment. The complete saved client/ and server/ directories do NOT match deployment, so other application versions and host integration code are not substituted into this snapshot.",
+  "excluded": [
+    "All .env and secret values",
+    "Database contents and exports",
+    "Client evidence and session data",
+    "node_modules and build outputs",
+    "Other MIRA versions and the paid archive",
+    "Unverified host integration source"
+  ]
+}

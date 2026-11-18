@@ -15,5 +15,10 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
+    // Deployed-preview checks require explicit configuration and opt-in.
+    exclude: process.env.RUN_MIRA_RUNTIME_TESTS === "1" ? [] : [
+      "server/payment/checkoutRuntimeConfig.integration.test.ts",
+      "server/payment/webhookSecretRuntime.test.ts",
+    ],
   },
 });

@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-06",
+  "consistencyCheckRuns": 1,
+  "result": "passed",
+  "checks": [
+    "FREE_MIRA_RAILWAY_V3: manifest, free label and read-only permissions passed",
+    "FREE_MIRA_FINAL_APPROVED: manifest, free label and read-only permissions passed",
+    "Railway: all 35 ZIP entries match saved files and read-only deployed V3 fingerprint; no credentials, paid archive or other version included",
+    "Approved free rule capture: terminal insight, optional non-blocking email, no paid/sales logic, specification-only",
+    "Pre-existing tracked source, Git index and pre-existing checkout status preserved",
+    "Comparison correctly records missing saved source, untested behaviour and no current reconnect-ready version"
+  ],
+  "completedCaptures": [
+    "FREE_MIRA_RAILWAY_V3",
+    "FREE_MIRA_FINAL_APPROVED"
+  ],
+  "allThreeRequestedSourceSnapshotsComplete": false,
+  "blockers": [
+    {
+      "version": "FREE_MIRA_SAVED_PROJECT",
+      "reason": "Four exact source files were not found; repository/folder clarification pending. No replacement source fabricated."
+    }
+  ],
+  "applicationTestsRun": 0,
+  "providerModelCalls": 0,
+  "deploymentOrDatabaseMutationsInVersioningTask": 0,
+  "archiveManifests": {
+    "FREE_MIRA_RAILWAY_V3": "678da7e9fb7962a197f8878d659f9932d3fb79faf1ebfc3e989d28d1a4f1ab34",
+    "FREE_MIRA_FINAL_APPROVED": "0c8c3ed971971fdbc3b1293007c0fbcfd90f475b4a5c6e23624ea83f5af7ae43"
+  },
+  "comparisonSha256": "662831366d1931cb838590ccb014084ca84106a5889ee93a3994a0807777ce88"
+}

@@ -1,0 +1,40 @@
+MIRA — add knowledge PDFs here
+
+For later Brand Management scans, keep using:
+  ../book-brand management/
+
+Parts 1–4 are now collected; Maria reports these are the final scans.
+Keep all earlier PDF files. If another part is needed, use the next unused
+number and a new name, for example:
+  brand-management-part-05.pdf
+  brand-management-part-06-pages-301-360.pdf
+
+Use printed page ranges only when you know them. Part numbers alone are fine.
+Do not replace or rename earlier parts. If a scan is a correction, keep the old
+file and give the corrected file a new name, then tell Codex which it replaces.
+
+For other books, create one folder per book inside this knowledge-inbox:
+  another-book-title/part-01.pdf
+  another-book-title/part-02.pdf
+
+For a standalone guide/article/report, a PDF directly in this folder is fine:
+  audience-research-guide.pdf
+
+If available, include the cover/title and copyright/edition pages with a book.
+Keep pages upright, in order and readable. Searchable PDFs are helpful, but you
+can keep adding scanned PDFs. Existing large PDFs do not need to be replaced;
+preparation will identify files that need splitting or OCR.
+
+You do not need to edit JSON, environment variables or Pinecone for each PDF.
+Tell Codex what you added and whether the book is complete or still in progress.
+
+Adding a file does not upload it, approve its knowledge or seed Pinecone.
+We will build the pipeline now and perform the seeding step after preparation
+and review, when Maria is ready. Later additions can use the same process.
+
+Local inventory command (no network, extraction, AI or seeding):
+  python3 scripts/scan-knowledge-inbox.py
+
+The command inventories this folder and the existing Brand Management folder.
+It records file hashes, exact-byte duplicates, changes, missing files and large
+parts in .mira-local-data/knowledge-inbox/inventory.json. It does not change PDFs.

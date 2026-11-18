@@ -1,0 +1,15 @@
+import {readFile} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {parse} from 'dotenv';
+import {createKnowledgeLabApp} from '../server/miraKnowledgeLab/app';
+const work='/Users/mariacavali/Desktop/Projects/brands/mira/work/2026-11_cleared-knowledge';
+const root=join(work,'runtime');
+await readFile(join(root,'registry.json'));
+const env=parse(await readFile(resolve('.env'),'utf8'));
+const lab=createKnowledgeLabApp({root,host:'127.0.0.1:5186',openaiKey:env.OPENAI_API_KEY,publicRoot:join(root,'public')});
+lab.app.get('/source-acknowledgement.txt',(_req,res)=>res.sendFile(join(work,'source-acknowledgement.txt')));
+lab.app.get('/source-review',(_req,res)=>res.sendFile(join(work,'source-review.html')));
+const server=lab.app.listen(5186,'127.0.0.1',()=>console.log('MIRA cleared-source comparison: http://127.0.0.1:5186 — separate unpublished runtime, no Pinecone'));
+server.on('error',error=>{console.error(error.message);process.exitCode=1;});
+for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>server.close(()=>process.exit(0)));
+void lab.checkLocal();

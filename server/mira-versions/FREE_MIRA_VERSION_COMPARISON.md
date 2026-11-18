@@ -1,0 +1,57 @@
+# Free MIRA version comparison
+
+Evidence captured 2026-11-06. All three named products are **free**. Numbering is a comparison label, not an instruction to merge code or reconnect a route. The €24 paid archive is excluded. This versioning task changes no live route, deployment, Railway variable, website, or database.
+
+## Version identity and capture status
+
+| Version | Source of truth | Exact status | Audience | Capture status |
+|---|---|---|---|---|
+| `FREE_MIRA_SAVED_PROJECT` | Maria named `client/src/pages/MiraV2Entry.tsx`, `MiraV2PathA.tsx`, `MiraV2PathB.tsx`, and `server/routers/miraV2.ts` in the Maria Cavali source. | archived (intended classification; working state unverified) | free | **Blocked: source not located. No source snapshot has been fabricated.** The requested directory is reserved but not created/frozen with replacement code. Repository/folder clarification is pending. |
+| [FREE_MIRA_RAILWAY_V3](FREE_MIRA_RAILWAY_V3/VERSION.md) | Current `mira-staging` service in `mira-v3-staging`; public URL below. | staging | free | Complete V3 module capture: 35 source/test/prompt files in an inert ZIP, individually hashed and byte-identical to the deployed V3 slice. This is not a standalone clone of the surrounding multi-version host application. |
+| [FREE_MIRA_FINAL_APPROVED](FREE_MIRA_FINAL_APPROVED/VERSION.md) | Maria’s latest explicit approved free-rule correction in this conversation. | specification-only | free | Approved rule record and reference specification captured. No application implementation or deployment is claimed. |
+
+**Currently on Railway:** `FREE_MIRA_RAILWAY_V3` at https://mira-staging-production-93f3.up.railway.app/ . Read-only source inspection in this task still showed the service online. Earlier build/public-browser results are reused and timestamped in its capture rather than repeated.
+
+**In the Maria Cavali source:** `FREE_MIRA_SAVED_PROJECT` is the version Maria identified by the four V2 paths. Those paths were not found in the available local MIRA checkouts/export or connected GitHub search, so the actual repository, route wiring, working state, and current `/mira` target remain unverified. Do not claim it is currently live on www.mariacavali.com.
+
+**Newest approved direction:** `FREE_MIRA_FINAL_APPROVED`; approval covers the supplied rules, not an implemented/released application. Neither historical source is silently upgraded to those rules.
+
+## Behaviour and implementation differences
+
+| Area | FREE_MIRA_SAVED_PROJECT | FREE_MIRA_RAILWAY_V3 | FREE_MIRA_FINAL_APPROVED |
+|---|---|---|---|
+| Purpose/opening | Free lead magnet. Declared Path A: “Something feels off”; Path B: “Build my personal brand”. Exact UI/copy requires the missing files. | Public opening: “A quieter place to hear what is already true.” / “Enter the private experience”. Authenticated source opening: “Begin where the performance ends.” / “Begin with a pause”. No A/B selector in the captured entry component. | Free diagnosis/reflection contract. Exact opening/selector copy is not specified by the latest approved rule list. No redesigned opening is invented. |
+| Conversation steps | A/B flow specified by Maria; questions/counts, branching and refinement unknown until source recovery. | Authentication → three meditation screens → journey/birth-context gate → eight accepted reflection turns → Mirror synthesis → optional edit/regeneration where permitted → explicit confirmation → three documents. Source-derived after authentication, not a completed live journey. | Hidden-conflict Misalignment rule; immediate diagnosis for visual/general problems; segment-specific stop triggers. Exact approved segment predicates still need source evidence. No mandatory eight-turn counter is imported. |
+| Hidden conflict | Unknown in source. | Adaptive focus sequence includes hidden conflict/protection; runtime question prompt says “Do not diagnose” during reflection. This is not proof of the approved Misalignment rule. | Preserve the approved hidden-conflict Misalignment rule; do not turn a generic visual/general problem into hidden conflict automatically. Exact classifier details are not invented. |
+| Visual/general problem | Unknown in source. | Still behind the reflection sequence/eight-turn synthesis gate; no verified immediate visual/general diagnosis path in captured module. | Immediate diagnosis, then completion; no unnecessary deeper sequence. |
+| Pause behaviour | Unknown. | Three manually advanced pre-session meditation steps. “Leave and resume later” navigation preserves persisted messages. Source creates replacement active sessions when the 24-hour session is absent/expired. No live resume/expiry verification. | No specific pause/resume or meditation contract supplied. Do not inherit Railway’s mandatory opening merely by copying code. |
+| Stop triggers | Unknown. | Eight accepted-answer counter; incomprehension rephrases do not count. No verified segment-specific diagnosis stop conditions. | Honour each segment’s approved triggers and stop after diagnosis. Concrete predicates/cases are not supplied in the correction; implementation must not guess them. |
+| End of session | Unknown. | “Show me what you heard” → “This is what Mira heard.” → editable/confirmable Mirror; confirmation unlocks documents. Additional reflection submissions are rejected after the eight-answer gate. | Complete after diagnosis. Short final insight begins exactly “This is what’s actually happening.”; include final direction statement; no unnecessary continuation/loop. |
+| Email capture/timing | Maria requires lead capture before or at the correct point; actual timing, optionality and consent handling unverified. | No separate lead-email collection, send-permission question, or Flodesk flow in the captured V3 module. Required sign-in is not evidence of marketing consent or report email delivery. | Optional, non-blocking email prompt. Insight/direction and completion cannot depend on submission, delivery or marketing consent. Never use “Do you want me to send this?”. Exact prompt/transport remains unimplemented. |
+| PDF/report generation | Unknown. | Source implements confirmation-gated Brand Soul File, Brand Expression Guide, Shoot Mood Board; storage-backed PDF generation and base64 download. Live PDF flow blocked/untested. | No PDF bundle/report entitlement approved in the supplied rules. Do not inherit Railway’s three-document promise. No renderer implemented for this version. |
+| Paid upsell/sales | Actual source unknown; intended product is free. No paid code substituted. | Free deployment; no paid upsell added in capture. “Private staging” refers to access, not payment. Other saved host modules are not imported or declared identical. | No sales messaging or paid upsell. The €24 archive is excluded. |
+| Database requirements | Unknown until the V2 router and schema dependencies are recovered. Do not assign Railway’s schema to it. | Existing MySQL/TiDB, Drizzle and shared users plus `miraV3*` tables. Earlier deployed source journal observation ended at 0007; applied migration state remains unverified after access was denied. No database rows/credentials captured. | No database schema or provider selected by this specification. No new database, migration or write implemented. |
+| What is implemented | Cannot establish without exact source. | Full V3 module is preserved, including prompts, persistence helpers, consent/media, Mirror and PDF logic; host integration dependencies are explicitly outside the capture. | Specification and machine-readable approved-rule record only. |
+| What is not implemented/proven | Source capture, runtime behaviour and integration evidence remain missing. | Approved terminal-diagnosis/free-email rules are not demonstrated; live authenticated journey and provider integrations are unverified. | All runtime integration and live behaviour. Missing exact stop-trigger definitions, opening/pause copy, email integration and any future PDF contract require approved evidence. |
+| Deployment status | Current Maria Cavali launch target not inspected/changed; deployment status unknown. | Existing Railway staging deployment online; earlier build passed. Missing OAuth URLs and rejected existing database access block the flow. | Not deployed; no registered route. |
+
+## Safest version to reconnect to `/mira`
+
+**None is currently established as safe to reconnect.** The saved-project source has not been recovered; Railway’s session entry is blocked by missing OAuth settings and its existing database connection was denied; the final-approved version is a specification only.
+
+`FREE_MIRA_FINAL_APPROVED` is the intended behavioural target for a future free launch, once implemented in a verified free baseline and tested. This is a recommendation about rule alignment, not permission to replace a working source, change `/mira`, publish, or deploy. Which existing implementation is the safest technical baseline cannot be decided until the saved V2 files are available. Do not choose a paid archive or the newer unrelated coach code as a substitute.
+
+## Evidence boundaries and what remains untested
+
+- Railway V3’s 35 captured files match a read-only deployed fingerprint. The surrounding saved `client/` and `server/` directories do **not** match deployment, so they were not substituted as a complete deployed application. Matching V3 code does not prove that saved V2 code is identical or that any route outside the observed public opening works.
+- Reused earlier public incognito evidence: homepage loads; mobile opening loads at 390 × 785; `auth.me` is HTTP 200 JSON with null user; entry click throws an invalid OAuth URL before a session-start network request.
+- No complete new session, question submission, refinement, terminal diagnosis, email delivery, PDF download, return/expiry, or authenticated mobile journey was exercised in this versioning task. Full JSON/HTML correctness across authenticated endpoints remains unverified.
+- Source-derived extra Railway issue: `birth_context` is mandatory in the current journey code, the UI cannot continue with the birth-data flag disabled, and skip rejects. Earlier variable names did not include that flag, which defaults false. This was not a new live journey test.
+- All saved-project runtime behaviour is unknown until the four exact files are recovered. The final-approved rule set has no integrated runtime or end-to-end proof.
+- Existing archived tests remain inside ZIP files and are not run/discovered by this task. One final offline consistency check covers archive hashes, cross-version labels, exclusions, and preservation of the pre-existing checkout; it is not an end-to-end application test.
+
+## Preservation and rollback
+
+Each completed capture has `VERSION.md`, source/specification files, a SHA-256 manifest and rollback instructions. Completed captures are made read-only after the final check; corrections require a separately named revision. The source snapshot stays compressed so it cannot enter the active application/test graph. No import, router registration, build configuration or database migration is changed.
+
+Rollback is a separately authorised future operation: verify the chosen capture, extract only into a fresh isolated directory, recover compatible host dependencies, inspect schema compatibility read-only, review a diff, and validate before any deployment approval. The final specification has no live implementation to roll back. No database restore/reset is part of these archives.

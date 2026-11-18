@@ -1,0 +1,32 @@
+{
+  "version": "FREE_MIRA_RAILWAY_V3",
+  "captured": "2026-11-06",
+  "policy": "Immutable capture; create a separate revision instead of overwriting.",
+  "files": [
+    {
+      "path": "PROVENANCE.json",
+      "sha256": "c1569c0578b8ff6a67a1a079247c2d43b9557357b27c4784f5cc3d8433e4aa7f",
+      "bytes": 1305
+    },
+    {
+      "path": "SOURCE_MANIFEST.json",
+      "sha256": "21b8f81ec98d619d78950ea7869fa63fe58b1bbc9398cb971fd27281ad6c04ac",
+      "bytes": 6048
+    },
+    {
+      "path": "UI_ROUTES_BEHAVIOUR.md",
+      "sha256": "081ec72fe8bb799992f8c1a4f40e186b48b085cf3fc445f8e528386383dd7576",
+      "bytes": 4530
+    },
+    {
+      "path": "VERSION.md",
+      "sha256": "5f6d9beed9eb1456425098375824deab0fbf0b207ab0e938f5aa00b22814e6ba",
+      "bytes": 5187
+    },
+    {
+      "path": "source.zip",
+      "sha256": "b8e5d7d756b13871e8e982605272b296999d33b4ba7c58209c31f4263078e5cf",
+      "bytes": 89393
+    }
+  ]
+}

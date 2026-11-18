@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -13,6 +14,8 @@ import MiraLevel1 from "./pages/MiraLevel1";
 import MiraLevel1Journey from "./pages/MiraLevel1Journey";
 import MiraLevel2Journey from "./pages/MiraLevel2Journey";
 import MiraLevel2Create from "./pages/MiraLevel2Create";
+import MiraCoach from "./pages/MiraCoach";
+import MiraSessionRoute from "./pages/MiraSession";
 import MiraDashboard from "./pages/MiraDashboard";
 import MiraPhotographerOnboarding from "./pages/MiraPhotographerOnboarding";
 import MiraShoot from "./pages/MiraShoot";
@@ -24,6 +27,10 @@ import MiraPhotographerHome from "./pages/MiraPhotographerHome";
 import MiraPhotographerSignup from "./pages/MiraPhotographerSignup";
 import MiraPhotographerLogin from "./pages/MiraPhotographerLogin";
 import MiraPaymentSuccess from "./pages/MiraPaymentSuccess";
+
+const MiraKnowledge = lazy(() => import("./pages/MiraKnowledge"));
+
+const MiraCoachPreview = import.meta.env.DEV ? lazy(() => import("./pages/MiraCoachPreview")) : null;
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -41,6 +48,12 @@ function Router() {
       <Route path={"/mira-1/journey/:journeyId/create"} component={MiraLevel2Create} />
       <Route path={"/mira"} component={MiraLanding} />
       <Route path={"/for-photographers"} component={MiraLanding} />
+      {MiraCoachPreview ? <Route path="/mira/coach-preview"><Suspense fallback={<p>Opening preview…</p>}><MiraCoachPreview /></Suspense></Route> : null}
+      <Route path="/mira/session/:workspaceId/:conversationId" component={MiraSessionRoute} />
+      <Route path="/mira/knowledge"><Suspense fallback={<p>Opening library…</p>}><MiraKnowledge /></Suspense></Route>
+      <Route path="/mira/coach/:workspaceId/:conversationId" component={MiraCoach} />
+      <Route path="/mira/coach/:workspaceId" component={MiraCoach} />
+      <Route path="/mira/coach" component={MiraCoach} />
       <Route path={"/mira/account"} component={MiraPhotographerHome} />
       <Route path={"/mira/login"} component={MiraPhotographerLogin} />
       <Route path={"/mira/signup"} component={MiraPhotographerSignup} />

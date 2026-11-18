@@ -7,6 +7,8 @@ import { createStripeWebhookHandler, normalizeStripeEvent } from "./stripeWebhoo
 
 const secret = "whsec_synthetic_test_secret";
 const stripe = new Stripe("sk_test_synthetic_key");
+// Only signature verification is real; never retrieve a synthetic session from Stripe.
+const webhookClient = { webhooks: stripe.webhooks };
 
 function checkoutPayload(overrides: Record<string, unknown> = {}) {
   return {
@@ -43,7 +45,9 @@ function signedPayload(payload: unknown) {
 
 function request(app: express.Express, body: string, signature?: string, contentType = "application/json") {
   return new Promise<{ status: number; body: Record<string, unknown> }>((resolve, reject) => {
-    const server = http.createServer(app).listen(0, "127.0.0.1", () => {
+    const server = http.createServer(app);
+    server.on("error", reject);
+    server.listen(0, "127.0.0.1", () => {
       const address = server.address();
       if (!address || typeof address === "string") return reject(new Error("test server did not start"));
       const req = http.request({ hostname: "127.0.0.1", port: address.port, path: "/api/webhooks/stripe", method: "POST", headers: { "Content-Type": contentType, "Content-Length": Buffer.byteLength(body), ...(signature ? { "Stripe-Signature": signature } : {}) } }, response => {
@@ -60,7 +64,7 @@ function request(app: express.Express, body: string, signature?: string, content
 
 function appFor(repository?: InMemoryPaymentEventRepository, options: Partial<Parameters<typeof createStripeWebhookHandler>[0]> = {}) {
   const app = express();
-  app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), createStripeWebhookHandler({ repository, stripe, webhookSecret: secret, paymentMode: "stripe", currency: "eur", priceId: "price_synthetic", ...options }));
+  app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), createStripeWebhookHandler({ repository, stripe: webhookClient, webhookSecret: secret, paymentMode: "stripe", currency: "eur", priceId: "price_synthetic", ...options }));
   app.use(express.json());
   return app;
 }

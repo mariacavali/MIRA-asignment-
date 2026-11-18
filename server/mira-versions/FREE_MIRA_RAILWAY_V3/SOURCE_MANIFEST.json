@@ -1,0 +1,182 @@
+{
+  "sourceFileCount": 35,
+  "digestAlgorithm": "SHA-256 over sorted path + TAB + file SHA-256 + LF, UTF-8",
+  "aggregateSha256": "5e1fce8864ac6249482dbee9b8f059642bbdfb8d4eeb04bf0e7ed32943b0deef",
+  "files": [
+    {
+      "path": "client/src/pages/MiraV3.tsx",
+      "sha256": "2878bef3884d388653d224857d4a551b2e0e81c899d50d8b216a93970a89e788",
+      "bytes": 6523
+    },
+    {
+      "path": "client/src/pages/MiraV3Journey.tsx",
+      "sha256": "9620f55c4c427d377ac0bcbd3992769807de868cba416430ce3df207fe6f2756",
+      "bytes": 32760
+    },
+    {
+      "path": "client/src/pages/MiraV3Results.tsx",
+      "sha256": "d50bb25fceff8e22351553b616a68f5ddfdecc6ecb9a79b4bab34d2c740f1e73",
+      "bytes": 13550
+    },
+    {
+      "path": "docs/prompts/README.md",
+      "sha256": "c88393790fb36538b3140bc8ea86f59ab79545ba3e0629f54f828484450c2505",
+      "bytes": 1205
+    },
+    {
+      "path": "docs/prompts/brand-soul-file-prompt.md",
+      "sha256": "ad929c6903c1dd5f82fad4f76b89440512abda263e6fa9c40dc65384fffb5cc9",
+      "bytes": 1870
+    },
+    {
+      "path": "docs/prompts/mira-v3-system-prompt.md",
+      "sha256": "9f2fb337478e9d849523bd60d9b986e5fe853e8556fe062df1d13ec12591d2d9",
+      "bytes": 3507
+    },
+    {
+      "path": "docs/prompts/pdf-generation-prompts.md",
+      "sha256": "4d21c59175c2d512d313fb3f4bee7bc509aae495eeac5172e5f43e6df089e1b2",
+      "bytes": 2063
+    },
+    {
+      "path": "docs/prompts/recognition-engine-prompt.md",
+      "sha256": "6c5d39c1d5e5076e4a1848a0cbade78700a2dde7595d1c4748fcbbe082b3e113",
+      "bytes": 6041
+    },
+    {
+      "path": "docs/prompts/reflection-mirror-prompt.md",
+      "sha256": "f84508b6df86bd8e23dad2a2dc56e1b9c9ba044dc2b09fb20a026f23a8d1052e",
+      "bytes": 2736
+    },
+    {
+      "path": "docs/prompts/visuals-that-feel-like-you-prompt.md",
+      "sha256": "0f47a9b14424f08b98daa044188bf042eeb8ef56c8ff75e3d2adc5fd2e4b8c13",
+      "bytes": 2880
+    },
+    {
+      "path": "server/miraV3/birthData.test.ts",
+      "sha256": "49c656f6387f58ac79ae7afb7d6e9fb6cca0b7ca5a225cd123712578b39a481a",
+      "bytes": 6187
+    },
+    {
+      "path": "server/miraV3/birthData.ts",
+      "sha256": "3da1223f70ddc3800a01480a8cf00db0ded1dd2cf342b256fcb666b71bdad4af",
+      "bytes": 13982
+    },
+    {
+      "path": "server/miraV3/bundle.test.ts",
+      "sha256": "7c08a540eb4e3b3ea61d224588b590694dde2302aa0320ece3edce0b745b02a3",
+      "bytes": 8045
+    },
+    {
+      "path": "server/miraV3/bundle.ts",
+      "sha256": "2ff5236208bffe48a4528f29265c820e6a9c9e2cab4c6ea1ec12f0f5bc982bea",
+      "bytes": 13230
+    },
+    {
+      "path": "server/miraV3/dakidartsCredential.test.ts",
+      "sha256": "f87839f391dbc636a198507a64edcf26878ad6a54cd27914236afc754d4d2c3e",
+      "bytes": 2291
+    },
+    {
+      "path": "server/miraV3/db.ts",
+      "sha256": "7298d5f01dda767e142d55c36ac3161daddcbb0ce3fb5155415855e3969a3187",
+      "bytes": 21649
+    },
+    {
+      "path": "server/miraV3/deliverables.test.ts",
+      "sha256": "62e6ab71a5830a8232afd479f0ed6a07c8f6acfbaaee37af627d704b5ff34e0f",
+      "bytes": 5702
+    },
+    {
+      "path": "server/miraV3/deliverables.ts",
+      "sha256": "ee33818b122c3649bfa39f12aa72bbe883000ebf58f8cc882491a38f2fafc796",
+      "bytes": 9669
+    },
+    {
+      "path": "server/miraV3/env.test.ts",
+      "sha256": "9b34ba533ac3a99a0eb444119f5865a1b3b1b970184168996497d354dfce5434",
+      "bytes": 375
+    },
+    {
+      "path": "server/miraV3/imageAnalysis.test.ts",
+      "sha256": "1069e025397784cfff4a4cb253974af7a08d1916fd636128c58db28e2f5501a8",
+      "bytes": 4143
+    },
+    {
+      "path": "server/miraV3/imageAnalysis.ts",
+      "sha256": "26a60bd7c8fc0e79d082c738bdd6bb17a514441f4392110195468e96a98f941e",
+      "bytes": 10693
+    },
+    {
+      "path": "server/miraV3/journeyIntakeUi.test.ts",
+      "sha256": "5241bae200b2f6a07d22a5d7557887f02a3d6ae57c2566be6ec75345b2c696ce",
+      "bytes": 2750
+    },
+    {
+      "path": "server/miraV3/media.test.ts",
+      "sha256": "2c93fc95bfad531bc40c5ecb8f2f45a050c9201af59852782ffe8f7f598a157b",
+      "bytes": 2175
+    },
+    {
+      "path": "server/miraV3/media.ts",
+      "sha256": "1b76048060bf69fd1dbd2ced4c693d63616d9df293313d062e1130914000a4e4",
+      "bytes": 2609
+    },
+    {
+      "path": "server/miraV3/mediaRoutes.test.ts",
+      "sha256": "8462e836df9a6c94b235891e1a6c0e322e38a1ba0465f03b4bdd8f6acaf0768f",
+      "bytes": 4653
+    },
+    {
+      "path": "server/miraV3/pdf.test.ts",
+      "sha256": "48e50e2cae02c971c4c0ffd942220588f7f891e35f4861f89936e1c8186cab86",
+      "bytes": 3008
+    },
+    {
+      "path": "server/miraV3/pdf.ts",
+      "sha256": "8405b1d34f111ee77c3ba7f53b46b151c5894e57c1322f3bfaa1db5299492cff",
+      "bytes": 5844
+    },
+    {
+      "path": "server/miraV3/recognition.live.test.ts",
+      "sha256": "eebae938c3b9ad031910afefcaa895fe552db4e894f6d7d70b0e613f01538a17",
+      "bytes": 2086
+    },
+    {
+      "path": "server/miraV3/recognition.test.ts",
+      "sha256": "598e313df62a7f9dd5fdaf6307667919799b2e706cc92d496a922283c6a43b7f",
+      "bytes": 6805
+    },
+    {
+      "path": "server/miraV3/recognition.ts",
+      "sha256": "9ea1c215573a598dbffddb6c0f7f8d43f9a31c54a4eddfdaced52eeefcb9ff78",
+      "bytes": 14889
+    },
+    {
+      "path": "server/miraV3/reflection.test.ts",
+      "sha256": "aae6663fab14892c1950d872f93ddcb1af90a53d3d3d165dfd81ff070024adbb",
+      "bytes": 7869
+    },
+    {
+      "path": "server/miraV3/reflection.ts",
+      "sha256": "0cacefd09816ebe8cecaaf7a50b7de06bc23de63dc1d7c87130b11a8446b2e7a",
+      "bytes": 11575
+    },
+    {
+      "path": "server/miraV3/reflectionRoutes.test.ts",
+      "sha256": "59ccf80d43a02a46907a7d345e2cf87a4c70e9d370fe85df9986ee0ecb7c6570",
+      "bytes": 16509
+    },
+    {
+      "path": "server/miraV3/renderRoutes.test.ts",
+      "sha256": "88db60e0c14bbb31257fb565fb0dd43e91cf617dfccd3abb60a0664f1774cfb0",
+      "bytes": 6411
+    },
+    {
+      "path": "server/miraV3/router.ts",
+      "sha256": "3ebdccbd005f2cc8cb54d63ca42e7a7e1db0ca71a90ebf1797a17f28e36a90df",
+      "bytes": 27159
+    }
+  ]
+}

@@ -134,6 +134,55 @@
       "when": 1788476544777,
       "tag": "0018_mira_resend_delivery_status",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1792081810055,
+      "tag": "0019_mira_brand_workspaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1792083629804,
+      "tag": "0020_mira_coach_conversations",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1792086985817,
+      "tag": "0021_mira_coach_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1792763000000,
+      "tag": "0022_mira_brand_directions",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1792766000000,
+      "tag": "0023_mira_knowledge_catalogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1792767820548,
+      "tag": "0024_mira_coach_interviews",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1793015181655,
+      "tag": "0025_mira_coach_call_clocks",
+      "breakpoints": true
     }
   ]
 }

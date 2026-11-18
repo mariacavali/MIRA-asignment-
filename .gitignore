@@ -9,6 +9,8 @@ build/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
@@ -113,3 +115,20 @@ temp/
 # Manus version file (auto-generated, not part of source)
 client/public/__manus__/version.json
 .project-config.json
+
+# Local, isolated PDF extraction environment
+.mira-pdf-venv/
+
+# Private source material and local review artifacts
+book-brand management/*.pdf
+knowledge-inbox/**/*.pdf
+knowledge-inbox/*.pdf
+.mira-local-data/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python extraction caches
+__pycache__/
+*.pyc

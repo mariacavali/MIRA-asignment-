@@ -1,0 +1,40 @@
+{
+  "version": "FREE_MIRA_FINAL_APPROVED",
+  "status": "specification-only",
+  "audience": "free",
+  "authority": "Maria’s explicit correction in this conversation, 2026-11-06; supersedes the earlier paid/free classification.",
+  "approvedRulesVerbatim": [
+    "hidden-conflict Misalignment rule",
+    "immediate diagnosis for visual/general problems",
+    "segment stop triggers",
+    "complete the session after diagnosis",
+    "short final insight beginning “This is what’s actually happening.”",
+    "optional non-blocking email prompt",
+    "final direction statement",
+    "no “Do you want me to send this?”",
+    "no sales messaging",
+    "no looping or unnecessary continuation"
+  ],
+  "finalInsightPrefix": "This is what’s actually happening.",
+  "completeAfterDiagnosis": true,
+  "email": {
+    "optional": true,
+    "blocking": false,
+    "requiredToSeeInsightOrDirection": false,
+    "sendPermissionQuestionForbidden": "Do you want me to send this?"
+  },
+  "salesMessagingAllowed": false,
+  "paidUpsellIncluded": false,
+  "implementation": {
+    "registeredRoute": null,
+    "runtimeCodeChanged": false,
+    "databaseChanged": false,
+    "deployed": false
+  },
+  "unresolvedDetails": [
+    "Exact per-segment stop-trigger predicates/cases were not supplied in the correction and must be recovered from approved free notes, not inferred from paid archives.",
+    "Exact entry copy and pause/resume behaviour are not specified by this approved rule list.",
+    "Exact email prompt wording, collection/consent transport and delivery behaviour remain unimplemented.",
+    "PDF/report entitlement and contents are not approved by this rule list; do not inherit the Railway three-document contract."
+  ]
+}

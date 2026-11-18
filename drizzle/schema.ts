@@ -1,4 +1,5 @@
 import {
+  foreignKey,
   index,
   int,
   json,
@@ -10,7 +11,12 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import type { MiraV4CreativeDna } from "../shared/miraV4CreativeDna";
+import type { CompletedCoachTurn } from "../shared/miraCoach";
 import type { ShootMemory } from "../shared/miraCore";
+import {
+  WORKSPACE_CAPABILITIES, WORKSPACE_GRANT_STATUSES, WORKSPACE_MEMBER_ROLES,
+  WORKSPACE_MEMBER_STATUSES, WORKSPACE_STATUSES,
+} from "../shared/miraWorkspace";
 
 /**
  * Core user table backing auth flow.
@@ -36,6 +42,104 @@ export const users = mysqlTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+// Standalone brand ownership: no shoot, invitation or photographer is required.
+export const miraBrandWorkspaces = mysqlTable("mira_brand_workspaces", {
+  id: int("id").autoincrement().primaryKey(),
+  ownerUserId: int("ownerUserId").notNull().references(() => users.id, { onDelete: "restrict" }),
+  name: varchar("name", { length: 200 }).notNull(),
+  status: mysqlEnum("status", WORKSPACE_STATUSES).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => [index("mira_workspaces_owner_status_idx").on(table.ownerUserId, table.status)]);
+
+export const miraWorkspaceMembers = mysqlTable("mira_workspace_members", {
+  id: int("id").autoincrement().primaryKey(),
+  workspaceId: int("workspaceId").notNull().references(() => miraBrandWorkspaces.id, { onDelete: "cascade" }),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  role: mysqlEnum("role", WORKSPACE_MEMBER_ROLES).notNull(),
+  status: mysqlEnum("status", WORKSPACE_MEMBER_STATUSES).default("active").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => [
+  uniqueIndex("mira_workspace_member_uidx").on(table.workspaceId, table.userId),
+  index("mira_workspace_member_user_idx").on(table.userId, table.status),
+]);
+
+// Only trusted billing/admin services will write grants; workspace editors cannot buy access by editing rows.
+export const miraWorkspaceGrants = mysqlTable("mira_workspace_grants", {
+  id: int("id").autoincrement().primaryKey(),
+  workspaceId: int("workspaceId").notNull().references(() => miraBrandWorkspaces.id, { onDelete: "cascade" }),
+  capability: mysqlEnum("capability", WORKSPACE_CAPABILITIES).notNull(),
+  status: mysqlEnum("status", WORKSPACE_GRANT_STATUSES).default("suspended").notNull(),
+  startsAt: timestamp("startsAt").notNull(),
+  expiresAt: timestamp("expiresAt"),
+  sourceReference: varchar("sourceReference", { length: 191 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => [uniqueIndex("mira_workspace_grant_uidx").on(table.workspaceId, table.capability)]);
+
+export const miraCoachConversations = mysqlTable("mira_coach_conversations", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  workspaceId: int("workspaceId").notNull().references(() => miraBrandWorkspaces.id, { onDelete: "cascade" }),
+  ownerUserId: int("ownerUserId").notNull().references(() => users.id, { onDelete: "restrict" }),
+  revision: int("revision").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => [index("mira_coach_conversation_scope_idx").on(table.workspaceId, table.ownerUserId)]);
+
+export const miraCoachTurns = mysqlTable("mira_coach_turns", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  conversationId: varchar("conversationId", { length: 36 }).notNull().references(() => miraCoachConversations.id, { onDelete: "cascade" }),
+  requestId: varchar("requestId", { length: 36 }).notNull(),
+  message: text("message").notNull(),
+  expectedRevision: int("expectedRevision").notNull(),
+  status: mysqlEnum("status", ["processing", "complete", "retryable_error"]).notNull(),
+  leaseToken: varchar("leaseToken", { length: 36 }),
+  leaseUntil: timestamp("leaseUntil"),
+  result: json("result").$type<CompletedCoachTurn>(),
+  completedAt: timestamp("completedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => [
+  uniqueIndex("mira_coach_turn_request_uidx").on(table.conversationId, table.requestId),
+  index("mira_coach_turn_history_idx").on(table.conversationId, table.status, table.expectedRevision),
+]);
+
+export const miraCoachMemoryProposals = mysqlTable("mira_coach_memory_proposals", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  turnId: varchar("turnId", { length: 36 }).notNull().references(() => miraCoachTurns.id, { onDelete: "cascade" }),
+  text: text("text").notNull(),
+  kind: mysqlEnum("kind", ["explicit", "interpreted"]).notNull(),
+  status: mysqlEnum("status", ["pending_confirmation", "confirmed", "rejected"]).default("pending_confirmation").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => [index("mira_coach_proposal_turn_idx").on(table.turnId)]);
+
+export const miraCoachInterviews = mysqlTable("mira_coach_interviews", {
+  conversationId: varchar("conversationId", { length: 36 }).primaryKey(),
+  ledger: json("ledger").$type<import("../shared/miraInterview").InterviewLedger>().notNull(),
+}, table => [foreignKey({ name: "mira_coach_interview_conversation_fk", columns: [table.conversationId], foreignColumns: [miraCoachConversations.id] }).onDelete("cascade")]);
+
+// One allowance per private workspace/user, shared by all their conversations.
+export const miraCoachCallClocks = mysqlTable("mira_coach_call_clocks", {
+  id: int("id").autoincrement().primaryKey(), workspaceId: int("workspaceId").notNull(), userId: int("userId").notNull(),
+  clock: json("clock").$type<import("../shared/miraCallClock").CallClockRecord>().notNull(),
+}, table => [uniqueIndex("mira_call_clock_scope_uidx").on(table.workspaceId, table.userId),
+  foreignKey({ name: "mira_call_clock_workspace_fk", columns: [table.workspaceId], foreignColumns: [miraBrandWorkspaces.id] }).onDelete("cascade"),
+  foreignKey({ name: "mira_call_clock_user_fk", columns: [table.userId], foreignColumns: [users.id] }).onDelete("cascade")]);
+
+// Client-supplied text, with explicit permission to use it in this private conversation.
+export const miraCoachSources = mysqlTable("mira_coach_sources", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  conversationId: varchar("conversationId", { length: 36 }).notNull().references(() => miraCoachConversations.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 200 }).notNull(),
+  text: text("text").notNull(),
+  referenceUrl: varchar("referenceUrl", { length: 2048 }),
+  rightsBasis: mysqlEnum("rightsBasis", ["client_owned", "permission_granted"]).notNull(),
+  status: mysqlEnum("status", ["active", "withdrawn"]).default("active").notNull(),
+  approvedByUserId: int("approvedByUserId").notNull().references(() => users.id, { onDelete: "restrict" }),
+  approvedAt: timestamp("approvedAt").defaultNow().notNull(),
+  withdrawnAt: timestamp("withdrawnAt"),
+}, table => [index("mira_coach_source_scope_idx").on(table.conversationId, table.status)]);
 
 export const miraPendingCheckouts = mysqlTable(
   "mira_pending_checkouts",
@@ -826,3 +930,44 @@ export const miraV4VisualSets = mysqlTable(
 
 export type MiraV4VisualSet = typeof miraV4VisualSets.$inferSelect;
 export type InsertMiraV4VisualSet = typeof miraV4VisualSets.$inferInsert;
+
+// Workspace discovery configuration is descriptive; grants remain authoritative.
+export const miraBrandConfigurations = mysqlTable("mira_brand_configurations", {
+  workspaceId: int("workspaceId").primaryKey(),
+  configuration: json("configuration").$type<import("../shared/miraBrandDirection").BrandConfiguration>().notNull(),
+}, table => [foreignKey({ name: "mira_brand_configuration_workspace_fk", columns: [table.workspaceId], foreignColumns: [miraBrandWorkspaces.id] }).onDelete("cascade")]);
+// One aggregate per private conversation. Drafts and review events remain in history.
+export const miraBrandDirections = mysqlTable("mira_brand_directions", {
+  conversationId: varchar("conversationId", { length: 36 }).primaryKey(),
+  records: json("records").$type<import("../shared/miraBrandDirection").DirectionRecord[]>().notNull(),
+  requests: json("requests").$type<Record<string, { payload: string; revision: number }>>().notNull(),
+}, table => [foreignKey({ name: "mira_brand_direction_conversation_fk", columns: [table.conversationId], foreignColumns: [miraCoachConversations.id] }).onDelete("cascade")]);
+
+// Shared editorial knowledge only. Client source/memory tables remain separate.
+export const miraKnowledgeCatalogue = mysqlTable("mira_knowledge_catalogue", {
+  id: int("id").primaryKey(),
+  revision: int("revision").default(0).notNull(),
+  activeReleaseId: varchar("activeReleaseId", { length: 36 }),
+});
+export const miraKnowledgeVersions = mysqlTable("mira_knowledge_versions", {
+  key: varchar("key", { length: 191 }).primaryKey(),
+  hash: varchar("hash", { length: 64 }).notNull(),
+});
+export const miraKnowledgeReleases = mysqlTable("mira_knowledge_releases", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  hash: varchar("hash", { length: 64 }).notNull(),
+  bundle: json("bundle").$type<import("../shared/miraKnowledge").KnowledgeBundle>().notNull(),
+  reviews: json("reviews").$type<import("../shared/miraKnowledge").KnowledgeReviews>().notNull(),
+  status: mysqlEnum("status", ["draft", "published"]).default("draft").notNull(),
+  importedByUserId: int("importedByUserId").notNull(),
+  publishedByUserId: int("publishedByUserId"),
+  parentReleaseId: varchar("parentReleaseId", { length: 36 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  publishedAt: timestamp("publishedAt"),
+}, table => [uniqueIndex("mira_knowledge_release_hash_uq").on(table.hash)]);
+export const miraKnowledgeWithdrawals = mysqlTable("mira_knowledge_withdrawals", {
+  key: varchar("key", { length: 191 }).primaryKey(),
+  actorUserId: int("actorUserId").notNull(),
+  reason: text("reason").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});

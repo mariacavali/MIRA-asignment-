@@ -1,81 +1,76 @@
-# MIRA — Project 3
+# MIRA local development
 
-MIRA is a private, authenticated brand-recognition and creative-direction application. MIRA V4 is the current Project 3 Brand World path from structured creative evidence through Creative DNA to a five-image editorial moodboard. MIRA V3 remains an active, separate recognition product in the same codebase; it has not been superseded in routing or persistence.
+MIRA is a TypeScript application with a React/Vite client, Express/tRPC server, shared TypeScript contracts and Drizzle migrations for MySQL-compatible databases. This repository contains several MIRA experiences and isolated research/review tools; the primary app starts with the commands below. Feature flags default off. Local setup does not configure or change production.
 
-## Peer Audit — Start Here
+## Requirements
 
-These documents provide factual system information for an independent audit and intentionally exclude the builder's own legal classification or compliance conclusions:
+- Node.js 22.12 or newer (see `package.json`)
+- pnpm 10.4.1 (pinned in `package.json`)
+- Git
+- A MySQL-compatible database (MySQL/TiDB) for the main app; do not point local development at production
+- Optional provider accounts only for the corresponding integrations (Forge, OpenAI, Pinecone, Resend, Stripe, Notion, Dakidarts)
 
-- [System brief for peer audit](MIRA_SYSTEM_BRIEF_FOR_PEER_AUDIT.md)
-- [Architecture for audit](docs/MIRA_ARCHITECTURE_FOR_AUDIT.md)
-- [AI and data inventory](docs/MIRA_AI_AND_DATA_INVENTORY.md)
-- [Detailed technical handoff](docs/MIRA_TECHNICAL_HANDOFF_FOR_CODEX.md)
-- [V4 current state](docs/MIRA_V4_CURRENT_STATE.md)
+## Clone and install
 
-## What the application does
+```sh
+git clone https://github.com/mariacavali/MIRA-asignment-.git
+cd MIRA-asignment-
+corepack enable
+corepack prepare pnpm@10.4.1 --activate
+pnpm install --frozen-lockfile
+cp .env.example .env
+```
 
-- MIRA V3 guides a user through meditation, adaptive reflection, a reviewable Mirror, and confirmation-gated Brand Soul and visual-direction deliverables.
-- MIRA V4 turns structured brand context and Creative DNA into visual directions and a five-image campaign moodboard.
-- Both surfaces use owner-scoped authentication and persistence. Their routes, tRPC namespaces, state machines, and database tables remain separate.
+On Windows, use PowerShell's `Copy-Item .env.example .env` instead of `cp`.
 
-## Architecture
+## Configure
 
-The product application uses React and Vite in `client/`, Express and tRPC in `server/`, shared TypeScript contracts in `shared/`, and Drizzle migrations for MySQL/TiDB in `drizzle/`. Model, image, storage, authentication, and optional provider integrations are server-side boundaries.
+Open `.env` and set only the values needed for your local task. See [Environment variables](docs/ENVIRONMENT_VARIABLES.md) for purpose, required/optional status, and credential sources. Never commit `.env` or paste credentials into issues or chat. `.env.example` is safe to commit and contains blank credential values and disabled feature flags.
 
-n8n is an optional automation boundary, not the application source of truth. The importable synthetic photographer/model-client lifecycle POC is documented in [`capstone/round2/n8n/`](capstone/round2/n8n/); it does not authenticate users, store payment instruments, send email, or replace MIRA persistence.
+For the base application, configure a dedicated local `DATABASE_URL`, `JWT_SECRET`, and platform OAuth/app values if your login flow requires them. Generate a new local JWT secret; never copy a production secret. Provider credentials are optional unless you enable the matching feature. Set local payment mode to `local`. Keep all paid/live integrations and feature flags disabled during ordinary setup.
 
-## Run locally
+## Database
 
-Requirements: Node.js and pnpm.
+Use a new disposable local MySQL-compatible database. Review `drizzle.config.ts` and migrations before applying them. `pnpm db:push` generates and applies migrations and can alter the configured database: verify `DATABASE_URL` points only to the disposable local database before running it. Existing migrations include legacy product tables and newer coach/knowledge tables. Do not run against an unknown or production database.
 
-1. Install dependencies with `pnpm install`.
-2. Create a local `.env` using the blank variable template in [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md). Never commit local credentials.
-3. Configure the required database and platform services for your environment.
-4. Apply database migrations with `pnpm db:push`.
-5. Start development with `pnpm dev`.
+## Run
 
-Useful checks:
+```sh
+pnpm dev
+```
 
-```bash
-pnpm test
+The server starts on port 3000 by default (`PORT` can change it); Vite serves the client through the development server integration. Open the local URL printed in the terminal. To build production assets locally, use `pnpm build`; this does not deploy them.
+
+Useful project commands (run only when you choose to validate a change):
+
+```sh
 pnpm check
+pnpm test
 pnpm build
 ```
 
-## Key deliverables
+The database, PDF and live-provider tests have opt-in gates. Do not enable them against production services. PDF extraction helpers require Python and the packages listed in `scripts/requirements-mira-pdf.txt`; see `scripts/LOCAL_BOOK_TOOLS.md` for the isolated local setup. These tools do not download or include private source books.
 
-- `client/` — MIRA product interface
-- `server/` — authenticated workflows, model/provider adapters, persistence, PDF generation, and tests
-- `shared/` — shared schemas and campaign contracts
-- `drizzle/` — database schema and migrations
-- `docs/` — architecture, implementation, prompt, environment, and validation documentation
-- `evidence/` — connected journey screenshots and generated-output evidence
-- [`MIRA_V3_STAGING_STATUS.md`](MIRA_V3_STAGING_STATUS.md) — concise V3 status and verification summary
-- [`FINAL_PRIVATE_MVP_VERIFICATION.md`](FINAL_PRIVATE_MVP_VERIFICATION.md) — consolidated acceptance evidence
+## Local-only review tools
 
-## Repository Map
+Some scripts start isolated review applications on loopback ports and use local socket databases under ignored `.mira-local-data/`. Read each script's documentation before running it. In particular, the connected coach review and Pinecone conversation scripts can make provider calls when explicitly approved/configured; opening a page alone does not authorize such calls. Do not run duplicate services on occupied ports.
 
-- `client/` — React/Vite routes and user interfaces for V3, V4, and the partial level-based extension
-- `server/` — Express/tRPC APIs, owner-scoped workflows, model/provider adapters, storage, PDF generation, and tests
-- `shared/` — shared schemas and deterministic campaign contracts
-- `drizzle/` — MySQL/TiDB schema, relations, and migrations
-- `docs/` — current-state, architecture, prompt, environment, provider, and validation documentation
-- `evidence/` — connected V3 journey screenshots, PDFs, transcript material, and validation records
+## Private files and credentials
 
-## Current Status
+`.env`, databases, `.mira-local-data/`, local Python environments and source PDFs are excluded from Git. Transfer required credentials through a password manager or the provider's own secure sharing process. Obtain fresh development credentials from each provider's console; do not reuse production credentials. Private book/source files must be transferred separately only where permitted. They are not needed to install or run the base application.
 
-- **Implemented:** V3 recognition and confirmed document outputs; V4 Brand World journey, structured Creative DNA, initial visual directions, one refinement, and final five-image moodboard generation.
-- **Partial:** the `/mira-1` Level 1/Level 2 extension, optional Notion retrieval, provider-dependent live revalidation, and some schema-declared V4 stages without customer-facing implementations.
-- **Optional:** V3 Dakidarts numerology context and consent-gated reference-image analysis.
-- **Not implemented:** an active Human Design provider, automatic V3-to-V4 data transfer, V4 Brand Book/PDF export, or production n8n integration. A synthetic, local-only n8n POC is included for assignment evidence.
-- **Legacy/retained:** older route and field names remain for compatibility; current behavior should be verified from client routing, tRPC procedures, schemas, and tests rather than inferred from names alone.
+The cleanup archive referenced by older project notes is stored outside this repository and is not required to build the active application. The four private Brand Management PDFs and knowledge inbox contents are intentionally kept out of GitHub.
 
-Useful evidence includes the [V3 screenshot/PDF journey](evidence/journey-30001/), the [V3 transcript package](evidence/journey-60001/), and the [V4 refinement validation](docs/V4_REFINEMENT_RETRY_VALIDATION.md).
+## Troubleshooting
 
-## Deployment and demo limitations
+- **Node/pnpm version errors:** use Node 22.12+ and the pnpm version pinned in `package.json`; run `corepack prepare pnpm@10.4.1 --activate`.
+- **Install differs from lockfile:** use `pnpm install --frozen-lockfile`; do not regenerate the lockfile unless intentionally changing dependencies.
+- **Database connection errors:** confirm the local database is running, its database exists, and `DATABASE_URL` names it. Never solve this by copying a production URL.
+- **OAuth/login errors:** local OAuth settings depend on the platform configuration. Leave authentication-dependent flows off until local credentials and callback URLs are configured; use an isolated local auth bypass only where the code explicitly supports it.
+- **Provider or Pinecone errors:** verify the server-side key and endpoint in `.env`, the account's free/paid quota, and that the relevant feature flags are intentionally enabled. Keep browser-exposed `VITE_*` values free of secrets.
+- **Port already in use:** set a free `PORT` for the server or stop the duplicate local process after identifying it.
+- **PDF tool errors:** create the documented isolated Python environment and install only `scripts/requirements-mira-pdf.txt`; do not put its directory in Git.
 
-The verified environment was private staging, not a public deployment. Provider credentials and service availability are required for live model, image, storage, OAuth, and optional birth-context integrations. Known boundaries—including disabled optional modules, the placeholder welcome video, and external image-provider availability—are documented in the status and handoff files.
+## Repository and branch
 
-## Security
-
-Local `.env` files, credentials, dependencies, build output, logs, and private platform metadata are intentionally excluded from version control.
+Canonical remote: https://github.com/mariacavali/MIRA-asignment-. The working branch for this handoff is `codex/mira-agent-foundation`; `main` is separate. Review the current branch and `git status` before committing further work.

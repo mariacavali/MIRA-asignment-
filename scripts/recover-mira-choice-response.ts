@@ -1,0 +1,30 @@
+import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {parseCoachReply} from '../server/miraCoach/model';
+import {redactCredentials} from '../server/miraCoach/conversationRules';
+import {eligibility,labVersionSchema} from '../server/miraKnowledgeLab/core';
+import {contentHash} from '../server/miraKnowledge/schema';
+import assert from 'node:assert/strict';
+
+// Exact local replay of the preserved visual reply. No model/network/key access.
+const root=resolve('.mira-local-data/knowledge-lab');
+const work='/Users/mariacavali/Desktop/Projects/brands/mira/work/2026-11_knowledge-lab/conversation-v2';
+const file=join(root,'sessions/aacbcee4-3741-44fa-a025-8efad247679f.json');
+const original=await readFile(file,'utf8'),session=JSON.parse(original),turn=session.turns.find((t:any)=>t.id==='c9e9cbfa-e81c-46ce-ab01-461e34802e3b');
+assert.ok(turn);
+assert.equal(session.configurationId,'a-baseline');assert.equal(turn.state,'failed');assert.equal(turn.error,'Brand coach model: invalid_output');
+assert.equal(turn.providerResult.finishReason,'stop');assert.equal(turn.providerResult.refused,false);
+assert.equal(contentHash(turn.promptMessages),turn.promptHash);assert.equal(redactCredentials(turn.providerResult.content),turn.providerResult.content);
+const registry=JSON.parse(await readFile(join(root,'registry.json'),'utf8'));
+const version=labVersionSchema.parse(registry.versions.find((v:any)=>v.id==='a-baseline'));
+assert.equal(contentHash(version),session.knowledgeHash);assert.deepEqual(eligibility(version,'openai',new Set(registry.withdrawnKeys)),[]);
+const raw=JSON.parse(turn.providerResult.content);
+assert.equal(raw.nextQuestion,'Which single scene would you prefer for the wide hero: an over-shoulder desk-by-window shot or a clean elevated workspace flatlay?');
+const draft=parseCoachReply({provider:'openai',apiKey:'local-replay-no-key',model:session.modelProfile.model,oneQuestionAtATime:true,emptyInterviewMetadata:true,separateQuestionField:true},raw);
+const archive=join(work,'history');await mkdir(archive,{recursive:true,mode:0o700});
+await writeFile(join(archive,'before-choice-false-positive-recovery.json'),original,{flag:'wx',mode:0o600});
+turn.validationRecovery={at:new Date().toISOString(),reviewer:'Codex',previousState:turn.state,previousError:turn.error,providerResultHash:contentHash(turn.providerResult),reason:'Fixed an overly restrictive question-field check that rejected a valid single-choice question containing a colon. Strict response schema, one-question count, compound/list guards, credentials and source eligibility all pass. No model reply was rewritten or regenerated.',modelCalls:0};
+turn.state='completed';turn.answer=draft.response;turn.memoryProposals=draft.memoryProposals;turn.error=null;session.updatedAt=new Date().toISOString();
+const tmp=file+'.recovery.tmp';await writeFile(tmp,JSON.stringify(session,null,2)+'\n',{mode:0o600});await rename(tmp,file);
+await writeFile(join(work,'local-response-recovery.json'),JSON.stringify(turn.validationRecovery,null,2)+'\n',{mode:0o600});
+console.log(JSON.stringify({recovered:true,turnId:turn.id,modelCalls:0,newCostUsd:0,originalTextUnchanged:true,validationSafeguardsPreserved:true}));

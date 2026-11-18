@@ -1,3 +1,9 @@
+// Exercise the enabled route using mocked dependencies, independent of staging flags.
+vi.mock("../_core/env", async importOriginal => {
+  const actual = await importOriginal<typeof import("../_core/env")>();
+  return { ...actual, ENV: { ...actual.ENV, miraV3Enabled: true } };
+});
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const dbMocks = vi.hoisted(() => ({

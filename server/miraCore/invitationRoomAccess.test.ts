@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const dbMocks = vi.hoisted(() => ({ getDb: vi.fn() }));
 vi.mock("../db", () => ({ getDb: dbMocks.getDb }));
@@ -49,9 +49,14 @@ function fakeDb(...selectResults: unknown[]) {
   return { select };
 }
 
+// Keep fixed invitation fixtures inside their intended access window.
 beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-10-15T12:00:00.000Z"));
   dbMocks.getDb.mockReset();
 });
+
+afterEach(() => vi.useRealTimers());
 
 describe("MIRA client room credential resolution", () => {
   it("still resolves the room for the original raw invitation token (regression)", async () => {

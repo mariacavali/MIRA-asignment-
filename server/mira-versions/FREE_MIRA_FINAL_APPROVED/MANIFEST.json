@@ -1,0 +1,22 @@
+{
+  "version": "FREE_MIRA_FINAL_APPROVED",
+  "captured": "2026-11-06",
+  "policy": "Immutable capture; create a separate revision instead of overwriting.",
+  "files": [
+    {
+      "path": "APPROVED_RULES.json",
+      "sha256": "5fdf7274e6d470492f1787520fb16efe6810d326a73424a2622d41a164ce5346",
+      "bytes": 1726
+    },
+    {
+      "path": "FREE_MIRA_SPEC.md",
+      "sha256": "47f1950b0d50427a1e45c218ecb56a8299149c8b07285c4f9abddfc4ab33eaaa",
+      "bytes": 2825
+    },
+    {
+      "path": "VERSION.md",
+      "sha256": "d26e0c1a0c27074e112afb28523fee3b82a232748d6b75ed513dfa1337e748fc",
+      "bytes": 3371
+    }
+  ]
+}

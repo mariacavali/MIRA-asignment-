@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "workingTitle": "Brand Management",
+  "completeness": "incomplete_verified",
+  "scanning": "supplied_parts_processed_rescans_required",
+  "reportedBy": "Maria",
+  "reportedAt": "2026-10-27",
+  "reportedCoverage": "Maria reports that parts 3 and 4 are the final scans of this same book; all four supplied parts are now collected. Page order/coverage, OCR and content remain unverified.",
+  "filesPresent": [
+    "PDF_1_Final_Ordered_New.pdf",
+    "PDF_2_Final_Ordered.pdf",
+    "PDF_3_Final_Ordered.pdf",
+    "PDF_4_Final_Ordered.pdf"
+  ],
+  "inventoryNote": "filesPresent is a status-time snapshot. scripts/scan-knowledge-inbox.py discovers additional PDF parts without manual JSON edits.",
+  "seedTiming": "Full-text local draft staged. Active publication/Pinecone seed held for source coverage, quality and source-use review.",
+  "authorEditionAndPageCoverage": "Identity verified from cover; printed 14–15 missing; earlier front matter incomplete; printed 112–113 visibly blurred.",
+  "libraryStatus": "3424 passages imported as unpublished local draft 24c45d09-4c9d-47c7-ad35-9a116ec7f229; no active book publication or Pinecone seed.",
+  "usageNote": "Original PDFs unchanged. Preserve all originals/duplicate photos. Exact draft readback passed; positive published-book retrieval is still pending. Do not mark complete from extraction/import success.",
+  "originalIntakeReport": {
+    "completeness": "complete_as_reported",
+    "scanning": "finished_as_reported",
+    "reportedBy": "Maria",
+    "reportedAt": "2026-10-27",
+    "reportedCoverage": "Maria reports that parts 3 and 4 are the final scans of this same book; all four supplied parts are now collected. Page order/coverage, OCR and content remain unverified."
+  },
+  "title": "Strategic Brand Management: Building, Measuring, and Managing Brand Equity",
+  "author": "Kevin Lane Keller",
+  "edition": "Fourth edition",
+  "verification": {
+    "by": "Codex source audit",
+    "checkedAt": "2026-10-30T13:06:50+0100",
+    "coverageReport": "/Volumes/2tb/MIRA-local/books/brand-management/coverage-quality.json",
+    "draftVerification": "/Volumes/2tb/MIRA-local/books/brand-management/rag/verification.json",
+    "confirmedMissingPrintedPages": [
+      14,
+      15
+    ],
+    "rescanPrintedPages": [
+      112,
+      113
+    ],
+    "complete": false
+  }
+}

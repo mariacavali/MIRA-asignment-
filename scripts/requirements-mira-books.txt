@@ -1,0 +1,2 @@
+# Free local document processing, pinned after checking the official PyPI release.
+docling[rapidocr]==2.144.0

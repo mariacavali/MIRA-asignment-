@@ -1,0 +1,15 @@
+import {readFile} from 'node:fs/promises';
+import {join,resolve} from 'node:path';
+import {parse} from 'dotenv';
+import {createKnowledgeLabApp} from '../server/miraKnowledgeLab/app';
+const work='/Users/mariacavali/Desktop/Projects/brands/mira/work/2026-11_mira-comparison-fixes';
+const original='/Users/mariacavali/Desktop/Projects/brands/mira/work/2026-11_cleared-knowledge';
+const root=join(work,'runtime');await readFile(join(root,'registry.json'));
+const env=parse(await readFile(resolve('.env'),'utf8'));
+const lab=createKnowledgeLabApp({root,host:'127.0.0.1:5187',openaiKey:env.OPENAI_API_KEY,publicRoot:join(root,'public')});
+lab.app.get('/source-acknowledgement.txt',(_req,res)=>res.sendFile(join(original,'source-acknowledgement.txt')));
+for(const file of ['fixes-report.html','fixes-report.css','follow-up-proposal.json','local-replay.json','empty-response-diagnosis.json','local-test-results.json'])lab.app.get('/'+file,(_req,res)=>res.sendFile(join(work,file)));
+const server=lab.app.listen(5187,'127.0.0.1',()=>console.log('Fixed MIRA follow-up: http://127.0.0.1:5187 — paid approval disabled, no Pinecone'));
+server.on('error',error=>{console.error(error.message);process.exitCode=1;});
+for(const signal of ['SIGINT','SIGTERM'] as const)process.once(signal,()=>server.close(()=>process.exit(0)));
+void lab.checkLocal();

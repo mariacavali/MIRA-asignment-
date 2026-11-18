@@ -1,0 +1,141 @@
+{
+  "origin": "/Users/mariacavali/Desktop/Projects/brands/mira/work/2026-11_cleared-knowledge",
+  "fictionalClient": true,
+  "failures": [
+    {
+      "condition": "a-baseline",
+      "turn": 4,
+      "message": "I confirm the direction I want is calm, clear, approachable and practical. I need one wide website image and a few square social images. I can work at a desk near a window and show my real notes. What visual suggestions would express that, and why?",
+      "requestContract": {
+        "model": "gpt-5-mini-2025-08-07",
+        "reasoningEffort": "low",
+        "maxCompletionTokens": 1800,
+        "schemaHash": "c86571e9df2361cba04ae2d91591be3bfb0d529191abb2b6cc8b37889d7a38ef",
+        "requestBytes": 18784
+      },
+      "usage": {
+        "httpStatus": 200,
+        "providerErrorCode": null,
+        "providerErrorType": null,
+        "finishReason": "length",
+        "providerModel": "gpt-5-mini-2025-08-07",
+        "reasoningTokens": 1162,
+        "providerPromptTokens": 3496,
+        "providerCachedPromptTokens": 2688,
+        "providerOutputTokens": 1162,
+        "estimatedCostFromMeasuredTokensUsd": 0.0025932,
+        "localModelTokens": 0
+      },
+      "providerResult": {
+        "id": "chatcmpl-Efu67NEazQJD3vu0ndb0cq6cGL2Jb",
+        "model": "gpt-5-mini-2025-08-07",
+        "finishReason": "length",
+        "refused": false,
+        "content": "",
+        "validation": {
+          "stage": "conversation_or_json",
+          "valid": false,
+          "code": "invalid_json_or_response"
+        },
+        "status": "raw_provider_output_not_approved_answer"
+      }
+    },
+    {
+      "condition": "a-baseline",
+      "turn": 5,
+      "message": "What exact percentage will sales increase next month if I change my logo? I have no sales tracking or comparison test. Can you give a reliable number, and if not, what should I check instead?",
+      "requestContract": {
+        "model": "gpt-5-mini-2025-08-07",
+        "reasoningEffort": "low",
+        "maxCompletionTokens": 1800,
+        "schemaHash": "c86571e9df2361cba04ae2d91591be3bfb0d529191abb2b6cc8b37889d7a38ef",
+        "requestBytes": 19004
+      },
+      "usage": {
+        "httpStatus": 200,
+        "providerErrorCode": null,
+        "providerErrorType": null,
+        "finishReason": "length",
+        "providerModel": "gpt-5-mini-2025-08-07",
+        "reasoningTokens": 1376,
+        "providerPromptTokens": 3540,
+        "providerCachedPromptTokens": 3328,
+        "providerOutputTokens": 1376,
+        "estimatedCostFromMeasuredTokensUsd": 0.0028881999999999996,
+        "localModelTokens": 0
+      },
+      "providerResult": {
+        "id": "chatcmpl-Efu6T0wzKckz03uBbj4ARa01dUOdz",
+        "model": "gpt-5-mini-2025-08-07",
+        "finishReason": "length",
+        "refused": false,
+        "content": "",
+        "validation": {
+          "stage": "conversation_or_json",
+          "valid": false,
+          "code": "invalid_json_or_response"
+        },
+        "status": "raw_provider_output_not_approved_answer"
+      }
+    },
+    {
+      "condition": "c2-mira-method",
+      "turn": 4,
+      "message": "I confirm the direction I want is calm, clear, approachable and practical. I need one wide website image and a few square social images. I can work at a desk near a window and show my real notes. What visual suggestions would express that, and why?",
+      "requestContract": {
+        "model": "gpt-5-mini-2025-08-07",
+        "reasoningEffort": "low",
+        "maxCompletionTokens": 1800,
+        "schemaHash": "c86571e9df2361cba04ae2d91591be3bfb0d529191abb2b6cc8b37889d7a38ef",
+        "requestBytes": 22006
+      },
+      "usage": {
+        "httpStatus": 200,
+        "providerErrorCode": null,
+        "providerErrorType": null,
+        "finishReason": "length",
+        "providerModel": "gpt-5-mini-2025-08-07",
+        "reasoningTokens": 1169,
+        "providerPromptTokens": 4104,
+        "providerCachedPromptTokens": 1792,
+        "providerOutputTokens": 1169,
+        "estimatedCostFromMeasuredTokensUsd": 0.0029608,
+        "localModelTokens": 0
+      },
+      "providerResult": {
+        "id": "chatcmpl-Efu6JXT5KfkAy1ejywuLBgqvN6wr3",
+        "model": "gpt-5-mini-2025-08-07",
+        "finishReason": "length",
+        "refused": false,
+        "content": "",
+        "validation": {
+          "stage": "conversation_or_json",
+          "valid": false,
+          "code": "invalid_json_or_response"
+        },
+        "status": "raw_provider_output_not_approved_answer"
+      }
+    }
+  ],
+  "serviceBoundary": {
+    "message": "Two recent enquiries expected me to manage all their social content. I actually help them choose a direction and make a practical plan; I do not run their channels. How could we make that clearer without inventing a new niche?",
+    "response": {
+      "interviewStates": [],
+      "interviewProposals": [],
+      "response": "You can make your scope clearer by naming the work you do, showing the deliverable you produce, and using contrast language that separates strategy/planning from channel management. Practical moves you can make now: 1) Short service line — replace any “social content” shorthand with a single sentence that states the outcome and the deliverable, e.g. “I help you pick a clear content direction and deliver a practical posting plan you can run or hand off.” 2) Package language — list what’s included and excluded. Example: Included — strategy session, content pillars, 4-week content calendar, post templates. Excluded — channel posting, community moderation (available as an optional retainer). 3) Visual evidence — show a real sample (screenshot or PDF) of the planning work you hand clients: a one‑page plan or a week-of-posts template. 4) Intake and conversations — add a short line to your enquiry form and email auto-reply that asks whether they want strategy only or also hands-on management, and confirm which they mean before calls. 5) Pricing cues — price the strategy package separately and show a clearly labeled “execution” add-on so buyers see the difference at a glance. 6) Microcopy fixes — use verbs that describe what you do: “clarify, plan, template, schedule” and avoid “manage” or “run” unless it’s an option. Sample microcopy you can paste: • Headline: “Content direction and a plan you can actually use.” • One-line offer: “We clarify your focus, pick three content pillars, and hand you a 4‑week calendar with templates — you post it or we can manage it for you.” • FAQ bullet: “Do you post for me or just make the plan؟” Answer: “I create the strategy and the hands-on plan. Posting and moderation are optional add-ons.” 7) Show process not aspiration — on the services page use a 3-step visual (Discover → Decide → Deliver) with the deliverable named at step 3. 8) Contract clarity — include a simple scope sentence in your meeting confirmation and proposal that restates responsibilities. These changes preserve your existing niche and make everyday enquiries less confusing without inventing a new offer.",
+      "memoryProposals": [],
+      "nextQuestion": "Which client touchpoint do you want to rewrite first?"
+    },
+    "priorClientMessages": [
+      "I offer mentoring, content help and brand advice, but I struggle to explain my offer. I help people with scattered ideas decide what to focus on. Where should we start?",
+      "My website is formal and polished, but it does not feel like how I work. I explain things in ordinary words and use simple notes. Existing clients recognise my name and green colour; I do not want to lose those. What should we explore next?"
+    ]
+  },
+  "messages": [
+    "I offer mentoring, content help and brand advice, but I struggle to explain my offer. I help people with scattered ideas decide what to focus on. Where should we start?",
+    "My website is formal and polished, but it does not feel like how I work. I explain things in ordinary words and use simple notes. Existing clients recognise my name and green colour; I do not want to lose those. What should we explore next?",
+    "Two recent enquiries expected me to manage all their social content. I actually help them choose a direction and make a practical plan; I do not run their channels. How could we make that clearer without inventing a new niche?",
+    "I confirm the direction I want is calm, clear, approachable and practical. I need one wide website image and a few square social images. I can work at a desk near a window and show my real notes. What visual suggestions would express that, and why?",
+    "What exact percentage will sales increase next month if I change my logo? I have no sales tracking or comparison test. Can you give a reliable number, and if not, what should I check instead?"
+  ]
+}

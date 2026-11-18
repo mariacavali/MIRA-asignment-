@@ -1,0 +1,427 @@
+{
+  "formatVersion": 1,
+  "sources": [
+    {
+      "id": "mira-project-method",
+      "version": 1,
+      "title": "MIRA Brand Discovery Method — Version 1",
+      "author": "MIRA project document maintained for Maria Cavali; named individual author not established in file metadata",
+      "edition": "Dated project document, independently retrieved 2 November 2026",
+      "kind": "editorial",
+      "assetReference": "https://drive.google.com/file/d/128bnr_hst6y_GcTer8UFumBy_fP3KeDX/view",
+      "intendedUse": "Selected project-specific discovery guidance authored in the dated project document. Optional reference; current service policy and user confirmations govern. No private client observations.",
+      "rightsBasis": "original",
+      "rightsEvidence": "Document expressly presents project guidance, retrieved from the MIRA project; created and last modified 2026-10-23T12:24:42.273Z / 2026-10-23T12:24:42.273Z, before this preparation. Text SHA-256 7ea1a7e3c86d44c7021e6e33808dd7fbbdd6fed5bc46cff75c0d313b055e3b8c. Snapshot: evidence/mira-method.json. Scope limited to the selected project-specific instructions verified here; no ownership claim for underlying books or third-party material. Earlier 'original wording' claims are not used as a rights basis."
+    },
+    {
+      "id": "mira-project-questions",
+      "version": 1,
+      "title": "MIRA brand discovery questions",
+      "author": "MIRA project document maintained for Maria Cavali; named individual author not established in file metadata",
+      "edition": "Dated project document, independently retrieved 2 November 2026",
+      "kind": "editorial",
+      "assetReference": "https://docs.google.com/document/d/10uHC6rBsGdHGk6JravFlaT0wRhTGaRLO/edit",
+      "intendedUse": "Selected project-specific discovery guidance authored in the dated project document. Optional reference; current service policy and user confirmations govern. No private client observations.",
+      "rightsBasis": "original",
+      "rightsEvidence": "Document expressly presents project guidance, retrieved from the MIRA project; created and last modified 2026-10-28T16:00:10.662Z / 2026-10-28T16:00:10.662Z, before this preparation. Text SHA-256 750fa8b2810f67e29c806d4c9b36e9eb6a5c53704c49a1ecd75c1d13b6bfb72c. Snapshot: evidence/mira-questions.json. Scope limited to the selected project-specific instructions verified here; no ownership claim for underlying books or third-party material. Earlier 'original wording' claims are not used as a rights basis."
+    },
+    {
+      "id": "gds-interviews",
+      "version": 1,
+      "title": "Using in-depth interviews",
+      "author": "Government Digital Service / GOV.UK Service Manual",
+      "edition": "Published/updated 2017-02-21; verified 2026-11-02",
+      "kind": "article",
+      "assetReference": "https://www.gov.uk/service-manual/user-research/using-in-depth-interviews",
+      "intendedUse": "Short attributed summary of the selected published prose for optional research-method reference in MIRA; commercial application and model processing under the applicable OGL terms. No third-party examples, logos or personal data.",
+      "rightsBasis": "licensed",
+      "rightsEvidence": "Official page footer makes content available under OGL v3.0 except where otherwise stated; selected prose has no identified third-party exception. Licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ Allows copying, adaptation and commercial reuse subject to attribution and exclusions. Contains public sector information licensed under the Open Government Licence v3.0. Source: https://www.gov.uk/service-manual/user-research/using-in-depth-interviews. Checked 2026-11-02; evidence/licence-verification.json. No government endorsement."
+    },
+    {
+      "id": "gds-analysis",
+      "version": 1,
+      "title": "Analyse a research session",
+      "author": "Government Digital Service / GOV.UK Service Manual",
+      "edition": "Published/updated 2016-05-24; verified 2026-11-02",
+      "kind": "article",
+      "assetReference": "https://www.gov.uk/service-manual/user-research/analyse-a-research-session",
+      "intendedUse": "Short attributed summary of the selected published prose for optional research-method reference in MIRA; commercial application and model processing under the applicable OGL terms. No third-party examples, logos or personal data.",
+      "rightsBasis": "licensed",
+      "rightsEvidence": "Official page footer makes content available under OGL v3.0 except where otherwise stated; selected prose has no identified third-party exception. Licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ Allows copying, adaptation and commercial reuse subject to attribution and exclusions. Contains public sector information licensed under the Open Government Licence v3.0. Source: https://www.gov.uk/service-manual/user-research/analyse-a-research-session. Checked 2026-11-02; evidence/licence-verification.json. No government endorsement."
+    },
+    {
+      "id": "gds-user-needs",
+      "version": 1,
+      "title": "Learning about users and their needs",
+      "author": "Government Digital Service / GOV.UK Service Manual",
+      "edition": "Published/updated 2017-03-23; verified 2026-11-02",
+      "kind": "article",
+      "assetReference": "https://www.gov.uk/service-manual/user-research/start-by-learning-user-needs",
+      "intendedUse": "Short attributed summary of the selected published prose for optional research-method reference in MIRA; commercial application and model processing under the applicable OGL terms. No third-party examples, logos or personal data.",
+      "rightsBasis": "licensed",
+      "rightsEvidence": "Official page footer makes content available under OGL v3.0 except where otherwise stated; selected prose has no identified third-party exception. Licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ Allows copying, adaptation and commercial reuse subject to attribution and exclusions. Contains public sector information licensed under the Open Government Licence v3.0. Source: https://www.gov.uk/service-manual/user-research/start-by-learning-user-needs. Checked 2026-11-02; evidence/licence-verification.json. No government endorsement."
+    }
+  ],
+  "items": [
+    {
+      "id": "mira-cleared-evidence",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Separate statements, observed material, inference and confirmation",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "original",
+      "authorName": "Codex editorial preparation for MIRA from the dated project method",
+      "sourceRefs": [
+        {
+          "id": "mira-project-method",
+          "version": 1,
+          "locator": "Core operating principle; Stage 2; Human-centred AI rules"
+        }
+      ],
+      "limitations": [
+        "The four categories are a MIRA project practice, not a validated identity test.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "MIRA’s dated project method records what the person says, what accessible material shows, what MIRA infers and what the person confirms or rejects as separate kinds of information.",
+      "useWhen": [
+        "Interpreting a client’s story or comparing their account with existing materials."
+      ],
+      "requiredClientEvidence": [
+        "The actual statement or accessible artifact and any correction or confirmation."
+      ],
+      "application": [
+        "Attach an interpretation to the statement or material that prompted it; keep it provisional until checked.",
+        "If material is inaccessible, record the gap. Reconsider an interpretation when the person corrects its basis."
+      ]
+    },
+    {
+      "id": "mira-cleared-visuals",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Explain visual choices from confirmed direction",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "original",
+      "authorName": "Codex editorial preparation for MIRA from the dated project method",
+      "sourceRefs": [
+        {
+          "id": "mira-project-method",
+          "version": 1,
+          "locator": "Stage 6 — Visual translation; Quality controls"
+        }
+      ],
+      "limitations": [
+        "No universal colour-to-personality mapping is established. A suggestion does not approve or license a reference image.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "visual_translation",
+      "principle": "MIRA’s project method translates a confirmed direction into proposed light, texture, composition, framing, styling and image subjects, explaining the contribution of each choice.",
+      "useWhen": [
+        "The person has confirmed a direction and asks how to express it visually."
+      ],
+      "requiredClientEvidence": [
+        "Confirmed meaning, intended use, practical constraints and the person’s explanation of references."
+      ],
+      "application": [
+        "Connect each suggestion to the confirmed meaning and use. Present alternatives when a choice remains uncertain.",
+        "Discuss a specific component of a reference, such as framing or light; do not adopt a whole identity."
+      ]
+    },
+    {
+      "id": "mira-cleared-stage",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Match the scope to the actual brand stage",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "original",
+      "authorName": "Codex editorial preparation for MIRA from the dated project method",
+      "sourceRefs": [
+        {
+          "id": "mira-project-method",
+          "version": 1,
+          "locator": "Stage 8 — Brand-depth routing"
+        }
+      ],
+      "limitations": [
+        "A reported mismatch alone does not establish a need for a complete redesign.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "The MIRA project method distinguishes starting, established and evolving brands so the work responds to an evidenced gap and preserves confirmed assets and constraints.",
+      "useWhen": [
+        "A client asks whether an existing identity needs changing."
+      ],
+      "requiredClientEvidence": [
+        "Actual stage, current mismatch, assets the person confirms they want to preserve and constraints."
+      ],
+      "application": [
+        "For established work, focus on the specific communication or visual gap.",
+        "For evolving work, explain what stays, what changes and why. Keep the proposed direction provisional if evidence is insufficient."
+      ]
+    },
+    {
+      "id": "mira-cleared-shots",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Make shot priorities usable for a photographer",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "original",
+      "authorName": "Codex editorial preparation for MIRA from the dated project method",
+      "sourceRefs": [
+        {
+          "id": "mira-project-method",
+          "version": 1,
+          "locator": "Stage 7 — Moodboard and shoot plan; Quality controls"
+        }
+      ],
+      "limitations": [
+        "Planning guidance does not authorise image generation, publication, booking or use of unlicensed references.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "preparation",
+      "principle": "MIRA’s project shoot method gives every priority image a confirmed brand idea and a practical use, then records enough detail for a photographer to execute it.",
+      "useWhen": [
+        "Preparing a brand shoot after direction is confirmed."
+      ],
+      "requiredClientEvidence": [
+        "Purpose, audience, intended formats, available environment and confirmed constraints."
+      ],
+      "application": [
+        "Distinguish priority and optional shots. Specify environment, wardrobe, props, light, framing, image types and exclusions.",
+        "Explain why each priority shot is needed and how it will be used."
+      ]
+    },
+    {
+      "id": "mira-cleared-behaviour",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Define proposed qualities through examples",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "original",
+      "authorName": "Codex editorial preparation for MIRA from the dated project method",
+      "sourceRefs": [
+        {
+          "id": "mira-project-method",
+          "version": 1,
+          "locator": "Stage 1 — Evidence collection; Stage 4 — Brand essence; Human-centred AI rules"
+        }
+      ],
+      "limitations": [
+        "A creative interpretation is not a psychological diagnosis or proof of professional competence.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "The MIRA project method develops a provisional creative interpretation from specific moments, choices and behaviour. A flattering adjective alone is insufficient evidence for a direction.",
+      "useWhen": [
+        "The client or assistant proposes a vague quality for the brand."
+      ],
+      "requiredClientEvidence": [
+        "A concrete example and what the person confirms or corrects about its meaning."
+      ],
+      "application": [
+        "Ask for one relevant situation or decision and explain which part supports the proposed quality.",
+        "Let the person correct the interpretation before treating it as a basis for visuals."
+      ]
+    },
+    {
+      "id": "mira-cleared-opening",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Use an optional opening and follow the answer",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "original",
+      "authorName": "Codex editorial preparation for MIRA from the dated project method",
+      "sourceRefs": [
+        {
+          "id": "mira-project-questions",
+          "version": 1,
+          "locator": "Opening questions 1–5; Gentle follow up questions; Notes for the interviewer"
+        }
+      ],
+      "limitations": [
+        "These are project prompts, not Portigal book coverage or a compulsory sequence.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "The dated MIRA question guide offers optional starting points about the trigger, current mismatch, explanation of the offer, misunderstandings and desired understanding. It asks the interviewer to follow the person’s story rather than read a form.",
+      "useWhen": [
+        "Beginning or restarting discovery."
+      ],
+      "requiredClientEvidence": [
+        "What the person has already said and the uncertainty most relevant now."
+      ],
+      "application": [
+        "Choose one relevant opening; allow room for the answer.",
+        "Follow up on an actual experience or the person’s own wording. Ask one question at a time."
+      ]
+    },
+    {
+      "id": "gds-cleared-interview",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Use neutral prompts about actual experiences",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "source_summary",
+      "authorName": "Codex summary of Government Digital Service guidance; Crown copyright, OGL v3.0",
+      "sourceRefs": [
+        {
+          "id": "gds-interviews",
+          "version": 1,
+          "locator": "Create a discussion guide; During the interview"
+        }
+      ],
+      "limitations": [
+        "This is interview guidance for service research, adapted to MIRA; it does not validate a brand conclusion or represent an audience sample.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "GDS recommends a flexible discussion guide, open neutral questions and concrete stories about what participants have done. Follow the interesting detail in an answer instead of forcing the planned sequence.",
+      "useWhen": [
+        "A discovery reply is broad or hypothetical."
+      ],
+      "requiredClientEvidence": [
+        "The participant’s actual account and the research topic being explored."
+      ],
+      "application": [
+        "MIRA adaptation: invite a specific recent example, listen, then clarify the part that matters.",
+        "MIRA adaptation: test the wording of a prompt before using it repeatedly."
+      ]
+    },
+    {
+      "id": "gds-cleared-analysis",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Keep observations, findings and actions traceable",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "source_summary",
+      "authorName": "Codex summary of Government Digital Service guidance; Crown copyright, OGL v3.0",
+      "sourceRefs": [
+        {
+          "id": "gds-analysis",
+          "version": 1,
+          "locator": "Record observations; Sort observations; Write findings; Decide actions"
+        }
+      ],
+      "limitations": [
+        "A plausible interpretation is not itself an observed fact. This process does not establish causation or a numerical sales forecast.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "GDS separates a record of what researchers saw or heard from the meaning drawn from it and the action proposed afterward. Findings should remain connected to observations.",
+      "useWhen": [
+        "Turning research notes into recommendations."
+      ],
+      "requiredClientEvidence": [
+        "Attributed observations from a research session; exceptions and gaps."
+      ],
+      "application": [
+        "MIRA adaptation: preserve the observed statement separately from the interpretation and next step.",
+        "MIRA adaptation: group related observations, then decide whether the evidence suggests a change or another research question."
+      ]
+    },
+    {
+      "id": "gds-cleared-needs",
+      "version": 1,
+      "kind": "card",
+      "language": "en",
+      "title": "Check needs through evidence before choosing a solution",
+      "segments": [
+        "personal_brand",
+        "small_business"
+      ],
+      "decisionDimensions": [
+        "discovery",
+        "preparation"
+      ],
+      "authorship": "source_summary",
+      "authorName": "Codex summary of Government Digital Service guidance; Crown copyright, OGL v3.0",
+      "sourceRefs": [
+        {
+          "id": "gds-user-needs",
+          "version": 1,
+          "locator": "Start by learning about users; Finding user needs; Writing user needs"
+        }
+      ],
+      "limitations": [
+        "Service-design guidance is a general reference, not evidence that a particular branding intervention will improve sales.",
+        "Optional reference, not instructions or verified client facts. Current service policy and access/approval controls take precedence."
+      ],
+      "category": "discovery",
+      "principle": "GDS advises learning from existing evidence and actual users, treating unsupported opinions as assumptions. Describe the problem or goal before selecting a particular service feature or solution.",
+      "useWhen": [
+        "Someone requests a design change before the underlying problem is understood."
+      ],
+      "requiredClientEvidence": [
+        "Available research, actual user experiences and what is still assumed."
+      ],
+      "application": [
+        "MIRA adaptation: ask what people are trying to do and what currently makes that difficult before recommending a format.",
+        "MIRA adaptation: seek an external perspective when the question concerns audience understanding; the owner’s intention is a starting point."
+      ]
+    }
+  ]
+}
