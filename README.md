@@ -1,5 +1,7 @@
 # MIRA local development
 
+Start with [LOCAL_SETUP.md](LOCAL_SETUP.md) for the verified branch, a provider-free local run, database setup, and secure handover instructions.
+
 MIRA is a TypeScript application with a React/Vite client, Express/tRPC server, shared TypeScript contracts and Drizzle migrations for MySQL-compatible databases. This repository contains several MIRA experiences and isolated research/review tools; the primary app starts with the commands below. Feature flags default off. Local setup does not configure or change production.
 
 ## Requirements
@@ -13,7 +15,7 @@ MIRA is a TypeScript application with a React/Vite client, Express/tRPC server, 
 ## Clone and install
 
 ```sh
-git clone https://github.com/mariacavali/MIRA-asignment-.git
+git clone --branch codex/mira-agent-foundation https://github.com/mariacavali/MIRA-asignment-.git
 cd MIRA-asignment-
 corepack enable
 corepack prepare pnpm@10.4.1 --activate

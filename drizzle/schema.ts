@@ -724,9 +724,7 @@ export const miraV3RenderArtifacts = mysqlTable(
     userId: int("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    reflectionRevisionId: int("reflectionRevisionId")
-      .notNull()
-      .references(() => miraV3ReflectionRevisions.id, { onDelete: "cascade" }),
+    reflectionRevisionId: int("reflectionRevisionId").notNull(),
     deliverable: mysqlEnum("deliverable", ["mirror", "brand_soul", "visual_direction"]).notNull(),
     format: mysqlEnum("format", ["html", "pdf"]).notNull(),
     status: mysqlEnum("status", ["pending", "ready", "failed"]).default("pending").notNull(),
@@ -737,6 +735,7 @@ export const miraV3RenderArtifacts = mysqlTable(
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   },
   table => [
+    foreignKey({ name: "mira_render_artifacts_reflection_revision_fk", columns: [table.reflectionRevisionId], foreignColumns: [miraV3ReflectionRevisions.id] }).onDelete("cascade"),
     index("mira_v3_render_artifacts_journey_idx").on(table.journeyId),
     uniqueIndex("mira_v3_render_artifacts_revision_kind_format_uq").on(
       table.reflectionRevisionId,
